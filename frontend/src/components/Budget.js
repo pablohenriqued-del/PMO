@@ -33,8 +33,11 @@ const Budget = () => {
 
   useEffect(() => {
     filterProjects();
-    calculateBudgetSummary();
   }, [projects, statusFilter, managerFilter]);
+
+  useEffect(() => {
+    calculateBudgetSummary();
+  }, [filteredProjects]);
 
   const fetchProjects = async () => {
     try {
