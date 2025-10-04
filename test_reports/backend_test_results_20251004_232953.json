@@ -1,0 +1,679 @@
+{
+  "timestamp": "20251004_232953",
+  "total_tests": 16,
+  "passed_tests": 15,
+  "success_rate": 93.75,
+  "test_results": [
+    {
+      "test_name": "API Root",
+      "success": true,
+      "details": "",
+      "response_data": {
+        "message": "Sony Music PMO Dashboard API"
+      }
+    },
+    {
+      "test_name": "Dashboard Stats",
+      "success": true,
+      "details": "",
+      "response_data": {
+        "total_projects": 5,
+        "active_projects": 4,
+        "completed_projects": 1,
+        "total_budget": 3900000.0,
+        "budget_spent": 2365000.0,
+        "team_utilization": 100.0,
+        "on_track_projects": 3,
+        "delayed_projects": 0
+      }
+    },
+    {
+      "test_name": "Dashboard Stats - Field Validation",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test_name": "Dashboard Stats - Team Utilization Range",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test_name": "Get All Projects",
+      "success": true,
+      "details": "",
+      "response_data": [
+        {
+          "id": "78a54250-e0df-4775-bb68-525e2a6bdee6",
+          "name": "Airplane - Release Management Platform",
+          "description": "Comprehensive platform for managing music releases and distribution across all channels",
+          "status": "in_progress",
+          "priority": "critical",
+          "type": "platform",
+          "manager": "Pablo Duarte",
+          "budget_allocated": 850000.0,
+          "budget_spent": 420000.0,
+          "start_date": "2024-01-15",
+          "end_date": "2024-12-30",
+          "progress": 65,
+          "milestones": [
+            {
+              "name": "Platform Architecture",
+              "date": "2024-03-01",
+              "completed": true
+            },
+            {
+              "name": "Core Features Development",
+              "date": "2024-06-15",
+              "completed": true
+            },
+            {
+              "name": "Beta Testing",
+              "date": "2024-09-30",
+              "completed": false
+            },
+            {
+              "name": "Production Launch",
+              "date": "2024-12-30",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Dev Team A",
+            "QA Team",
+            "Product Owner"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "Amazon Music",
+            "YouTube Music"
+          ],
+          "created_at": "2025-10-04T23:22:02.051944+00:00",
+          "updated_at": "2025-10-04T23:22:02.051953+00:00"
+        },
+        {
+          "id": "ba6faa77-42b9-4b06-ace7-222c8ef98ed9",
+          "name": "SMERA - Legal Participation Management",
+          "description": "Legal project system for managing special participations and royalty distributions",
+          "status": "in_progress",
+          "priority": "critical",
+          "type": "legal",
+          "manager": "Diana Peluha",
+          "budget_allocated": 650000.0,
+          "budget_spent": 275000.0,
+          "start_date": "2024-02-01",
+          "end_date": "2024-11-15",
+          "progress": 55,
+          "milestones": [
+            {
+              "name": "Legal Framework Setup",
+              "date": "2024-04-01",
+              "completed": true
+            },
+            {
+              "name": "Database Design",
+              "date": "2024-06-01",
+              "completed": true
+            },
+            {
+              "name": "Integration Testing",
+              "date": "2024-09-01",
+              "completed": false
+            },
+            {
+              "name": "Legal Compliance Review",
+              "date": "2024-11-15",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Legal Team",
+            "Backend Dev",
+            "Database Admin"
+          ],
+          "streaming_platforms": [],
+          "created_at": "2025-10-04T23:22:02.051960+00:00",
+          "updated_at": "2025-10-04T23:22:02.051962+00:00"
+        },
+        {
+          "id": "146b0a69-9acb-49b3-b866-d27f9365413a",
+          "name": "SQL AI Agent - Data Intelligence Platform",
+          "description": "AI-powered agent for automated SQL query generation and data analysis",
+          "status": "planning",
+          "priority": "critical",
+          "type": "platform",
+          "manager": "Andre Luiz",
+          "budget_allocated": 450000.0,
+          "budget_spent": 95000.0,
+          "start_date": "2024-03-01",
+          "end_date": "2024-10-30",
+          "progress": 25,
+          "milestones": [
+            {
+              "name": "AI Model Research",
+              "date": "2024-04-15",
+              "completed": true
+            },
+            {
+              "name": "Prototype Development",
+              "date": "2024-07-01",
+              "completed": false
+            },
+            {
+              "name": "Integration & Testing",
+              "date": "2024-09-15",
+              "completed": false
+            },
+            {
+              "name": "Production Deployment",
+              "date": "2024-10-30",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "AI Team",
+            "Data Scientists",
+            "Backend Dev"
+          ],
+          "streaming_platforms": [],
+          "created_at": "2025-10-04T23:22:02.051972+00:00",
+          "updated_at": "2025-10-04T23:22:02.051974+00:00"
+        },
+        {
+          "id": "d017ac73-a352-4636-9610-f1922d8fd922",
+          "name": "Bad Bunny - Nadie Sabe Lo Que Va a Pasar Ma\u00f1ana Campaign",
+          "description": "Digital campaign and streaming optimization for Bad Bunny's latest album release",
+          "status": "completed",
+          "priority": "high",
+          "type": "digital",
+          "manager": "Nicolas Calderon",
+          "budget_allocated": 1200000.0,
+          "budget_spent": 1150000.0,
+          "start_date": "2023-10-01",
+          "end_date": "2024-01-31",
+          "progress": 100,
+          "milestones": [
+            {
+              "name": "Campaign Strategy",
+              "date": "2023-11-01",
+              "completed": true
+            },
+            {
+              "name": "Content Creation",
+              "date": "2023-12-15",
+              "completed": true
+            },
+            {
+              "name": "Platform Rollout",
+              "date": "2024-01-15",
+              "completed": true
+            },
+            {
+              "name": "Performance Analysis",
+              "date": "2024-01-31",
+              "completed": true
+            }
+          ],
+          "team_members": [
+            "Marketing Team",
+            "Content Creators",
+            "Analytics Team"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "YouTube",
+            "Amazon Music"
+          ],
+          "created_at": "2025-10-04T23:22:02.051980+00:00",
+          "updated_at": "2025-10-04T23:22:02.051982+00:00"
+        },
+        {
+          "id": "b3dfe667-ca8a-4f55-9060-06306bb250fb",
+          "name": "Rosal\u00eda - MOTOMAMI+ Streaming Expansion",
+          "description": "Streaming platform expansion and digital content optimization for Rosal\u00eda",
+          "status": "in_progress",
+          "priority": "high",
+          "type": "streaming",
+          "manager": "Pablo Duarte",
+          "budget_allocated": 750000.0,
+          "budget_spent": 425000.0,
+          "start_date": "2024-01-01",
+          "end_date": "2024-08-31",
+          "progress": 70,
+          "milestones": [
+            {
+              "name": "Platform Analysis",
+              "date": "2024-02-15",
+              "completed": true
+            },
+            {
+              "name": "Content Optimization",
+              "date": "2024-05-01",
+              "completed": true
+            },
+            {
+              "name": "Regional Expansion",
+              "date": "2024-07-15",
+              "completed": false
+            },
+            {
+              "name": "Performance Metrics",
+              "date": "2024-08-31",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Digital Team",
+            "Regional Managers",
+            "Data Analysts"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "Deezer",
+            "Tidal"
+          ],
+          "created_at": "2025-10-04T23:22:02.051987+00:00",
+          "updated_at": "2025-10-04T23:22:02.051989+00:00"
+        }
+      ]
+    },
+    {
+      "test_name": "Priority Projects Present",
+      "success": true,
+      "details": "Found: ['Airplane', 'SMERA', 'SQL AI Agent']",
+      "response_data": null
+    },
+    {
+      "test_name": "Project Structure Validation",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test_name": "Projects Filter - Status",
+      "success": true,
+      "details": "",
+      "response_data": [
+        {
+          "id": "78a54250-e0df-4775-bb68-525e2a6bdee6",
+          "name": "Airplane - Release Management Platform",
+          "description": "Comprehensive platform for managing music releases and distribution across all channels",
+          "status": "in_progress",
+          "priority": "critical",
+          "type": "platform",
+          "manager": "Pablo Duarte",
+          "budget_allocated": 850000.0,
+          "budget_spent": 420000.0,
+          "start_date": "2024-01-15",
+          "end_date": "2024-12-30",
+          "progress": 65,
+          "milestones": [
+            {
+              "name": "Platform Architecture",
+              "date": "2024-03-01",
+              "completed": true
+            },
+            {
+              "name": "Core Features Development",
+              "date": "2024-06-15",
+              "completed": true
+            },
+            {
+              "name": "Beta Testing",
+              "date": "2024-09-30",
+              "completed": false
+            },
+            {
+              "name": "Production Launch",
+              "date": "2024-12-30",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Dev Team A",
+            "QA Team",
+            "Product Owner"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "Amazon Music",
+            "YouTube Music"
+          ],
+          "created_at": "2025-10-04T23:22:02.051944+00:00",
+          "updated_at": "2025-10-04T23:22:02.051953+00:00"
+        },
+        {
+          "id": "ba6faa77-42b9-4b06-ace7-222c8ef98ed9",
+          "name": "SMERA - Legal Participation Management",
+          "description": "Legal project system for managing special participations and royalty distributions",
+          "status": "in_progress",
+          "priority": "critical",
+          "type": "legal",
+          "manager": "Diana Peluha",
+          "budget_allocated": 650000.0,
+          "budget_spent": 275000.0,
+          "start_date": "2024-02-01",
+          "end_date": "2024-11-15",
+          "progress": 55,
+          "milestones": [
+            {
+              "name": "Legal Framework Setup",
+              "date": "2024-04-01",
+              "completed": true
+            },
+            {
+              "name": "Database Design",
+              "date": "2024-06-01",
+              "completed": true
+            },
+            {
+              "name": "Integration Testing",
+              "date": "2024-09-01",
+              "completed": false
+            },
+            {
+              "name": "Legal Compliance Review",
+              "date": "2024-11-15",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Legal Team",
+            "Backend Dev",
+            "Database Admin"
+          ],
+          "streaming_platforms": [],
+          "created_at": "2025-10-04T23:22:02.051960+00:00",
+          "updated_at": "2025-10-04T23:22:02.051962+00:00"
+        },
+        {
+          "id": "b3dfe667-ca8a-4f55-9060-06306bb250fb",
+          "name": "Rosal\u00eda - MOTOMAMI+ Streaming Expansion",
+          "description": "Streaming platform expansion and digital content optimization for Rosal\u00eda",
+          "status": "in_progress",
+          "priority": "high",
+          "type": "streaming",
+          "manager": "Pablo Duarte",
+          "budget_allocated": 750000.0,
+          "budget_spent": 425000.0,
+          "start_date": "2024-01-01",
+          "end_date": "2024-08-31",
+          "progress": 70,
+          "milestones": [
+            {
+              "name": "Platform Analysis",
+              "date": "2024-02-15",
+              "completed": true
+            },
+            {
+              "name": "Content Optimization",
+              "date": "2024-05-01",
+              "completed": true
+            },
+            {
+              "name": "Regional Expansion",
+              "date": "2024-07-15",
+              "completed": false
+            },
+            {
+              "name": "Performance Metrics",
+              "date": "2024-08-31",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Digital Team",
+            "Regional Managers",
+            "Data Analysts"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "Deezer",
+            "Tidal"
+          ],
+          "created_at": "2025-10-04T23:22:02.051987+00:00",
+          "updated_at": "2025-10-04T23:22:02.051989+00:00"
+        }
+      ]
+    },
+    {
+      "test_name": "Projects Filter - Manager",
+      "success": true,
+      "details": "",
+      "response_data": [
+        {
+          "id": "78a54250-e0df-4775-bb68-525e2a6bdee6",
+          "name": "Airplane - Release Management Platform",
+          "description": "Comprehensive platform for managing music releases and distribution across all channels",
+          "status": "in_progress",
+          "priority": "critical",
+          "type": "platform",
+          "manager": "Pablo Duarte",
+          "budget_allocated": 850000.0,
+          "budget_spent": 420000.0,
+          "start_date": "2024-01-15",
+          "end_date": "2024-12-30",
+          "progress": 65,
+          "milestones": [
+            {
+              "name": "Platform Architecture",
+              "date": "2024-03-01",
+              "completed": true
+            },
+            {
+              "name": "Core Features Development",
+              "date": "2024-06-15",
+              "completed": true
+            },
+            {
+              "name": "Beta Testing",
+              "date": "2024-09-30",
+              "completed": false
+            },
+            {
+              "name": "Production Launch",
+              "date": "2024-12-30",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Dev Team A",
+            "QA Team",
+            "Product Owner"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "Amazon Music",
+            "YouTube Music"
+          ],
+          "created_at": "2025-10-04T23:22:02.051944+00:00",
+          "updated_at": "2025-10-04T23:22:02.051953+00:00"
+        },
+        {
+          "id": "b3dfe667-ca8a-4f55-9060-06306bb250fb",
+          "name": "Rosal\u00eda - MOTOMAMI+ Streaming Expansion",
+          "description": "Streaming platform expansion and digital content optimization for Rosal\u00eda",
+          "status": "in_progress",
+          "priority": "high",
+          "type": "streaming",
+          "manager": "Pablo Duarte",
+          "budget_allocated": 750000.0,
+          "budget_spent": 425000.0,
+          "start_date": "2024-01-01",
+          "end_date": "2024-08-31",
+          "progress": 70,
+          "milestones": [
+            {
+              "name": "Platform Analysis",
+              "date": "2024-02-15",
+              "completed": true
+            },
+            {
+              "name": "Content Optimization",
+              "date": "2024-05-01",
+              "completed": true
+            },
+            {
+              "name": "Regional Expansion",
+              "date": "2024-07-15",
+              "completed": false
+            },
+            {
+              "name": "Performance Metrics",
+              "date": "2024-08-31",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Digital Team",
+            "Regional Managers",
+            "Data Analysts"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "Deezer",
+            "Tidal"
+          ],
+          "created_at": "2025-10-04T23:22:02.051987+00:00",
+          "updated_at": "2025-10-04T23:22:02.051989+00:00"
+        }
+      ]
+    },
+    {
+      "test_name": "Projects Filter - Search",
+      "success": true,
+      "details": "",
+      "response_data": [
+        {
+          "id": "78a54250-e0df-4775-bb68-525e2a6bdee6",
+          "name": "Airplane - Release Management Platform",
+          "description": "Comprehensive platform for managing music releases and distribution across all channels",
+          "status": "in_progress",
+          "priority": "critical",
+          "type": "platform",
+          "manager": "Pablo Duarte",
+          "budget_allocated": 850000.0,
+          "budget_spent": 420000.0,
+          "start_date": "2024-01-15",
+          "end_date": "2024-12-30",
+          "progress": 65,
+          "milestones": [
+            {
+              "name": "Platform Architecture",
+              "date": "2024-03-01",
+              "completed": true
+            },
+            {
+              "name": "Core Features Development",
+              "date": "2024-06-15",
+              "completed": true
+            },
+            {
+              "name": "Beta Testing",
+              "date": "2024-09-30",
+              "completed": false
+            },
+            {
+              "name": "Production Launch",
+              "date": "2024-12-30",
+              "completed": false
+            }
+          ],
+          "team_members": [
+            "Dev Team A",
+            "QA Team",
+            "Product Owner"
+          ],
+          "streaming_platforms": [
+            "Spotify",
+            "Apple Music",
+            "Amazon Music",
+            "YouTube Music"
+          ],
+          "created_at": "2025-10-04T23:22:02.051944+00:00",
+          "updated_at": "2025-10-04T23:22:02.051953+00:00"
+        }
+      ]
+    },
+    {
+      "test_name": "Get Managers",
+      "success": true,
+      "details": "",
+      "response_data": [
+        "Pablo Duarte",
+        "Diana Peluha",
+        "Andre Luiz",
+        "Nicolas Calderon"
+      ]
+    },
+    {
+      "test_name": "Expected Managers Present",
+      "success": true,
+      "details": "Found: ['Pablo Duarte', 'Diana Peluha', 'Andre Luiz', 'Nicolas Calderon']",
+      "response_data": null
+    },
+    {
+      "test_name": "Get Streaming Platforms",
+      "success": true,
+      "details": "",
+      "response_data": [
+        {
+          "name": "Spotify",
+          "streams": 2500000000,
+          "growth": 12.5
+        },
+        {
+          "name": "Apple Music",
+          "streams": 1800000000,
+          "growth": 8.3
+        },
+        {
+          "name": "YouTube Music",
+          "streams": 1200000000,
+          "growth": 15.2
+        },
+        {
+          "name": "Amazon Music",
+          "streams": 900000000,
+          "growth": 10.1
+        },
+        {
+          "name": "Deezer",
+          "streams": 450000000,
+          "growth": 6.8
+        },
+        {
+          "name": "Tidal",
+          "streams": 200000000,
+          "growth": 4.2
+        }
+      ]
+    },
+    {
+      "test_name": "Expected Streaming Platforms Present",
+      "success": true,
+      "details": "Found: ['Spotify', 'Apple Music', 'YouTube Music', 'Amazon Music']",
+      "response_data": null
+    },
+    {
+      "test_name": "Streaming Platform Structure",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test_name": "Create Project",
+      "success": false,
+      "details": "Expected 201, got 200",
+      "response_data": null
+    }
+  ]
+}
