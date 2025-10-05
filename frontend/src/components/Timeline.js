@@ -23,7 +23,7 @@ const Timeline = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [currentYear, setCurrentYear] = useState(2024);
   const [hiddenProjects, setHiddenProjects] = useState([]);
   const [managers, setManagers] = useState([]);
 
