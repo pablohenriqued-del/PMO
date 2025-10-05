@@ -392,37 +392,42 @@ const Timeline = () => {
                   {/* Timeline Bar */}
                   <div style={{ 
                     position: 'relative',
-                    height: '32px',
+                    height: '36px',
                     background: 'var(--sony-gray-100)',
-                    borderRadius: '16px',
-                    overflow: 'hidden'
+                    borderRadius: '18px',
+                    overflow: 'visible',
+                    border: '1px solid var(--sony-gray-200)'
                   }}>
-                    {!isHidden && (
+                    {!isHidden && position.visible && (
                       <>
                         {/* Project Bar */}
                         <div
                           style={{
                             position: 'absolute',
-                            top: '6px',
-                            height: '20px',
-                            background: `linear-gradient(90deg, ${getStatusColor(project.status)}, ${getStatusColor(project.status)}AA)`,
-                            borderRadius: '10px',
-                            ...position,
-                            minWidth: '20px',
+                            top: '4px',
+                            height: '26px',
+                            background: `linear-gradient(90deg, ${getStatusColor(project.status)}, ${getStatusColor(project.status)}DD)`,
+                            borderRadius: '13px',
+                            left: position.left,
+                            width: position.width,
+                            minWidth: '30px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             color: 'white',
-                            fontSize: '10px',
-                            fontWeight: '600',
-                            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                            cursor: 'pointer'
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            boxShadow: '0 3px 8px rgba(0, 0, 0, 0.15)',
+                            cursor: 'pointer',
+                            border: '2px solid white',
+                            zIndex: 2
                           }}
                           title={`${project.name}\n${formatDate(project.start_date)} - ${formatDate(project.end_date)}\nProgress: ${project.progress}%`}
                         >
                           <span style={{ 
-                            opacity: parseFloat(position.width) > 8 ? 1 : 0,
-                            transition: 'opacity 0.2s ease'
+                            opacity: parseFloat(position.width) > 12 ? 1 : 0,
+                            transition: 'opacity 0.2s ease',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.3)'
                           }}>
                             {project.progress}%
                           </span>
