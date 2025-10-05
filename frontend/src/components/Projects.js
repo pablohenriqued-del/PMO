@@ -457,11 +457,24 @@ const Projects = () => {
       </div>
 
       {/* Project Detail Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent 
-          className="project-detail-modal"
-          data-testid="project-detail-modal"
+      {isModalOpen && (
+        <div 
+          className="modal-overlay"
+          onClick={() => setIsModalOpen(false)}
+          data-testid="modal-overlay"
         >
+          <div 
+            className="project-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+            data-testid="project-detail-modal"
+          >
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="modal-close-btn"
+              data-testid="close-modal-btn"
+            >
+              ✕
+            </button>
           {selectedProject && (
             <>
               <DialogHeader>
