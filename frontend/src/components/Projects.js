@@ -688,8 +688,9 @@ const Projects = () => {
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
+      )}
 
       {/* Empty State */}
       {!loading && filteredProjects.length === 0 && (
