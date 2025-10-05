@@ -94,12 +94,26 @@ const Timeline = () => {
     // Calculate position and width as percentage of year
     const yearStart = new Date(currentYear, 0, 1);
     const yearEnd = new Date(currentYear, 11, 31);
+    const yearDuration = yearEnd - yearStart;
     
-    const startPos = Math.max(0, (startDate - yearStart) / (yearEnd - yearStart) * 100);
-    const endPos = Math.min(100, (endDate - yearStart) / (yearEnd - yearStart) * 100);
-    const width = endPos - startPos;
+    let startPos = Math.max(0, ((startDate - yearStart) / yearDuration) * 100);
+    let endPos = Math.min(100, ((endDate - yearStart) / yearDuration) * 100);
     
-    return { left: `${startPos}%`, width: `${Math.max(width, 2)}%` };
+    // Ensure project is visible if it spans the year
+    if (startDate.getFullYear() < currentYear && endDate.getFullYear() >= currentYear) {
+      startPos = 0;
+    }
+    if (startDate.getFullYear() <= currentYear && endDate.getFullYear() > currentYear) {
+      endPos = 100;
+    }
+    
+    const width = Math.max(endPos - startPos, 1); // Minimum 1% width
+    
+    return { 
+      left: `${startPos}%`, 
+      width: `${width}%`,
+      visible: startDate.getFullYear() <= currentYear && endDate.getFullYear() >= currentYear
+    };
   };
 
   const getStatusColor = (status) => {
