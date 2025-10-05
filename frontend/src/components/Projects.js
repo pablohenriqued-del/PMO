@@ -476,20 +476,15 @@ const Projects = () => {
             </button>
           {selectedProject && (
             <>
-              <DialogHeader>
-                <DialogTitle style={{ 
-                  fontSize: '28px', 
-                  fontWeight: '800',
-                  color: 'var(--sony-gray-900)',
-                  marginBottom: '8px'
-                }}>
+              <div className="modal-header">
+                <h1>
                   {selectedProject.name}
-                </DialogTitle>
+                </h1>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  marginTop: '12px'
+                  marginBottom: '24px'
                 }}>
                   <span className={`status-badge status-${selectedProject.status}`}>
                     {selectedProject.status.replace('_', ' ')}
@@ -507,7 +502,7 @@ const Projects = () => {
                     {selectedProject.type.replace('_', ' ').toUpperCase()}
                   </span>
                 </div>
-              </DialogHeader>
+              </div>
               
               <div style={{ padding: '24px 0' }}>
                 {/* Project Overview */}
