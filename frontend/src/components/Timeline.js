@@ -438,35 +438,65 @@ const Timeline = () => {
                           const milestoneDate = new Date(milestone.date);
                           const yearStart = new Date(currentYear, 0, 1);
                           const yearEnd = new Date(currentYear, 11, 31);
-                          const milestonePos = (milestoneDate - yearStart) / (yearEnd - yearStart) * 100;
+                          const yearDuration = yearEnd - yearStart;
+                          const milestonePos = ((milestoneDate - yearStart) / yearDuration) * 100;
                           
-                          if (milestonePos >= 0 && milestonePos <= 100) {
+                          if (milestonePos >= -2 && milestonePos <= 102) {
                             return (
                               <div
                                 key={milestoneIndex}
                                 style={{
                                   position: 'absolute',
-                                  left: `${milestonePos}%`,
-                                  top: '0',
-                                  width: '2px',
-                                  height: '32px',
+                                  left: `${Math.max(0, Math.min(100, milestonePos))}%`,
+                                  top: '-2px',
+                                  width: '3px',
+                                  height: '40px',
                                   background: milestone.completed ? '#10B981' : '#F59E0B',
-                                  zIndex: 10,
-                                  cursor: 'pointer'
+                                  zIndex: 15,
+                                  cursor: 'pointer',
+                                  borderRadius: '2px',
+                                  transform: 'translateX(-50%)'
                                 }}
-                                title={`${milestone.name}\n${formatDate(milestone.date)}\n${milestone.completed ? 'Completed' : 'Pending'}`}
+                                title={`${milestone.name}\n${formatDate(milestone.date)}\n${milestone.completed ? '✅ Completed' : '⏳ Pending'}`}
                               >
                                 <div style={{
                                   position: 'absolute',
-                                  top: '-4px',
-                                  left: '-3px',
-                                  width: '8px',
-                                  height: '8px',
+                                  top: '-6px',
+                                  left: '-6px',
+                                  width: '15px',
+                                  height: '15px',
                                   borderRadius: '50%',
                                   background: milestone.completed ? '#10B981' : '#F59E0B',
-                                  border: '2px solid white',
-                                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
-                                }}></div>
+                                  border: '3px solid white',
+                                  boxShadow: '0 3px 6px rgba(0, 0, 0, 0.2)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '8px',
+                                  color: 'white',
+                                  fontWeight: '700'
+                                }}>
+                                  {milestone.completed ? '✓' : '•'}
+                                </div>
+                                <div style={{
+                                  position: 'absolute',
+                                  bottom: '-6px',
+                                  left: '-6px',
+                                  width: '15px',
+                                  height: '15px',
+                                  borderRadius: '50%',
+                                  background: milestone.completed ? '#10B981' : '#F59E0B',
+                                  border: '3px solid white',
+                                  boxShadow: '0 3px 6px rgba(0, 0, 0, 0.2)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  fontSize: '8px',
+                                  color: 'white',
+                                  fontWeight: '700'
+                                }}>
+                                  {milestone.completed ? '✓' : '•'}
+                                </div>
                               </div>
                             );
                           }
