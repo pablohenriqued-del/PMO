@@ -444,6 +444,36 @@ html, body {
   }
 }
 
+/* Project Detail Modal */
+.project-detail-modal {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  max-width: 900px !important;
+  width: 90vw !important;
+  max-height: 85vh !important;
+  overflow-y: auto !important;
+  background: var(--sony-white) !important;
+  border: 1px solid var(--sony-gray-200) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+  z-index: 1000 !important;
+  padding: 32px !important;
+}
+
+.project-detail-modal .sr-only {
+  display: none;
+}
+
+/* Dialog Overlay */
+[data-radix-dialog-overlay] {
+  background: rgba(0, 0, 0, 0.6) !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999 !important;
+}
+
 /* Utility Classes */
 .text-center {
   text-align: center;
