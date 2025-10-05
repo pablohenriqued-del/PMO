@@ -357,6 +357,13 @@ async def get_streaming_platforms():
         {"name": "Tidal", "streams": 200000000, "growth": 4.2}
     ]
 
+@api_router.post("/reset-data")
+async def reset_data():
+    """Reset and reinitialize mock data"""
+    await db.projects.delete_many({})
+    await initialize_mock_data()
+    return {"message": "Data reset successfully"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
