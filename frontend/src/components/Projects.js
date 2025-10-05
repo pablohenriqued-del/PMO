@@ -458,15 +458,10 @@ const Projects = () => {
 
       {/* Project Detail Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent style={{ 
-          maxWidth: '900px', 
-          maxHeight: '85vh', 
-          overflow: 'auto',
-          background: 'var(--sony-white)',
-          border: '1px solid var(--sony-gray-200)',
-          borderRadius: '16px',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
-        }} data-testid="project-detail-modal">
+        <DialogContent 
+          className="project-detail-modal"
+          data-testid="project-detail-modal"
+        >
           {selectedProject && (
             <>
               <DialogHeader>
