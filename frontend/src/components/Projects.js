@@ -458,13 +458,48 @@ const Projects = () => {
 
       {/* Project Detail Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent style={{ maxWidth: '800px', maxHeight: '80vh', overflow: 'auto' }}>
+        <DialogContent style={{ 
+          maxWidth: '900px', 
+          maxHeight: '85vh', 
+          overflow: 'auto',
+          background: 'var(--sony-white)',
+          border: '1px solid var(--sony-gray-200)',
+          borderRadius: '16px',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)'
+        }} data-testid="project-detail-modal">
           {selectedProject && (
             <>
               <DialogHeader>
-                <DialogTitle style={{ fontSize: '24px', fontWeight: '700' }}>
+                <DialogTitle style={{ 
+                  fontSize: '28px', 
+                  fontWeight: '800',
+                  color: 'var(--sony-gray-900)',
+                  marginBottom: '8px'
+                }}>
                   {selectedProject.name}
                 </DialogTitle>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  marginTop: '12px'
+                }}>
+                  <span className={`status-badge status-${selectedProject.status}`}>
+                    {selectedProject.status.replace('_', ' ')}
+                  </span>
+                  <span className={`priority-badge priority-${selectedProject.priority}`}>
+                    {selectedProject.priority}
+                  </span>
+                  <span style={{ 
+                    fontSize: '14px',
+                    color: 'var(--sony-gray-600)',
+                    background: 'var(--sony-gray-100)',
+                    padding: '4px 12px',
+                    borderRadius: '20px'
+                  }}>
+                    {selectedProject.type.replace('_', ' ').toUpperCase()}
+                  </span>
+                </div>
               </DialogHeader>
               
               <div style={{ padding: '24px 0' }}>
