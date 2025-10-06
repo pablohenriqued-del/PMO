@@ -464,6 +464,144 @@ const LessonsLearned = () => {
         </div>
       )}
 
+      {/* Create Lesson Modal */}
+      {isCreateModalOpen && (
+        <div 
+          className="modal-overlay"
+          onClick={() => setIsCreateModalOpen(false)}
+        >
+          <div 
+            className="project-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsCreateModalOpen(false)}
+              className="modal-close-btn"
+            >
+              ✕
+            </button>
+            
+            <div className="modal-header">
+              <h1>Add New Lesson Learned</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Capture valuable insights from project experiences
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateLesson} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="lesson-project">Project Name *</Label>
+                  <Input
+                    id="lesson-project"
+                    value={newLesson.project}
+                    onChange={(e) => setNewLesson(prev => ({...prev, project: e.target.value}))}
+                    placeholder="Enter project name"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lesson-category">Category *</Label>
+                  <Select 
+                    value={newLesson.category} 
+                    onValueChange={(value) => setNewLesson(prev => ({...prev, category: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Technical">Technical</SelectItem>
+                      <SelectItem value="Marketing">Marketing</SelectItem>
+                      <SelectItem value="Process">Process</SelectItem>
+                      <SelectItem value="Legal">Legal</SelectItem>
+                      <SelectItem value="Management">Management</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="lesson-title">Lesson Title *</Label>
+                <Input
+                  id="lesson-title"
+                  value={newLesson.lesson}
+                  onChange={(e) => setNewLesson(prev => ({...prev, lesson: e.target.value}))}
+                  placeholder="Brief, actionable lesson learned"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="lesson-description">Description *</Label>
+                <Textarea
+                  id="lesson-description"
+                  value={newLesson.description}
+                  onChange={(e) => setNewLesson(prev => ({...prev, description: e.target.value}))}
+                  placeholder="Detailed description of the lesson, context, and recommendations"
+                  rows={4}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="lesson-impact">Impact Level</Label>
+                  <Select 
+                    value={newLesson.impact} 
+                    onValueChange={(value) => setNewLesson(prev => ({...prev, impact: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Low">Low</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Critical">Critical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="lesson-tags">Tags</Label>
+                  <Input
+                    id="lesson-tags"
+                    value={newLesson.tags}
+                    onChange={(e) => setNewLesson(prev => ({...prev, tags: e.target.value}))}
+                    placeholder="streaming, api, performance (comma separated)"
+                  />
+                </div>
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                gap: '12px',
+                paddingTop: '20px',
+                borderTop: '1px solid var(--sony-gray-200)'
+              }}>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  style={{ 
+                    background: 'var(--sony-red)',
+                    color: 'white',
+                    border: 'none'
+                  }}
+                >
+                  Add Lesson
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .lesson-card:hover {
           transform: translateY(-2px);
