@@ -464,6 +464,7 @@ ${playbookData?.templates?.map(t => `• ${t.name} (${t.type})`).join('\n') || '
                         cursor: 'pointer'
                       }}
                       className="template-card"
+                      onClick={() => handleDownloadTemplate(template)}
                       data-testid={`template-${index}`}
                     >
                       <div style={{
