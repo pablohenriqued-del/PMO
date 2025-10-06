@@ -147,6 +147,51 @@ const Projects = () => {
     setIsModalOpen(true);
   };
 
+  const handleCreateProject = async (e) => {
+    e.preventDefault();
+    try {
+      const projectData = {
+        ...newProject,
+        budget_allocated: parseFloat(newProject.budget_allocated) || 0,
+        team_members: newProject.team_members.split(',').map(member => member.trim()).filter(Boolean),
+        streaming_platforms: newProject.streaming_platforms.split(',').map(platform => platform.trim()).filter(Boolean)
+      };
+
+      const response = await axios.post(`${API}/projects`, projectData);
+      
+      // Refresh projects list
+      await fetchProjects();
+      
+      // Reset form
+      setNewProject({
+        name: '',
+        description: '',
+        status: 'planning',
+        priority: 'medium',
+        type: 'digital',
+        manager: '',
+        budget_allocated: '',
+        start_date: '',
+        end_date: '',
+        team_members: '',
+        streaming_platforms: ''
+      });
+      
+      setIsCreateModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Project created successfully!",
+      });
+    } catch (error) {
+      console.error('Error creating project:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create project. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div data-testid="projects-loading">
