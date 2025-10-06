@@ -24,6 +24,16 @@ const RootCauseAnalysis = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCase, setSelectedCase] = useState(null);
+  const [isCreateRCAModalOpen, setIsCreateRCAModalOpen] = useState(false);
+  const [newRCA, setNewRCA] = useState({
+    incident: '',
+    severity: 'Medium',
+    impact: '',
+    root_causes: [''],
+    five_whys: ['', '', '', '', ''],
+    actions: [{ action: '', owner: '', status: 'Planned' }],
+    lessons: ''
+  });
 
   useEffect(() => {
     fetchRcaCases();
