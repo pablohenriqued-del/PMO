@@ -88,10 +88,7 @@ const LessonsLearned = () => {
       });
       
       setIsCreateModalOpen(false);
-      toast({
-        title: "Success",
-        description: "Lesson learned added successfully!",
-      });
+      alert("Lesson learned added successfully!");
     } catch (error) {
       console.error('Error creating lesson:', error);
       toast({
