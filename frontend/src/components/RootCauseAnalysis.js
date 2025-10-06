@@ -132,7 +132,7 @@ const RootCauseAnalysis = () => {
               color: 'white',
               border: 'none'
             }}
-            onClick={() => alert('RCA creation form would open here - Contact PMO team to create new Root Cause Analysis')}
+            onClick={() => setIsCreateRCAModalOpen(true)}
             data-testid="create-rca-btn"
           >
             <Plus size={16} style={{ marginRight: '8px' }} />
