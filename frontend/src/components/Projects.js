@@ -749,6 +749,217 @@ const Projects = () => {
         </div>
       )}
 
+      {/* Create Project Modal */}
+      {isCreateModalOpen && (
+        <div 
+          className="modal-overlay"
+          onClick={() => setIsCreateModalOpen(false)}
+          data-testid="create-modal-overlay"
+        >
+          <div 
+            className="project-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+            data-testid="create-project-modal"
+          >
+            <button
+              onClick={() => setIsCreateModalOpen(false)}
+              className="modal-close-btn"
+              data-testid="close-create-modal-btn"
+            >
+              ✕
+            </button>
+            
+            <div className="modal-header">
+              <h1>Create New Project</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Add a new project to the Sony Music portfolio
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateProject} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-name">Project Name *</Label>
+                  <Input
+                    id="project-name"
+                    value={newProject.name}
+                    onChange={(e) => setNewProject(prev => ({...prev, name: e.target.value}))}
+                    placeholder="Enter project name"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-manager">Project Manager *</Label>
+                  <Select 
+                    value={newProject.manager} 
+                    onValueChange={(value) => setNewProject(prev => ({...prev, manager: value}))}
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select manager" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {managers.map(manager => (
+                        <SelectItem key={manager} value={manager}>{manager}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="project-description">Description</Label>
+                <Textarea
+                  id="project-description"
+                  value={newProject.description}
+                  onChange={(e) => setNewProject(prev => ({...prev, description: e.target.value}))}
+                  placeholder="Describe the project objectives and scope"
+                  rows={3}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-status">Status</Label>
+                  <Select 
+                    value={newProject.status} 
+                    onValueChange={(value) => setNewProject(prev => ({...prev, status: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="planning">Planning</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="on_hold">On Hold</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="project-priority">Priority</Label>
+                  <Select 
+                    value={newProject.priority} 
+                    onValueChange={(value) => setNewProject(prev => ({...prev, priority: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="critical">Critical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="project-type">Type</Label>
+                  <Select 
+                    value={newProject.type} 
+                    onValueChange={(value) => setNewProject(prev => ({...prev, type: value}))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="digital">Digital</SelectItem>
+                      <SelectItem value="streaming">Streaming</SelectItem>
+                      <SelectItem value="platform">Platform</SelectItem>
+                      <SelectItem value="legal">Legal</SelectItem>
+                      <SelectItem value="release">Release</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-budget">Budget (USD) *</Label>
+                  <Input
+                    id="project-budget"
+                    type="number"
+                    value={newProject.budget_allocated}
+                    onChange={(e) => setNewProject(prev => ({...prev, budget_allocated: e.target.value}))}
+                    placeholder="0"
+                    min="0"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-start">Start Date *</Label>
+                  <Input
+                    id="project-start"
+                    type="date"
+                    value={newProject.start_date}
+                    onChange={(e) => setNewProject(prev => ({...prev, start_date: e.target.value}))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-end">End Date *</Label>
+                  <Input
+                    id="project-end"
+                    type="date"
+                    value={newProject.end_date}
+                    onChange={(e) => setNewProject(prev => ({...prev, end_date: e.target.value}))}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-team">Team Members</Label>
+                  <Input
+                    id="project-team"
+                    value={newProject.team_members}
+                    onChange={(e) => setNewProject(prev => ({...prev, team_members: e.target.value}))}
+                    placeholder="Developer, Designer, QA (comma separated)"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-platforms">Streaming Platforms</Label>
+                  <Input
+                    id="project-platforms"
+                    value={newProject.streaming_platforms}
+                    onChange={(e) => setNewProject(prev => ({...prev, streaming_platforms: e.target.value}))}
+                    placeholder="Spotify, Apple Music (comma separated)"
+                  />
+                </div>
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                gap: '12px',
+                paddingTop: '20px',
+                borderTop: '1px solid var(--sony-gray-200)'
+              }}>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  style={{ 
+                    background: 'var(--sony-red)',
+                    color: 'white',
+                    border: 'none'
+                  }}
+                >
+                  Create Project
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Empty State */}
       {!loading && filteredProjects.length === 0 && (
         <div style={{ 
