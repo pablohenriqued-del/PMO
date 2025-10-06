@@ -29,6 +29,15 @@ const LessonsLearned = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [impactFilter, setImpactFilter] = useState("all");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newLesson, setNewLesson] = useState({
+    project: '',
+    category: 'Technical',
+    lesson: '',
+    impact: 'Medium',
+    description: '',
+    tags: ''
+  });
 
   useEffect(() => {
     fetchLessons();
