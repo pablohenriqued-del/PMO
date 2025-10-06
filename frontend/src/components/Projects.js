@@ -818,56 +818,65 @@ const Projects = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
                 <div>
                   <Label htmlFor="project-status">Status</Label>
-                  <Select 
+                  <select 
+                    id="project-status"
                     value={newProject.status} 
-                    onValueChange={(value) => setNewProject(prev => ({...prev, status: value}))}
+                    onChange={(e) => setNewProject(prev => ({...prev, status: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="planning">Planning</SelectItem>
-                      <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="on_hold">On Hold</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="planning">Planning</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="on_hold">On Hold</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="project-priority">Priority</Label>
-                  <Select 
+                  <select 
+                    id="project-priority"
                     value={newProject.priority} 
-                    onValueChange={(value) => setNewProject(prev => ({...prev, priority: value}))}
+                    onChange={(e) => setNewProject(prev => ({...prev, priority: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="critical">Critical</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="project-type">Type</Label>
-                  <Select 
+                  <select 
+                    id="project-type"
                     value={newProject.type} 
-                    onValueChange={(value) => setNewProject(prev => ({...prev, type: value}))}
+                    onChange={(e) => setNewProject(prev => ({...prev, type: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="digital">Digital</SelectItem>
-                      <SelectItem value="streaming">Streaming</SelectItem>
-                      <SelectItem value="platform">Platform</SelectItem>
-                      <SelectItem value="legal">Legal</SelectItem>
-                      <SelectItem value="release">Release</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="digital">Digital</option>
+                    <option value="streaming">Streaming</option>
+                    <option value="platform">Platform</option>
+                    <option value="legal">Legal</option>
+                    <option value="release">Release</option>
+                  </select>
                 </div>
               </div>
 
