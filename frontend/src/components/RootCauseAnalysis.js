@@ -527,6 +527,86 @@ const RootCauseAnalysis = () => {
         </div>
       )}
 
+      {/* Create RCA Modal */}
+      {isCreateRCAModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsCreateRCAModalOpen(false)}>
+          <div className="project-detail-modal" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setIsCreateRCAModalOpen(false)} className="modal-close-btn">✕</button>
+            
+            <div className="modal-header">
+              <h1>Create Root Cause Analysis</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Systematic analysis of incidents and failures
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateRCA} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="rca-incident">Incident Title *</Label>
+                  <Input id="rca-incident" value={newRCA.incident} onChange={(e) => setNewRCA(prev => ({...prev, incident: e.target.value}))} placeholder="Brief incident description" required />
+                </div>
+                <div>
+                  <Label htmlFor="rca-severity">Severity *</Label>
+                  <select id="rca-severity" value={newRCA.severity} onChange={(e) => setNewRCA(prev => ({...prev, severity: e.target.value}))} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--sony-gray-300)', borderRadius: '6px', fontSize: '14px' }} required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="rca-impact">Impact Description *</Label>
+                <Textarea id="rca-impact" value={newRCA.impact} onChange={(e) => setNewRCA(prev => ({...prev, impact: e.target.value}))} placeholder="Describe the business impact and consequences" rows={2} required />
+              </div>
+
+              <div>
+                <Label>Root Causes *</Label>
+                {newRCA.root_causes.map((cause, index) => (
+                  <Input key={index} value={cause} onChange={(e) => updateRootCause(index, e.target.value)} placeholder={`Root cause ${index + 1}`} style={{ marginBottom: '8px' }} />
+                ))}
+                <Button type="button" variant="outline" onClick={addRootCause} style={{ marginTop: '8px' }}>+ Add Root Cause</Button>
+              </div>
+
+              <div>
+                <Label>Five Whys Analysis</Label>
+                {newRCA.five_whys.map((why, index) => (
+                  <Input key={index} value={why} onChange={(e) => updateFiveWhy(index, e.target.value)} placeholder={`Why ${index + 1}?`} style={{ marginBottom: '8px' }} />
+                ))}
+              </div>
+
+              <div>
+                <Label>Corrective Actions</Label>
+                {newRCA.actions.map((action, index) => (
+                  <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                    <Input value={action.action} onChange={(e) => updateAction(index, 'action', e.target.value)} placeholder="Action description" />
+                    <Input value={action.owner} onChange={(e) => updateAction(index, 'owner', e.target.value)} placeholder="Owner" />
+                    <select value={action.status} onChange={(e) => updateAction(index, 'status', e.target.value)} style={{ padding: '8px', border: '1px solid var(--sony-gray-300)', borderRadius: '6px' }}>
+                      <option value="Planned">Planned</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Complete">Complete</option>
+                    </select>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" onClick={addAction}>+ Add Action</Button>
+              </div>
+
+              <div>
+                <Label htmlFor="rca-lessons">Key Lessons Learned</Label>
+                <Textarea id="rca-lessons" value={newRCA.lessons} onChange={(e) => setNewRCA(prev => ({...prev, lessons: e.target.value}))} placeholder="Summarize key insights and preventive measures" rows={3} />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid var(--sony-gray-200)' }}>
+                <Button type="button" variant="outline" onClick={() => setIsCreateRCAModalOpen(false)}>Cancel</Button>
+                <Button type="submit" style={{ background: 'var(--sony-red)', color: 'white', border: 'none' }}>Create RCA</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .rca-case-card:hover {
           transform: translateY(-2px);
