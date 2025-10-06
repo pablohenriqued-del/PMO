@@ -117,8 +117,8 @@ async def initialize_mock_data():
                 "priority": "critical", 
                 "type": "platform",
                 "manager": "Pablo Duarte",
-                "budget_allocated": 850000.0,
-                "budget_spent": 420000.0,
+                "budget_allocated": 420000.0,
+                "budget_spent": 275000.0,
                 "start_date": "2024-01-15",
                 "end_date": "2024-12-30",
                 "progress": 65,
@@ -129,7 +129,7 @@ async def initialize_mock_data():
                     {"name": "Production Launch", "date": "2024-12-30", "completed": False}
                 ],
                 "team_members": ["Dev Team A", "QA Team", "Product Owner"],
-                "streaming_platforms": ["Spotify", "Apple Music", "Amazon Music", "YouTube Music"],
+                "streaming_platforms": [],
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "updated_at": datetime.now(timezone.utc).isoformat()
             },
