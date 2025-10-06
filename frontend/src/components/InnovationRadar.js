@@ -26,6 +26,16 @@ const InnovationRadar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [quadrantFilter, setQuadrantFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [isCreateTechModalOpen, setIsCreateTechModalOpen] = useState(false);
+  const [newTechnology, setNewTechnology] = useState({
+    name: '',
+    category: 'AI/ML',
+    quadrant: 'Assess',
+    description: '',
+    impact: 'Medium',
+    timeline: '6-12 months',
+    risk: 'Medium'
+  });
 
   useEffect(() => {
     fetchRadarData();
