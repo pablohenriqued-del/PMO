@@ -144,6 +144,7 @@ const LessonsLearned = () => {
               color: 'white',
               border: 'none'
             }}
+            onClick={() => setIsCreateModalOpen(true)}
             data-testid="add-lesson-btn"
           >
             <Plus size={16} style={{ marginRight: '8px' }} />
