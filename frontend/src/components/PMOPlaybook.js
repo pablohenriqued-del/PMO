@@ -38,6 +38,52 @@ const PMOPlaybook = () => {
     }
   };
 
+  const handleDownloadPlaybook = () => {
+    const playbookContent = generatePlaybookPDF();
+    const blob = new Blob([playbookContent], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Sony_Music_PMO_Playbook_${new Date().toISOString().split('T')[0]}.txt`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const generatePlaybookPDF = () => {
+    return `
+SONY MUSIC LATIN IBÉRIA PMO PLAYBOOK
+====================================
+
+Generated: ${new Date().toLocaleDateString()}
+
+FRAMEWORKS:
+-----------
+${playbookData?.frameworks.map(fw => `
+${fw.name}
+${fw.description}
+
+Phases: ${fw.phases?.join(' → ') || 'N/A'}
+Ceremonies: ${fw.ceremonies?.join(', ') || 'N/A'}
+`).join('\n') || 'No frameworks available'}
+
+GOVERNANCE PRINCIPLES:
+---------------------
+${playbookData?.governance.principles?.map(p => `• ${p}`).join('\n') || 'No principles available'}
+
+GOVERNANCE PROCESSES:
+--------------------
+${playbookData?.governance.processes?.map(p => `• ${p}`).join('\n') || 'No processes available'}
+
+TEMPLATES:
+----------
+${playbookData?.templates?.map(t => `• ${t.name} (${t.type})`).join('\n') || 'No templates available'}
+
+© Sony Music Entertainment
+    `;
+  };
+
   if (loading) {
     return (
       <div data-testid="pmo-playbook-loading">
