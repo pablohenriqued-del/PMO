@@ -91,11 +91,7 @@ const LessonsLearned = () => {
       alert("Lesson learned added successfully!");
     } catch (error) {
       console.error('Error creating lesson:', error);
-      toast({
-        title: "Error", 
-        description: "Failed to add lesson. Please try again.",
-        variant: "destructive",
-      });
+      alert("Error: Failed to add lesson. Please try again.");
     }
   };
 
