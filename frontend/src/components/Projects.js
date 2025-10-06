@@ -178,10 +178,7 @@ const Projects = () => {
       });
       
       setIsCreateModalOpen(false);
-      toast({
-        title: "Success",
-        description: "Project created successfully!",
-      });
+      alert("Project created successfully!");
     } catch (error) {
       console.error('Error creating project:', error);
       toast({
