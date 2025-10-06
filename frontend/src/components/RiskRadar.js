@@ -26,6 +26,16 @@ const RiskRadar = () => {
   const [severityFilter, setSeverityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [isCreateRiskModalOpen, setIsCreateRiskModalOpen] = useState(false);
+  const [newRisk, setNewRisk] = useState({
+    project: '',
+    risk: '',
+    probability: 'Medium',
+    impact: 'Medium',
+    category: 'Technical',
+    mitigation: '',
+    owner: ''
+  });
 
   useEffect(() => {
     fetchRisks();
