@@ -90,10 +90,7 @@ const Budget = () => {
     link.click();
     document.body.removeChild(link);
     
-    toast({
-      title: "Success",
-      description: "Budget report exported successfully!",
-    });
+    alert("Budget report exported successfully!");
   };
 
   const generateBudgetCSV = () => {
