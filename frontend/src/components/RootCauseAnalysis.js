@@ -106,6 +106,73 @@ const RootCauseAnalysis = () => {
     });
   };
 
+  const handleCreateRCA = async (e) => {
+    e.preventDefault();
+    try {
+      const rcaData = {
+        ...newRCA,
+        date: new Date().toISOString().split('T')[0],
+        id: `rca-${Date.now()}`,
+        root_causes: newRCA.root_causes.filter(cause => cause.trim() !== ''),
+        five_whys: newRCA.five_whys.filter(why => why.trim() !== ''),
+        actions: newRCA.actions.filter(action => action.action.trim() !== '')
+      };
+      
+      setRcaCases(prev => [...prev, rcaData]);
+      
+      // Reset form
+      setNewRCA({
+        incident: '',
+        severity: 'Medium',
+        impact: '',
+        root_causes: [''],
+        five_whys: ['', '', '', '', ''],
+        actions: [{ action: '', owner: '', status: 'Planned' }],
+        lessons: ''
+      });
+      
+      setIsCreateRCAModalOpen(false);
+      alert("RCA case created successfully!");
+    } catch (error) {
+      console.error('Error creating RCA:', error);
+      alert("Error: Failed to create RCA. Please try again.");
+    }
+  };
+
+  const addRootCause = () => {
+    setNewRCA(prev => ({...prev, root_causes: [...prev.root_causes, '']}));
+  };
+
+  const updateRootCause = (index, value) => {
+    setNewRCA(prev => ({
+      ...prev,
+      root_causes: prev.root_causes.map((cause, i) => i === index ? value : cause)
+    }));
+  };
+
+  const updateFiveWhy = (index, value) => {
+    setNewRCA(prev => ({
+      ...prev,
+      five_whys: prev.five_whys.map((why, i) => i === index ? value : why)
+    }));
+  };
+
+  const addAction = () => {
+    setNewRCA(prev => ({
+      ...prev, 
+      actions: [...prev.actions, { action: '', owner: '', status: 'Planned' }]
+    }));
+  };
+
+  const updateAction = (index, field, value) => {
+    setNewRCA(prev => ({
+      ...prev,
+      actions: prev.actions.map((action, i) => 
+        i === index ? {...action, [field]: value} : action
+      )
+    }));
+  };
+
   if (loading) {
     return (
       <div data-testid="rca-loading">
