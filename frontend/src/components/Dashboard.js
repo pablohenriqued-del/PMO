@@ -44,10 +44,10 @@ const Dashboard = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('es-ES', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'EUR',
-      minimation: 0
+      currency: 'USD',
+      minimumFractionDigits: 0
     }).format(amount);
   };
 
