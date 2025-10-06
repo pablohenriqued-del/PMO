@@ -495,21 +495,25 @@ const LessonsLearned = () => {
                 </div>
                 <div>
                   <Label htmlFor="lesson-category">Category *</Label>
-                  <Select 
+                  <select 
+                    id="lesson-category"
                     value={newLesson.category} 
-                    onValueChange={(value) => setNewLesson(prev => ({...prev, category: value}))}
+                    onChange={(e) => setNewLesson(prev => ({...prev, category: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Technical">Technical</SelectItem>
-                      <SelectItem value="Marketing">Marketing</SelectItem>
-                      <SelectItem value="Process">Process</SelectItem>
-                      <SelectItem value="Legal">Legal</SelectItem>
-                      <SelectItem value="Management">Management</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="Technical">Technical</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Process">Process</option>
+                    <option value="Legal">Legal</option>
+                    <option value="Management">Management</option>
+                  </select>
                 </div>
               </div>
 
