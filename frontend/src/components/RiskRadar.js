@@ -138,6 +138,43 @@ const RiskRadar = () => {
     return getProbabilityWeight(probability) * getImpactWeight(impact);
   };
 
+  const handleCreateRisk = async (e) => {
+    e.preventDefault();
+    try {
+      const riskScore = calculateRiskScore(newRisk.probability, newRisk.impact);
+      let severity = 'Low';
+      if (riskScore >= 9) severity = 'Critical';
+      else if (riskScore >= 6) severity = 'High';
+      else if (riskScore >= 3) severity = 'Medium';
+
+      const riskData = {
+        ...newRisk,
+        severity,
+        status: 'Active',
+        id: `risk-${Date.now()}`
+      };
+      
+      setRisks(prev => [...prev, riskData]);
+      
+      // Reset form
+      setNewRisk({
+        project: '',
+        risk: '',
+        probability: 'Medium',
+        impact: 'Medium',
+        category: 'Technical',
+        mitigation: '',
+        owner: ''
+      });
+      
+      setIsCreateRiskModalOpen(false);
+      alert("Risk reported successfully!");
+    } catch (error) {
+      console.error('Error creating risk:', error);
+      alert("Error: Failed to report risk. Please try again.");
+    }
+  };
+
   if (loading) {
     return (
       <div data-testid="risk-radar-loading">
