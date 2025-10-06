@@ -581,6 +581,89 @@ const InnovationRadar = () => {
         </div>
       )}
 
+      {/* Create Technology Modal */}
+      {isCreateTechModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsCreateTechModalOpen(false)}>
+          <div className="project-detail-modal" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setIsCreateTechModalOpen(false)} className="modal-close-btn">✕</button>
+            
+            <div className="modal-header">
+              <h1>Add New Technology</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Propose emerging technology for evaluation
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateTechnology} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="tech-name">Technology Name *</Label>
+                  <Input id="tech-name" value={newTechnology.name} onChange={(e) => setNewTechnology(prev => ({...prev, name: e.target.value}))} placeholder="Enter technology name" required />
+                </div>
+                <div>
+                  <Label htmlFor="tech-category">Category *</Label>
+                  <select id="tech-category" value={newTechnology.category} onChange={(e) => setNewTechnology(prev => ({...prev, category: e.target.value}))} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--sony-gray-300)', borderRadius: '6px', fontSize: '14px' }} required>
+                    <option value="AI/ML">AI/ML</option>
+                    <option value="Blockchain">Blockchain</option>
+                    <option value="Audio Tech">Audio Tech</option>
+                    <option value="VR/AR">VR/AR</option>
+                    <option value="Analytics">Analytics</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="tech-description">Description *</Label>
+                <Textarea id="tech-description" value={newTechnology.description} onChange={(e) => setNewTechnology(prev => ({...prev, description: e.target.value}))} placeholder="Describe the technology and its potential applications" rows={3} required />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="tech-quadrant">Quadrant *</Label>
+                  <select id="tech-quadrant" value={newTechnology.quadrant} onChange={(e) => setNewTechnology(prev => ({...prev, quadrant: e.target.value}))} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--sony-gray-300)', borderRadius: '6px', fontSize: '14px' }} required>
+                    <option value="Adopt">Adopt</option>
+                    <option value="Trial">Trial</option>
+                    <option value="Assess">Assess</option>
+                    <option value="Hold">Hold</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="tech-impact">Impact *</Label>
+                  <select id="tech-impact" value={newTechnology.impact} onChange={(e) => setNewTechnology(prev => ({...prev, impact: e.target.value}))} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--sony-gray-300)', borderRadius: '6px', fontSize: '14px' }} required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="tech-timeline">Timeline *</Label>
+                  <select id="tech-timeline" value={newTechnology.timeline} onChange={(e) => setNewTechnology(prev => ({...prev, timeline: e.target.value}))} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--sony-gray-300)', borderRadius: '6px', fontSize: '14px' }} required>
+                    <option value="3-6 months">3-6 months</option>
+                    <option value="6-12 months">6-12 months</option>
+                    <option value="12-18 months">12-18 months</option>
+                    <option value="18-24 months">18-24 months</option>
+                    <option value="24+ months">24+ months</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="tech-risk">Risk Level *</Label>
+                  <select id="tech-risk" value={newTechnology.risk} onChange={(e) => setNewTechnology(prev => ({...prev, risk: e.target.value}))} style={{ width: '100%', padding: '8px 12px', border: '1px solid var(--sony-gray-300)', borderRadius: '6px', fontSize: '14px' }} required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '20px', borderTop: '1px solid var(--sony-gray-200)' }}>
+                <Button type="button" variant="outline" onClick={() => setIsCreateTechModalOpen(false)}>Cancel</Button>
+                <Button type="submit" style={{ background: 'var(--sony-red)', color: 'white', border: 'none' }}>Add Technology</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <style jsx>{`
         .tech-card:hover {
           transform: translateY(-2px);
