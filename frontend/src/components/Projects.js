@@ -32,7 +32,21 @@ const Projects = () => {
   const [managerFilter, setManagerFilter] = useState("all");
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [managers, setManagers] = useState([]);
+  const [newProject, setNewProject] = useState({
+    name: '',
+    description: '',
+    status: 'planning',
+    priority: 'medium',
+    type: 'digital',
+    manager: '',
+    budget_allocated: '',
+    start_date: '',
+    end_date: '',
+    team_members: '',
+    streaming_platforms: ''
+  });
 
   useEffect(() => {
     fetchProjects();
