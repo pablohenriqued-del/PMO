@@ -227,6 +227,7 @@ const Projects = () => {
               color: 'white',
               border: 'none'
             }}
+            onClick={() => setIsCreateModalOpen(true)}
             data-testid="add-project-btn"
           >
             <Plus size={16} style={{ marginRight: '8px' }} />
