@@ -543,20 +543,23 @@ const LessonsLearned = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <Label htmlFor="lesson-impact">Impact Level</Label>
-                  <Select 
+                  <select 
+                    id="lesson-impact"
                     value={newLesson.impact} 
-                    onValueChange={(value) => setNewLesson(prev => ({...prev, impact: value}))}
+                    onChange={(e) => setNewLesson(prev => ({...prev, impact: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Low">Low</SelectItem>
-                      <SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="High">High</SelectItem>
-                      <SelectItem value="Critical">Critical</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="lesson-tags">Tags</Label>
