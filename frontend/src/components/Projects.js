@@ -783,20 +783,24 @@ const Projects = () => {
                 </div>
                 <div>
                   <Label htmlFor="project-manager">Project Manager *</Label>
-                  <Select 
+                  <select 
+                    id="project-manager"
                     value={newProject.manager} 
-                    onValueChange={(value) => setNewProject(prev => ({...prev, manager: value}))}
+                    onChange={(e) => setNewProject(prev => ({...prev, manager: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
                     required
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select manager" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {managers.map(manager => (
-                        <SelectItem key={manager} value={manager}>{manager}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <option value="">Select manager</option>
+                    {managers.map(manager => (
+                      <option key={manager} value={manager}>{manager}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
