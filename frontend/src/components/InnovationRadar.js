@@ -59,6 +59,39 @@ const InnovationRadar = () => {
     }
   };
 
+  const handleCreateTechnology = async (e) => {
+    e.preventDefault();
+    try {
+      const techData = {
+        ...newTechnology,
+        id: `tech-${Date.now()}`
+      };
+      
+      // Add to local radar data
+      setRadarData(prev => ({
+        ...prev,
+        technologies: [...prev.technologies, techData]
+      }));
+      
+      // Reset form
+      setNewTechnology({
+        name: '',
+        category: 'AI/ML',
+        quadrant: 'Assess',
+        description: '',
+        impact: 'Medium',
+        timeline: '6-12 months',
+        risk: 'Medium'
+      });
+      
+      setIsCreateTechModalOpen(false);
+      alert("Technology added successfully!");
+    } catch (error) {
+      console.error('Error creating technology:', error);
+      alert("Error: Failed to add technology. Please try again.");
+    }
+  };
+
   const filterTechnologies = () => {
     if (!radarData) return;
     
