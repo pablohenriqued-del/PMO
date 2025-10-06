@@ -74,6 +74,66 @@ const Budget = () => {
     setFilteredProjects(filtered);
   };
 
+  const handleExportReport = () => {
+    // Generate CSV content
+    const csvContent = generateBudgetCSV();
+    
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Sony_Music_Budget_Report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Success",
+      description: "Budget report exported successfully!",
+    });
+  };
+
+  const generateBudgetCSV = () => {
+    const headers = [
+      'Project Name',
+      'Manager', 
+      'Status',
+      'Priority',
+      'Type',
+      'Budget Allocated (USD)',
+      'Budget Spent (USD)',
+      'Budget Remaining (USD)',
+      'Budget Utilization (%)',
+      'Progress (%)',
+      'Start Date',
+      'End Date'
+    ];
+
+    const rows = filteredProjects.map(project => [
+      project.name,
+      project.manager,
+      project.status,
+      project.priority,
+      project.type,
+      project.budget_allocated,
+      project.budget_spent,
+      project.budget_allocated - project.budget_spent,
+      ((project.budget_spent / project.budget_allocated) * 100).toFixed(1),
+      project.progress,
+      project.start_date,
+      project.end_date
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    return csvContent;
+  };
+
   const calculateBudgetSummary = () => {
     if (filteredProjects.length === 0) {
       setBudgetSummary(null);
