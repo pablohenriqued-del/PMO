@@ -84,6 +84,122 @@ ${playbookData?.templates?.map(t => `• ${t.name} (${t.type})`).join('\n') || '
     `;
   };
 
+  const handleDownloadTemplate = (template) => {
+    const templateContent = generateTemplateContent(template);
+    const blob = new Blob([templateContent], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${template.name.replace(/\s+/g, '_')}_Template.txt`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const generateTemplateContent = (template) => {
+    const templates = {
+      'Project Charter': `
+PROJECT CHARTER TEMPLATE
+========================
+
+Project Name: ___________________
+Project Manager: ___________________
+Sponsor: ___________________
+
+PROJECT OVERVIEW:
+_________________________________
+
+OBJECTIVES:
+• 
+• 
+• 
+
+SUCCESS CRITERIA:
+• 
+• 
+
+STAKEHOLDERS:
+• 
+• 
+
+RISKS:
+• 
+• 
+
+TIMELINE:
+Start Date: ___________
+End Date: ___________
+
+BUDGET:
+$___________
+
+© Sony Music Entertainment`,
+
+      'Risk Assessment Matrix': `
+RISK ASSESSMENT MATRIX
+======================
+
+Project: ___________________
+Date: ___________________
+
+Risk ID | Risk Description | Probability | Impact | Risk Score | Mitigation Strategy | Owner
+--------|------------------|-------------|--------|------------|-------------------|-------
+R001    |                  | H/M/L      | H/M/L  |           |                   |
+R002    |                  | H/M/L      | H/M/L  |           |                   |
+
+Risk Scoring:
+High = 3, Medium = 2, Low = 1
+Risk Score = Probability × Impact
+
+© Sony Music Entertainment`,
+
+      'Stakeholder Analysis': `
+STAKEHOLDER ANALYSIS TEMPLATE
+=============================
+
+Project: ___________________
+Date: ___________________
+
+Stakeholder | Role | Influence | Interest | Engagement Strategy
+------------|------|-----------|----------|-------------------
+           |      | H/M/L     | H/M/L    |
+           |      | H/M/L     | H/M/L    |
+
+© Sony Music Entertainment`,
+
+      'Release Checklist': `
+RELEASE CHECKLIST
+=================
+
+Project: ___________________
+Release Date: ___________________
+
+PRE-RELEASE:
+□ Legal clearance obtained
+□ Quality assurance complete
+□ Platform approvals received
+□ Marketing materials ready
+□ Distribution setup complete
+
+RELEASE DAY:
+□ Go-live executed
+□ Monitoring active
+□ Support team ready
+□ Communication sent
+
+POST-RELEASE:
+□ Performance metrics reviewed
+□ Issues documented
+□ Lessons learned captured
+□ Success celebration
+
+© Sony Music Entertainment`
+    };
+
+    return templates[template.name] || `Template: ${template.name}\nType: ${template.type}\n\nTemplate content would be here.`;
+  };
+
   if (loading) {
     return (
       <div data-testid="pmo-playbook-loading">
