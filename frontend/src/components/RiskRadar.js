@@ -29,6 +29,8 @@ const RiskRadar = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [isCreateRiskModalOpen, setIsCreateRiskModalOpen] = useState(false);
+  const [isEditRiskModalOpen, setIsEditRiskModalOpen] = useState(false);
+  const [selectedRisk, setSelectedRisk] = useState(null);
   const [newRisk, setNewRisk] = useState({
     project: '',
     risk: '',
@@ -37,6 +39,16 @@ const RiskRadar = () => {
     category: 'Technical',
     mitigation: '',
     owner: ''
+  });
+  const [editRisk, setEditRisk] = useState({
+    project: '',
+    risk: '',
+    probability: 'Medium',
+    impact: 'Medium',
+    category: 'Technical',
+    mitigation: '',
+    owner: '',
+    status: 'Active'
   });
 
   useEffect(() => {
