@@ -526,6 +526,172 @@ const RiskRadar = () => {
           <p>Try adjusting your search criteria or filters</p>
         </div>
       )}
+
+      {/* Create Risk Modal */}
+      {isCreateRiskModalOpen && (
+        <div 
+          className="modal-overlay"
+          onClick={() => setIsCreateRiskModalOpen(false)}
+        >
+          <div 
+            className="project-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsCreateRiskModalOpen(false)}
+              className="modal-close-btn"
+            >
+              ✕
+            </button>
+            
+            <div className="modal-header">
+              <h1>Report New Risk</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Identify and assess potential risks for project tracking
+              </p>
+            </div>
+
+            <form onSubmit={handleCreateRisk} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="risk-project">Project Name *</Label>
+                  <Input
+                    id="risk-project"
+                    value={newRisk.project}
+                    onChange={(e) => setNewRisk(prev => ({...prev, project: e.target.value}))}
+                    placeholder="Enter project name"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="risk-category">Category *</Label>
+                  <select 
+                    id="risk-category"
+                    value={newRisk.category} 
+                    onChange={(e) => setNewRisk(prev => ({...prev, category: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Technical">Technical</option>
+                    <option value="Compliance">Compliance</option>
+                    <option value="Market">Market</option>
+                    <option value="Operational">Operational</option>
+                    <option value="Financial">Financial</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="risk-description">Risk Description *</Label>
+                <Input
+                  id="risk-description"
+                  value={newRisk.risk}
+                  onChange={(e) => setNewRisk(prev => ({...prev, risk: e.target.value}))}
+                  placeholder="Describe the potential risk"
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="risk-probability">Probability *</Label>
+                  <select 
+                    id="risk-probability"
+                    value={newRisk.probability} 
+                    onChange={(e) => setNewRisk(prev => ({...prev, probability: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="risk-impact">Impact *</Label>
+                  <select 
+                    id="risk-impact"
+                    value={newRisk.impact} 
+                    onChange={(e) => setNewRisk(prev => ({...prev, impact: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="risk-owner">Risk Owner *</Label>
+                  <Input
+                    id="risk-owner"
+                    value={newRisk.owner}
+                    onChange={(e) => setNewRisk(prev => ({...prev, owner: e.target.value}))}
+                    placeholder="Responsible person"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="risk-mitigation">Mitigation Strategy</Label>
+                <Textarea
+                  id="risk-mitigation"
+                  value={newRisk.mitigation}
+                  onChange={(e) => setNewRisk(prev => ({...prev, mitigation: e.target.value}))}
+                  placeholder="Describe mitigation actions and contingency plans"
+                  rows={3}
+                />
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                gap: '12px',
+                paddingTop: '20px',
+                borderTop: '1px solid var(--sony-gray-200)'
+              }}>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateRiskModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  style={{ 
+                    background: 'var(--sony-red)',
+                    color: 'white',
+                    border: 'none'
+                  }}
+                >
+                  Report Risk
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
