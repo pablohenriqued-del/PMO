@@ -364,6 +364,212 @@ async def reset_data():
     await initialize_mock_data()
     return {"message": "Data reset successfully"}
 
+# Lessons Learned endpoints
+@api_router.get("/lessons-learned")
+async def get_lessons_learned():
+    """Get lessons learned from projects"""
+    return [
+        {
+            "id": "ll-001",
+            "project": "Bad Bunny - Nadie Sabe Campaign",
+            "category": "Marketing",
+            "lesson": "Early influencer engagement increases streaming by 35%",
+            "impact": "High",
+            "description": "Partnering with micro-influencers 2 weeks before release significantly boosted initial streaming numbers",
+            "date": "2024-02-15",
+            "tags": ["influencer-marketing", "streaming", "pre-release"],
+            "author": "Nicolas Calderon"
+        },
+        {
+            "id": "ll-002", 
+            "project": "Airplane - Release Management",
+            "category": "Technical",
+            "lesson": "API rate limiting essential for high-volume releases",
+            "impact": "Critical",
+            "description": "Without proper rate limiting, platform APIs failed during peak traffic. Implement exponential backoff.",
+            "date": "2024-06-20",
+            "tags": ["api", "scaling", "infrastructure"],
+            "author": "Pablo Duarte"
+        },
+        {
+            "id": "ll-003",
+            "project": "SMERA - Legal Participation",
+            "category": "Process",
+            "lesson": "Legal review cycles must be parallel, not sequential",
+            "impact": "Medium",
+            "description": "Sequential legal reviews added 3 weeks to project timeline. Parallel reviews with clear ownership reduced this to 1 week.",
+            "date": "2024-08-10",
+            "tags": ["legal-process", "timeline", "efficiency"],
+            "author": "Diana Peluha"
+        }
+    ]
+
+# Risk Radar endpoints
+@api_router.get("/risk-radar")
+async def get_risk_radar():
+    """Get risk assessment data"""
+    return [
+        {
+            "id": "risk-001",
+            "project": "Airplane - Release Management Platform",
+            "risk": "Third-party API dependencies",
+            "probability": "High",
+            "impact": "High", 
+            "severity": "Critical",
+            "mitigation": "Implement circuit breakers and fallback mechanisms",
+            "owner": "Pablo Duarte",
+            "status": "Active",
+            "category": "Technical"
+        },
+        {
+            "id": "risk-002",
+            "project": "SQL AI Agent",
+            "risk": "AI model accuracy degradation",
+            "probability": "Medium",
+            "impact": "High",
+            "severity": "High", 
+            "mitigation": "Continuous model monitoring and retraining pipeline",
+            "owner": "Andre Luiz",
+            "status": "Monitoring",
+            "category": "Technical"
+        },
+        {
+            "id": "risk-003",
+            "project": "SMERA Legal",
+            "risk": "Regulatory compliance changes",
+            "probability": "Low",
+            "impact": "Critical",
+            "severity": "High",
+            "mitigation": "Quarterly legal framework reviews",
+            "owner": "Diana Peluha", 
+            "status": "Mitigated",
+            "category": "Compliance"
+        }
+    ]
+
+# PMO Playbook endpoints
+@api_router.get("/pmo-playbook")
+async def get_pmo_playbook():
+    """Get PMO playbook frameworks and processes"""
+    return {
+        "frameworks": [
+            {
+                "name": "Sony Music Agile Framework",
+                "description": "Hybrid Scrum-Kanban approach tailored for music industry projects",
+                "phases": ["Discovery", "Planning", "Execution", "Launch", "Post-Launch"],
+                "ceremonies": ["Sprint Planning", "Daily Standups", "Sprint Reviews", "Retrospectives"],
+                "artifacts": ["Product Backlog", "Sprint Backlog", "Burndown Charts", "Release Notes"]
+            },
+            {
+                "name": "Digital Release Framework", 
+                "description": "Standardized process for digital music releases and campaigns",
+                "phases": ["Pre-Production", "Content Creation", "Platform Setup", "Launch", "Analytics"],
+                "gates": ["Legal Clearance", "Quality Assurance", "Platform Approval", "Go-Live"],
+                "stakeholders": ["Artists", "Labels", "Digital Platforms", "Marketing"]
+            }
+        ],
+        "governance": {
+            "principles": [
+                "Artist-First Approach",
+                "Data-Driven Decisions", 
+                "Agile Delivery",
+                "Quality Excellence",
+                "Stakeholder Collaboration"
+            ],
+            "processes": [
+                "Weekly Steering Committee",
+                "Monthly Portfolio Review",
+                "Quarterly Strategy Alignment",
+                "Continuous Improvement"
+            ]
+        },
+        "templates": [
+            {"name": "Project Charter", "type": "document"},
+            {"name": "Risk Assessment Matrix", "type": "spreadsheet"},
+            {"name": "Stakeholder Analysis", "type": "template"},
+            {"name": "Release Checklist", "type": "checklist"}
+        ]
+    }
+
+# Root Cause Analysis endpoints  
+@api_router.get("/root-cause-analysis")
+async def get_root_cause_analysis():
+    """Get root cause analysis cases"""
+    return [
+        {
+            "id": "rca-001",
+            "incident": "Streaming Platform Outage - Bad Bunny Release",
+            "date": "2024-01-15",
+            "severity": "Critical",
+            "impact": "2.5M lost streams in first hour",
+            "root_causes": [
+                "Insufficient load testing for peak traffic",
+                "API rate limits not properly configured", 
+                "Lack of auto-scaling mechanisms"
+            ],
+            "five_whys": [
+                "Why did the platform crash? - Traffic exceeded capacity",
+                "Why wasn't capacity adequate? - Load testing was incomplete", 
+                "Why was load testing incomplete? - Test scenarios didn't include viral growth",
+                "Why weren't viral scenarios tested? - No historical data for reference",
+                "Why no historical data? - First release of this scale on new platform"
+            ],
+            "actions": [
+                {"action": "Implement comprehensive load testing", "owner": "DevOps Team", "status": "Complete"},
+                {"action": "Configure auto-scaling", "owner": "Infrastructure Team", "status": "In Progress"},
+                {"action": "Create viral growth test scenarios", "owner": "QA Team", "status": "Planned"}
+            ],
+            "lessons": "Always test for 10x expected load when dealing with viral content"
+        }
+    ]
+
+# Innovation Radar endpoints
+@api_router.get("/innovation-radar")
+async def get_innovation_radar():
+    """Get innovation radar data"""
+    return {
+        "technologies": [
+            {
+                "name": "AI-Powered Music Mastering",
+                "category": "AI/ML",
+                "quadrant": "Assess", 
+                "description": "Automated audio mastering using machine learning",
+                "impact": "High",
+                "timeline": "6-12 months",
+                "risk": "Medium"
+            },
+            {
+                "name": "Blockchain Rights Management",
+                "category": "Blockchain",
+                "quadrant": "Trial",
+                "description": "Smart contracts for automated royalty distribution",
+                "impact": "High", 
+                "timeline": "12-18 months",
+                "risk": "High"
+            },
+            {
+                "name": "Spatial Audio Streaming",
+                "category": "Audio Tech",
+                "quadrant": "Adopt",
+                "description": "3D audio experiences for streaming platforms",
+                "impact": "Medium",
+                "timeline": "3-6 months", 
+                "risk": "Low"
+            },
+            {
+                "name": "Virtual Reality Concerts",
+                "category": "VR/AR",
+                "quadrant": "Assess",
+                "description": "Immersive concert experiences in virtual environments", 
+                "impact": "Medium",
+                "timeline": "12-24 months",
+                "risk": "High"
+            }
+        ],
+        "quadrants": ["Adopt", "Trial", "Assess", "Hold"],
+        "categories": ["AI/ML", "Blockchain", "Audio Tech", "VR/AR", "Analytics"]
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
