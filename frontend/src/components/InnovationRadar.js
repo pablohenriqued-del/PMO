@@ -152,6 +152,7 @@ const InnovationRadar = () => {
               color: 'white',
               border: 'none'
             }}
+            onClick={() => alert('Technology submission form would open here - Contact Innovation team to propose new technologies')}
             data-testid="add-technology-btn"
           >
             <Zap size={16} style={{ marginRight: '8px' }} />
