@@ -5,6 +5,11 @@ import {
   FolderOpen, 
   Calendar, 
   PiggyBank,
+  BookOpen,
+  AlertTriangle,
+  FileText,
+  Search,
+  Zap,
   Menu,
   X
 } from "lucide-react";
