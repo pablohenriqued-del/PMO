@@ -177,7 +177,7 @@ const RiskRadar = () => {
               color: 'white',
               border: 'none'
             }}
-            onClick={() => alert('Risk reporting form would open here - Contact PMO team to report risks')}
+            onClick={() => setIsCreateRiskModalOpen(true)}
             data-testid="add-risk-btn"
           >
             <AlertTriangle size={16} style={{ marginRight: '8px' }} />
