@@ -59,6 +59,49 @@ const LessonsLearned = () => {
     }
   };
 
+  const handleCreateLesson = async (e) => {
+    e.preventDefault();
+    try {
+      const lessonData = {
+        ...newLesson,
+        date: new Date().toISOString().split('T')[0],
+        author: "PMO Manager", // Could be dynamic based on logged user
+        tags: newLesson.tags.split(',').map(tag => tag.trim()).filter(Boolean)
+      };
+
+      // For now, just add to local state since we don't have a POST endpoint
+      const newLessonWithId = {
+        ...lessonData,
+        id: `ll-${Date.now()}`
+      };
+      
+      setLessons(prev => [...prev, newLessonWithId]);
+      
+      // Reset form
+      setNewLesson({
+        project: '',
+        category: 'Technical',
+        lesson: '',
+        impact: 'Medium',
+        description: '',
+        tags: ''
+      });
+      
+      setIsCreateModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Lesson learned added successfully!",
+      });
+    } catch (error) {
+      console.error('Error creating lesson:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to add lesson. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filterLessons = () => {
     let filtered = lessons;
 
