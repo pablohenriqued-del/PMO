@@ -66,6 +66,7 @@ const PMOPlaybook = () => {
               color: 'white',
               border: 'none'
             }}
+            onClick={handleDownloadPlaybook}
             data-testid="download-playbook-btn"
           >
             <Download size={16} style={{ marginRight: '8px' }} />
