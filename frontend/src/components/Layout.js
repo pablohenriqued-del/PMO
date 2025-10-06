@@ -42,6 +42,36 @@ const Layout = ({ children }) => {
       href: "/budget",
       icon: PiggyBank,
       current: location.pathname === "/budget"
+    },
+    {
+      name: "Lessons Learned",
+      href: "/lessons-learned",
+      icon: BookOpen,
+      current: location.pathname === "/lessons-learned"
+    },
+    {
+      name: "Risk Radar",
+      href: "/risk-radar",
+      icon: AlertTriangle,
+      current: location.pathname === "/risk-radar"
+    },
+    {
+      name: "PMO Playbook",
+      href: "/pmo-playbook",
+      icon: FileText,
+      current: location.pathname === "/pmo-playbook"
+    },
+    {
+      name: "Root Cause Analysis",
+      href: "/root-cause-analysis",
+      icon: Search,
+      current: location.pathname === "/root-cause-analysis"
+    },
+    {
+      name: "Innovation Radar",
+      href: "/innovation-radar",
+      icon: Zap,
+      current: location.pathname === "/innovation-radar"
     }
   ];
 
