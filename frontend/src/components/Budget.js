@@ -182,6 +182,7 @@ const Budget = () => {
               color: 'white',
               border: 'none'
             }}
+            onClick={handleExportReport}
             data-testid="export-budget-btn"
           >
             <Download size={16} style={{ marginRight: '8px' }} />
