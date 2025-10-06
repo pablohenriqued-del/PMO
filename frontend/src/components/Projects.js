@@ -181,11 +181,7 @@ const Projects = () => {
       alert("Project created successfully!");
     } catch (error) {
       console.error('Error creating project:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create project. Please try again.",
-        variant: "destructive",
-      });
+      alert("Error: Failed to create project. Please try again.");
     }
   };
 
