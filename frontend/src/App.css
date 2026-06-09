@@ -50,7 +50,7 @@ html, body {
 
 .sidebar {
   width: 280px;
-  background: linear-gradient(180deg, var(--sony-black) 0%, var(--sony-gray-900) 100%);
+  background: var(--sony-black);
   color: var(--pure-white);
   display: flex;
   flex-direction: column;
@@ -70,7 +70,7 @@ html, body {
 /* Sony Music Brand Header */
 .brand-header {
   padding: 24px 20px;
-  border-bottom: 1px solid var(--sony-gray-700);
+  border-bottom: 1px solid var(--sony-gray-200);
   background: var(--sony-black);
 }
 
@@ -118,7 +118,7 @@ html, body {
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  color: var(--sony-gray-300);
+  color: var(--sony-gray-600);
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
