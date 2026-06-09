@@ -153,13 +153,16 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Projects update progress functionality fully working. Successfully tested: (1) Click on project card to open detail modal, (2) Click 'Update Progress' button, (3) Change progress from 75% to 85%, (4) Change budget spent from $150,000 to $200,000, (5) Toggle milestone 'Platform Architecture' from unchecked to checked, (6) Save changes, (7) Verify project card shows updated progress (85%), (8) Verify detail modal shows updated budget spent ($200,000) and milestone status. All changes persisted correctly after page refresh."
+      - working: true
+        agent: "testing"
+        comment: "Additional testing completed for milestone assignment and revenue generation features. Successfully tested on 'Airplane' project: (1) Clicked on 'Airplane' project, (2) Clicked 'Update Progress', (3) Selected user 'João Silva (Senior Developer)' from 'Assigned to' dropdown for first milestone, (4) Added Revenue Gen value of 50000, (5) Clicked Save Changes, (6) Verified changes persisted - Revenue Gen displayed as $50,000 in Financial Overview, (7) Re-opened Update Progress modal and confirmed milestone assignment (value: u1) and Revenue Gen (50000) persisted correctly. All functionality working perfectly. Minor: React console warning about missing key prop (non-critical)."
 
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 1
+  test_sequence: 2
   run_ui: true
-  last_updated: "2026-06-09 22:44:33"
+  last_updated: "2026-06-09 23:00:15"
 
 test_plan:
   current_focus:
@@ -172,3 +175,5 @@ test_plan:
 agent_communication:
   - agent: "testing"
     message: "Completed comprehensive testing of Risk Radar edit functionality and Projects update progress functionality. Both features are working perfectly. All API calls successful (confirmed via backend logs), UI updates correctly, and data persists after page refresh. No issues found. Ready for production use."
+  - agent: "testing"
+    message: "Additional testing completed for Projects Update Progress - Milestone Assignment & Revenue Generation features. Tested on 'Airplane' project: Successfully assigned user 'João Silva (Senior Developer)' to first milestone, added Revenue Gen value of 50000, saved changes, and verified persistence. All changes persisted correctly in both the Financial Overview display ($50,000) and in the Update Progress form (milestone assignment: u1, revenue: 50000). No critical issues found. Minor React console warning about missing key prop (non-critical, doesn't affect functionality). Feature is fully working and ready for production."

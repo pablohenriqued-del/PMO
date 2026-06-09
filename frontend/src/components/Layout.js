@@ -5,6 +5,7 @@ import {
   FolderOpen, 
   Calendar, 
   PiggyBank,
+  Globe,
   BookOpen,
   AlertTriangle,
   FileText,
@@ -24,6 +25,12 @@ const Layout = ({ children }) => {
       href: "/",
       icon: LayoutDashboard,
       current: location.pathname === "/"
+    },
+    {
+      name: "Regional Analytics",
+      href: "/regional",
+      icon: Globe,
+      current: location.pathname === "/regional"
     },
     {
       name: "Projects",

@@ -3,18 +3,19 @@
 /* Sony Music Colors */
 :root {
   --sony-black: #000000;
-  --sony-white: #FFFFFF;
+  --sony-white: #1E1E1E;
   --sony-red: #E50914;
-  --sony-gray-50: #F8F9FA;
-  --sony-gray-100: #F1F3F4;
-  --sony-gray-200: #E8EAED;
-  --sony-gray-300: #DADCE0;
-  --sony-gray-400: #BDC1C6;
-  --sony-gray-500: #9AA0A6;
-  --sony-gray-600: #80868B;
-  --sony-gray-700: #5F6368;
-  --sony-gray-800: #3C4043;
-  --sony-gray-900: #202124;
+  --sony-gray-50: #121212;
+  --sony-gray-100: #2A2A2A;
+  --sony-gray-200: #333333;
+  --sony-gray-300: #444444;
+  --sony-gray-400: #666666;
+  --sony-gray-500: #888888;
+  --sony-gray-600: #AAAAAA;
+  --sony-gray-700: #CCCCCC;
+  --sony-gray-800: #E0E0E0;
+  --sony-gray-900: #FFFFFF;
+  --pure-white: #FFFFFF;
 }
 
 * {
@@ -50,7 +51,7 @@ html, body {
 .sidebar {
   width: 280px;
   background: linear-gradient(180deg, var(--sony-black) 0%, var(--sony-gray-900) 100%);
-  color: var(--sony-white);
+  color: var(--pure-white);
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--sony-gray-200);
@@ -80,7 +81,7 @@ html, body {
 }
 
 .brand-text {
-  color: var(--sony-white);
+  color: var(--pure-white);
   font-weight: 800;
   font-size: 18px;
   line-height: 1.2;
@@ -102,7 +103,7 @@ html, body {
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  color: var(--sony-white);
+  color: var(--pure-white);
   font-size: 14px;
 }
 
@@ -127,13 +128,13 @@ html, body {
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.05);
-  color: var(--sony-white);
+  color: var(--pure-white);
   border-left-color: var(--sony-red);
 }
 
 .nav-item.active {
   background: rgba(229, 9, 20, 0.1);
-  color: var(--sony-white);
+  color: var(--pure-white);
   border-left-color: var(--sony-red);
 }
 
@@ -207,7 +208,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--sony-white);
+  color: var(--pure-white);
 }
 
 .kpi-value {
@@ -321,22 +322,22 @@ html, body {
 
 .priority-critical {
   background: var(--sony-red);
-  color: var(--sony-white);
+  color: var(--pure-white);
 }
 
 .priority-high {
   background: #F59E0B;
-  color: var(--sony-white);
+  color: var(--pure-white);
 }
 
 .priority-medium {
   background: #6B7280;
-  color: var(--sony-white);
+  color: var(--pure-white);
 }
 
 .priority-low {
   background: #10B981;
-  color: var(--sony-white);
+  color: var(--pure-white);
 }
 
 /* Progress Bar */

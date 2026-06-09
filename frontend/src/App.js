@@ -14,6 +14,7 @@ import RiskRadar from "./components/RiskRadar";
 import PMOPlaybook from "./components/PMOPlaybook";
 import RootCauseAnalysis from "./components/RootCauseAnalysis";
 import InnovationRadar from "./components/InnovationRadar";
+import RegionalDashboard from "./components/RegionalDashboard";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -24,6 +25,7 @@ function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/regional" element={<RegionalDashboard />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/timeline" element={<Timeline />} />
             <Route path="/budget" element={<Budget />} />

@@ -37,6 +37,7 @@ const Projects = () => {
   const [updateData, setUpdateData] = useState({
     progress: 0,
     budget_spent: 0,
+    revenue_generated: 0,
     milestones: []
   });
 
@@ -44,6 +45,7 @@ const Projects = () => {
     setUpdateData({
       progress: selectedProject.progress || 0,
       budget_spent: selectedProject.budget_spent || 0,
+      revenue_generated: selectedProject.revenue_generated || 0,
       milestones: selectedProject.milestones ? [...selectedProject.milestones] : []
     });
     setIsUpdateModalOpen(true);
@@ -56,6 +58,7 @@ const Projects = () => {
         ...selectedProject,
         progress: parseInt(updateData.progress, 10),
         budget_spent: parseFloat(updateData.budget_spent),
+        revenue_generated: parseFloat(updateData.revenue_generated),
         milestones: updateData.milestones
       };
 
@@ -79,7 +82,14 @@ const Projects = () => {
     setUpdateData(prev => ({ ...prev, milestones: newMilestones }));
   };
 
+  const assignUserToMilestone = (index, userId) => {
+    const newMilestones = [...updateData.milestones];
+    newMilestones[index].assigned_to = userId;
+    setUpdateData(prev => ({ ...prev, milestones: newMilestones }));
+  };
+
   const [managers, setManagers] = useState([]);
+  const [ldapUsers, setLdapUsers] = useState([]);
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -87,7 +97,9 @@ const Projects = () => {
     priority: 'medium',
     type: 'digital',
     manager: '',
+    country: 'Brazil',
     budget_allocated: '',
+    revenue_expected: '',
     start_date: '',
     end_date: '',
     team_members: '',
@@ -97,7 +109,17 @@ const Projects = () => {
   useEffect(() => {
     fetchProjects();
     fetchManagers();
+    fetchLdapUsers();
   }, []);
+
+  const fetchLdapUsers = async () => {
+    try {
+      const response = await axios.get(`${API}/ldap/users`);
+      setLdapUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching LDAP users:', error);
+    }
+  };
 
   useEffect(() => {
     filterProjects();
@@ -199,6 +221,7 @@ const Projects = () => {
       const projectData = {
         ...newProject,
         budget_allocated: parseFloat(newProject.budget_allocated) || 0,
+        revenue_expected: parseFloat(newProject.revenue_expected) || 0,
         team_members: newProject.team_members.split(',').map(member => member.trim()).filter(Boolean),
         streaming_platforms: newProject.streaming_platforms.split(',').map(platform => platform.trim()).filter(Boolean)
       };
@@ -216,7 +239,9 @@ const Projects = () => {
         priority: 'medium',
         type: 'digital',
         manager: '',
+        country: 'Brazil',
         budget_allocated: '',
+        revenue_expected: '',
         start_date: '',
         end_date: '',
         team_members: '',
@@ -646,6 +671,12 @@ const Projects = () => {
                         </div>
                       </div>
                       <div>
+                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Country</span>
+                        <div style={{ fontSize: '14px', fontWeight: '600' }}>
+                          {selectedProject.country || 'Global'}
+                        </div>
+                      </div>
+                      <div>
                         <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Status</span>
                         <div>
                           <span className={`status-badge status-${selectedProject.status}`}>
@@ -695,8 +726,13 @@ const Projects = () => {
                             <div style={{ fontSize: '14px', fontWeight: '600' }}>
                               {milestone.name}
                             </div>
-                            <div style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>
+                            <div style={{ fontSize: '12px', color: 'var(--sony-gray-600)', marginTop: '4px' }}>
                               Due: {formatDate(milestone.date)}
+                              {milestone.assigned_to && (
+                                <span style={{ marginLeft: '12px', padding: '2px 8px', background: 'var(--sony-gray-200)', borderRadius: '12px' }}>
+                                  Assigned to: {ldapUsers.find(u => u.id === milestone.assigned_to)?.name || 'Unknown'}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -717,29 +753,31 @@ const Projects = () => {
                     borderRadius: '12px'
                   }}>
                     <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>
-                      Budget Overview
+                      Financial Overview
                     </h4>
                     <div style={{ display: 'grid', gap: '12px' }}>
                       <div>
-                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Allocated</span>
+                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Allocated Budget</span>
                         <div style={{ fontSize: '18px', fontWeight: '700' }}>
                           {formatCurrency(selectedProject.budget_allocated)}
                         </div>
                       </div>
                       <div>
-                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Spent</span>
+                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Budget Spent</span>
                         <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--sony-red)' }}>
                           {formatCurrency(selectedProject.budget_spent)}
                         </div>
                       </div>
+                      <div style={{ borderTop: '1px solid var(--sony-gray-200)', paddingTop: '8px' }}>
+                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Expected Revenue</span>
+                        <div style={{ fontSize: '18px', fontWeight: '700', color: '#10B981' }}>
+                          {formatCurrency(selectedProject.revenue_expected)}
+                        </div>
+                      </div>
                       <div>
-                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Remaining</span>
-                        <div style={{ 
-                          fontSize: '18px', 
-                          fontWeight: '700',
-                          color: selectedProject.budget_spent > selectedProject.budget_allocated ? 'var(--sony-red)' : '#10B981'
-                        }}>
-                          {formatCurrency(selectedProject.budget_allocated - selectedProject.budget_spent)}
+                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Generated Revenue</span>
+                        <div style={{ fontSize: '18px', fontWeight: '700', color: '#10B981' }}>
+                          {formatCurrency(selectedProject.revenue_generated)}
                         </div>
                       </div>
                     </div>
@@ -854,6 +892,44 @@ const Projects = () => {
                       <option key={manager} value={manager}>{manager}</option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-country">Country</Label>
+                  <select 
+                    id="project-country"
+                    value={newProject.country} 
+                    onChange={(e) => setNewProject(prev => ({...prev, country: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Global">Global</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="Mexico">Mexico</option>
+                    <option value="Argentina">Argentina</option>
+                    <option value="Colombia">Colombia</option>
+                    <option value="Chile">Chile</option>
+                    <option value="Peru">Peru</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="project-revenue">Revenue Expected (USD)</Label>
+                  <Input
+                    id="project-revenue"
+                    type="number"
+                    value={newProject.revenue_expected}
+                    onChange={(e) => setNewProject(prev => ({...prev, revenue_expected: e.target.value}))}
+                    placeholder="0"
+                    min="0"
+                  />
                 </div>
               </div>
 
@@ -1059,7 +1135,7 @@ const Projects = () => {
             </div>
 
             <form onSubmit={handleUpdateProject} style={{ display: 'grid', gap: '20px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
                 <div>
                   <Label htmlFor="update-progress">Progress (%) *</Label>
                   <Input
@@ -1084,14 +1160,28 @@ const Projects = () => {
                     required
                   />
                   <div style={{ fontSize: '12px', color: 'var(--sony-gray-500)', marginTop: '4px' }}>
-                    Allocated Budget: {formatCurrency(selectedProject.budget_allocated)}
+                    Allocated: {formatCurrency(selectedProject.budget_allocated)}
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="update-revenue">Revenue Gen. (USD)</Label>
+                  <Input
+                    id="update-revenue"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={updateData.revenue_generated}
+                    onChange={(e) => setUpdateData(prev => ({...prev, revenue_generated: e.target.value}))}
+                  />
+                  <div style={{ fontSize: '12px', color: 'var(--sony-gray-500)', marginTop: '4px' }}>
+                    Expected: {formatCurrency(selectedProject.revenue_expected)}
                   </div>
                 </div>
               </div>
 
               {updateData.milestones && updateData.milestones.length > 0 && (
                 <div>
-                  <Label>Milestones</Label>
+                  <Label>Milestones & Resource Allocation (AD/LDAP)</Label>
                   <div style={{ 
                     border: '1px solid var(--sony-gray-200)', 
                     borderRadius: '8px',
@@ -1101,28 +1191,47 @@ const Projects = () => {
                     gap: '12px'
                   }}>
                     {updateData.milestones.map((milestone, index) => (
-                      <label 
+                      <div 
                         key={index} 
                         style={{ 
                           display: 'flex', 
                           alignItems: 'center', 
                           gap: '12px',
-                          cursor: 'pointer'
                         }}
                       >
                         <input 
                           type="checkbox" 
                           checked={milestone.completed}
                           onChange={() => toggleMilestone(index)}
-                          style={{ width: '16px', height: '16px' }}
+                          style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                         />
                         <span style={{ fontSize: '14px', flex: 1, textDecoration: milestone.completed ? 'line-through' : 'none', color: milestone.completed ? 'var(--sony-gray-500)' : 'inherit' }}>
                           {milestone.name}
                         </span>
-                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-500)' }}>
+                        
+                        <select
+                          value={milestone.assigned_to || ''}
+                          onChange={(e) => assignUserToMilestone(index, e.target.value)}
+                          style={{
+                            padding: '4px 8px',
+                            border: '1px solid var(--sony-gray-300)',
+                            borderRadius: '4px',
+                            fontSize: '12px',
+                            maxWidth: '200px'
+                          }}
+                        >
+                          <option value="">Unassigned</option>
+                          {ldapUsers.map(user => (
+                            <option key={user.id} value={user.id}>
+                              {user.name} ({user.role})
+                            </option>
+                          ))}
+                        </select>
+
+                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-500)', minWidth: '80px', textAlign: 'right' }}>
                           {formatDate(milestone.date)}
                         </span>
-                      </label>
+                      </div>
                     ))}
                   </div>
                 </div>

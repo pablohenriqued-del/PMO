@@ -70,8 +70,11 @@ class Project(BaseModel):
     priority: ProjectPriority
     type: ProjectType
     manager: str
+    country: str = "Global"
     budget_allocated: float
     budget_spent: float
+    revenue_expected: float = 0.0
+    revenue_generated: float = 0.0
     start_date: str
     end_date: str
     progress: int = Field(ge=0, le=100)
@@ -88,8 +91,11 @@ class ProjectCreate(BaseModel):
     priority: ProjectPriority
     type: ProjectType
     manager: str
+    country: str = "Global"
     budget_allocated: float
     budget_spent: float = 0.0
+    revenue_expected: float = 0.0
+    revenue_generated: float = 0.0
     start_date: str
     end_date: str
     progress: int = Field(ge=0, le=100, default=0)
@@ -125,23 +131,26 @@ async def initialize_mock_data():
     if existing_projects == 0:
         mock_projects = [
             {
-                "id": str(uuid.uuid4()),
+                "id": "p-1",
                 "name": "Airplane - Release Management Platform",
                 "description": "Comprehensive platform for managing music releases and distribution across all channels",
                 "status": "in_progress",
                 "priority": "critical", 
                 "type": "platform",
                 "manager": "Pablo Duarte",
+                "country": "Brazil",
                 "budget_allocated": 420000.0,
                 "budget_spent": 275000.0,
+                "revenue_expected": 800000.0,
+                "revenue_generated": 100000.0,
                 "start_date": "2024-01-15",
                 "end_date": "2024-12-30",
                 "progress": 65,
                 "milestones": [
-                    {"name": "Platform Architecture", "date": "2024-03-01", "completed": True},
-                    {"name": "Core Features Development", "date": "2024-06-15", "completed": True},
-                    {"name": "Beta Testing", "date": "2024-09-30", "completed": False},
-                    {"name": "Production Launch", "date": "2024-12-30", "completed": False}
+                    {"name": "Platform Architecture", "date": "2024-03-01", "completed": True, "assigned_to": "u1"},
+                    {"name": "Core Features Development", "date": "2024-06-15", "completed": True, "assigned_to": "u2"},
+                    {"name": "Beta Testing", "date": "2024-09-30", "completed": False, "assigned_to": "u3"},
+                    {"name": "Production Launch", "date": "2024-12-30", "completed": False, "assigned_to": None}
                 ],
                 "team_members": ["Dev Team A", "QA Team", "Product Owner"],
                 "streaming_platforms": [],
@@ -149,23 +158,26 @@ async def initialize_mock_data():
                 "updated_at": datetime.now(timezone.utc).isoformat()
             },
             {
-                "id": str(uuid.uuid4()),
+                "id": "p-2",
                 "name": "SMERA - Legal Participation Management",
                 "description": "Legal project system for managing special participations and royalty distributions",
                 "status": "in_progress",
                 "priority": "critical",
                 "type": "legal",
                 "manager": "Diana Peluha",
+                "country": "Mexico",
                 "budget_allocated": 320000.0,
                 "budget_spent": 185000.0,
+                "revenue_expected": 500000.0,
+                "revenue_generated": 0.0,
                 "start_date": "2024-02-01",
                 "end_date": "2024-11-15",
                 "progress": 55,
                 "milestones": [
-                    {"name": "Legal Framework Setup", "date": "2024-04-01", "completed": True},
-                    {"name": "Database Design", "date": "2024-06-01", "completed": True},
-                    {"name": "Integration Testing", "date": "2024-09-01", "completed": False},
-                    {"name": "Legal Compliance Review", "date": "2024-11-15", "completed": False}
+                    {"name": "Legal Framework Setup", "date": "2024-04-01", "completed": True, "assigned_to": "u4"},
+                    {"name": "Database Design", "date": "2024-06-01", "completed": True, "assigned_to": "u1"},
+                    {"name": "Integration Testing", "date": "2024-09-01", "completed": False, "assigned_to": "u2"},
+                    {"name": "Legal Compliance Review", "date": "2024-11-15", "completed": False, "assigned_to": "u4"}
                 ],
                 "team_members": ["Legal Team", "Backend Dev", "Database Admin"],
                 "streaming_platforms": [],
@@ -173,23 +185,26 @@ async def initialize_mock_data():
                 "updated_at": datetime.now(timezone.utc).isoformat()
             },
             {
-                "id": str(uuid.uuid4()),
+                "id": "p-3",
                 "name": "SQL AI Agent - Data Intelligence Platform",
                 "description": "AI-powered agent for automated SQL query generation and data analysis",
                 "status": "planning", 
                 "priority": "critical",
                 "type": "platform",
                 "manager": "Andre Luiz",
+                "country": "Colombia",
                 "budget_allocated": 180000.0,
                 "budget_spent": 45000.0,
+                "revenue_expected": 600000.0,
+                "revenue_generated": 0.0,
                 "start_date": "2024-03-01",
                 "end_date": "2024-10-30",
                 "progress": 25,
                 "milestones": [
-                    {"name": "AI Model Research", "date": "2024-04-15", "completed": True},
-                    {"name": "Prototype Development", "date": "2024-07-01", "completed": False},
-                    {"name": "Integration & Testing", "date": "2024-09-15", "completed": False},
-                    {"name": "Production Deployment", "date": "2024-10-30", "completed": False}
+                    {"name": "AI Model Research", "date": "2024-04-15", "completed": True, "assigned_to": "u5"},
+                    {"name": "Prototype Development", "date": "2024-07-01", "completed": False, "assigned_to": "u2"},
+                    {"name": "Integration & Testing", "date": "2024-09-15", "completed": False, "assigned_to": "u3"},
+                    {"name": "Production Deployment", "date": "2024-10-30", "completed": False, "assigned_to": "u1"}
                 ],
                 "team_members": ["AI Team", "Data Scientists", "Backend Dev"],
                 "streaming_platforms": [],
@@ -197,23 +212,26 @@ async def initialize_mock_data():
                 "updated_at": datetime.now(timezone.utc).isoformat()
             },
             {
-                "id": str(uuid.uuid4()),
+                "id": "p-4",
                 "name": "Bad Bunny - Nadie Sabe Lo Que Va a Pasar Mañana Campaign",
                 "description": "Digital campaign and streaming optimization for Bad Bunny's latest album release",
                 "status": "completed",
                 "priority": "high",
                 "type": "digital",
                 "manager": "Nicolas Calderon",
+                "country": "Argentina",
                 "budget_allocated": 850000.0,
                 "budget_spent": 825000.0,
+                "revenue_expected": 2500000.0,
+                "revenue_generated": 3200000.0,
                 "start_date": "2023-10-01",
                 "end_date": "2024-01-31",
                 "progress": 100,
                 "milestones": [
-                    {"name": "Campaign Strategy", "date": "2023-11-01", "completed": True},
-                    {"name": "Content Creation", "date": "2023-12-15", "completed": True},
-                    {"name": "Platform Rollout", "date": "2024-01-15", "completed": True},
-                    {"name": "Performance Analysis", "date": "2024-01-31", "completed": True}
+                    {"name": "Campaign Strategy", "date": "2023-11-01", "completed": True, "assigned_to": "u6"},
+                    {"name": "Content Creation", "date": "2023-12-15", "completed": True, "assigned_to": "u6"},
+                    {"name": "Platform Rollout", "date": "2024-01-15", "completed": True, "assigned_to": "u7"},
+                    {"name": "Performance Analysis", "date": "2024-01-31", "completed": True, "assigned_to": "u5"}
                 ],
                 "team_members": ["Marketing Team", "Content Creators", "Analytics Team"],
                 "streaming_platforms": ["Spotify", "Apple Music", "YouTube", "Amazon Music"],
@@ -221,23 +239,26 @@ async def initialize_mock_data():
                 "updated_at": datetime.now(timezone.utc).isoformat()
             },
             {
-                "id": str(uuid.uuid4()),
+                "id": "p-5",
                 "name": "Rosalía - MOTOMAMI+ Streaming Expansion",
                 "description": "Streaming platform expansion and digital content optimization for Rosalía",
                 "status": "in_progress",
                 "priority": "high",
                 "type": "streaming",
                 "manager": "Pablo Duarte",
+                "country": "Brazil",
                 "budget_allocated": 390000.0,
                 "budget_spent": 275000.0,
+                "revenue_expected": 1200000.0,
+                "revenue_generated": 850000.0,
                 "start_date": "2024-01-01",
                 "end_date": "2024-08-31",
                 "progress": 70,
                 "milestones": [
-                    {"name": "Platform Analysis", "date": "2024-02-15", "completed": True},
-                    {"name": "Content Optimization", "date": "2024-05-01", "completed": True},
-                    {"name": "Regional Expansion", "date": "2024-07-15", "completed": False},
-                    {"name": "Performance Metrics", "date": "2024-08-31", "completed": False}
+                    {"name": "Platform Analysis", "date": "2024-02-15", "completed": True, "assigned_to": "u5"},
+                    {"name": "Content Optimization", "date": "2024-05-01", "completed": True, "assigned_to": "u6"},
+                    {"name": "Regional Expansion", "date": "2024-07-15", "completed": False, "assigned_to": "u8"},
+                    {"name": "Performance Metrics", "date": "2024-08-31", "completed": False, "assigned_to": "u5"}
                 ],
                 "team_members": ["Digital Team", "Regional Managers", "Data Analysts"],
                 "streaming_platforms": ["Spotify", "Apple Music", "Deezer", "Tidal"],
@@ -417,6 +438,63 @@ async def get_streaming_platforms():
         {"name": "Deezer", "streams": 450000000, "growth": 6.8},
         {"name": "Tidal", "streams": 200000000, "growth": 4.2}
     ]
+
+# LDAP Mock endpoint
+@api_router.get("/ldap/users")
+async def get_ldap_users():
+    """Mock endpoint to simulate Active Directory / LDAP resources"""
+    return [
+        {"id": "u1", "name": "João Silva", "email": "joao.silva@sonymusic.com", "department": "Engineering", "role": "Senior Developer"},
+        {"id": "u2", "name": "Maria Garcia", "email": "maria.garcia@sonymusic.com", "department": "Engineering", "role": "Frontend Developer"},
+        {"id": "u3", "name": "Carlos Santos", "email": "carlos.santos@sonymusic.com", "department": "QA", "role": "QA Engineer"},
+        {"id": "u4", "name": "Ana Rodriguez", "email": "ana.rodriguez@sonymusic.com", "department": "Legal", "role": "Legal Consultant"},
+        {"id": "u5", "name": "Luis Gomez", "email": "luis.gomez@sonymusic.com", "department": "Data Science", "role": "Data Analyst"},
+        {"id": "u6", "name": "Camila Alves", "email": "camila.alves@sonymusic.com", "department": "Marketing", "role": "Marketing Manager"},
+        {"id": "u7", "name": "Pedro Lima", "email": "pedro.lima@sonymusic.com", "department": "Product", "role": "Product Owner"},
+        {"id": "u8", "name": "Sofia Costa", "email": "sofia.costa@sonymusic.com", "department": "Operations", "role": "Regional Manager"}
+    ]
+
+# Analytics endpoints
+@api_router.get("/analytics/countries")
+async def get_country_analytics():
+    """Get project analytics grouped by country"""
+    projects = await db.projects.find().to_list(1000)
+    
+    country_data = {}
+    
+    for p in projects:
+        country = p.get("country", "Global")
+        if country not in country_data:
+            country_data[country] = {
+                "country": country,
+                "project_count": 0,
+                "budget_allocated": 0.0,
+                "budget_spent": 0.0,
+                "revenue_expected": 0.0,
+                "revenue_generated": 0.0,
+                "profitability": 0.0,
+                "roi": 0.0,
+                "financial_efficiency": 0.0
+            }
+            
+        c = country_data[country]
+        c["project_count"] += 1
+        c["budget_allocated"] += p.get("budget_allocated", 0.0)
+        c["budget_spent"] += p.get("budget_spent", 0.0)
+        c["revenue_expected"] += p.get("revenue_expected", 0.0)
+        c["revenue_generated"] += p.get("revenue_generated", 0.0)
+        
+    for c in country_data.values():
+        profit = c["revenue_generated"] - c["budget_spent"]
+        c["profitability"] = profit
+        if c["budget_spent"] > 0:
+            c["roi"] = (profit / c["budget_spent"]) * 100
+            c["financial_efficiency"] = c["revenue_generated"] / c["budget_spent"]
+        else:
+            c["roi"] = 0.0
+            c["financial_efficiency"] = 0.0
+            
+    return list(country_data.values())
 
 @api_router.post("/reset-data")
 async def reset_data():
