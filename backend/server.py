@@ -46,6 +46,21 @@ class ProjectPriority(str, Enum):
     HIGH = "high"
     CRITICAL = "critical"
 
+class RiskCreate(BaseModel):
+    project: str
+    risk: str
+    probability: str
+    impact: str
+    severity: str
+    mitigation: str
+    owner: str
+    status: str
+    category: str
+
+class Risk(RiskCreate):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # Models
 class Project(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -232,7 +247,53 @@ async def initialize_mock_data():
         ]
         
         await db.projects.insert_many(mock_projects)
-        logger.info("Mock data initialized successfully")
+        logger.info("Mock projects initialized successfully")
+
+    existing_risks = await db.risks.count_documents({})
+    if existing_risks == 0:
+        mock_risks = [
+            {
+                "id": "risk-001",
+                "project": "Airplane - Release Management Platform",
+                "risk": "Third-party API dependencies",
+                "probability": "High",
+                "impact": "High", 
+                "severity": "Critical",
+                "mitigation": "Implement circuit breakers and fallback mechanisms",
+                "owner": "Pablo Duarte",
+                "status": "Active",
+                "category": "Technical",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "risk-002",
+                "project": "SQL AI Agent",
+                "risk": "AI model accuracy degradation",
+                "probability": "Medium",
+                "impact": "High",
+                "severity": "High", 
+                "mitigation": "Continuous model monitoring and retraining pipeline",
+                "owner": "Andre Luiz",
+                "status": "Monitoring",
+                "category": "Technical",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "risk-003",
+                "project": "SMERA Legal",
+                "risk": "Regulatory compliance changes",
+                "probability": "Low",
+                "impact": "Critical",
+                "severity": "High",
+                "mitigation": "Quarterly legal framework reviews",
+                "owner": "Diana Peluha", 
+                "status": "Mitigated",
+                "category": "Compliance",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        await db.risks.insert_many(mock_risks)
+        logger.info("Mock risks initialized successfully")
 
 # API Routes
 @api_router.get("/")
@@ -361,6 +422,7 @@ async def get_streaming_platforms():
 async def reset_data():
     """Reset and reinitialize mock data"""
     await db.projects.delete_many({})
+    await db.risks.delete_many({})
     await initialize_mock_data()
     return {"message": "Data reset successfully"}
 
@@ -405,47 +467,44 @@ async def get_lessons_learned():
     ]
 
 # Risk Radar endpoints
-@api_router.get("/risk-radar")
+@api_router.get("/risk-radar", response_model=List[Risk])
 async def get_risk_radar():
     """Get risk assessment data"""
-    return [
-        {
-            "id": "risk-001",
-            "project": "Airplane - Release Management Platform",
-            "risk": "Third-party API dependencies",
-            "probability": "High",
-            "impact": "High", 
-            "severity": "Critical",
-            "mitigation": "Implement circuit breakers and fallback mechanisms",
-            "owner": "Pablo Duarte",
-            "status": "Active",
-            "category": "Technical"
-        },
-        {
-            "id": "risk-002",
-            "project": "SQL AI Agent",
-            "risk": "AI model accuracy degradation",
-            "probability": "Medium",
-            "impact": "High",
-            "severity": "High", 
-            "mitigation": "Continuous model monitoring and retraining pipeline",
-            "owner": "Andre Luiz",
-            "status": "Monitoring",
-            "category": "Technical"
-        },
-        {
-            "id": "risk-003",
-            "project": "SMERA Legal",
-            "risk": "Regulatory compliance changes",
-            "probability": "Low",
-            "impact": "Critical",
-            "severity": "High",
-            "mitigation": "Quarterly legal framework reviews",
-            "owner": "Diana Peluha", 
-            "status": "Mitigated",
-            "category": "Compliance"
-        }
-    ]
+    risks = await db.risks.find().to_list(1000)
+    return [Risk(**parse_from_mongo(risk)) for risk in risks]
+
+@api_router.post("/risk-radar", response_model=Risk)
+async def create_risk(risk_data: RiskCreate):
+    """Create a new risk"""
+    risk_dict = risk_data.dict()
+    risk = Risk(**risk_dict)
+    
+    await db.risks.insert_one(prepare_for_mongo(risk.dict()))
+    return risk
+
+@api_router.put("/risk-radar/{risk_id}", response_model=Risk)
+async def update_risk(risk_id: str, risk_data: RiskCreate):
+    """Update an existing risk"""
+    existing_risk = await db.risks.find_one({"id": risk_id})
+    if not existing_risk:
+        raise HTTPException(status_code=404, detail="Risk not found")
+    
+    risk_dict = risk_data.dict()
+    risk_dict["id"] = risk_id
+    risk_dict["created_at"] = existing_risk.get("created_at", datetime.now(timezone.utc).isoformat())
+    
+    risk = Risk(**risk_dict)
+    await db.risks.replace_one({"id": risk_id}, prepare_for_mongo(risk.dict()))
+    return risk
+
+@api_router.delete("/risk-radar/{risk_id}")
+async def delete_risk(risk_id: str):
+    """Delete a risk"""
+    result = await db.risks.delete_one({"id": risk_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Risk not found")
+    
+    return {"message": "Risk deleted successfully"}
 
 # PMO Playbook endpoints
 @api_router.get("/pmo-playbook")

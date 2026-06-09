@@ -33,6 +33,52 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [updateData, setUpdateData] = useState({
+    progress: 0,
+    budget_spent: 0,
+    milestones: []
+  });
+
+  const openUpdateModal = () => {
+    setUpdateData({
+      progress: selectedProject.progress || 0,
+      budget_spent: selectedProject.budget_spent || 0,
+      milestones: selectedProject.milestones ? [...selectedProject.milestones] : []
+    });
+    setIsUpdateModalOpen(true);
+  };
+
+  const handleUpdateProject = async (e) => {
+    e.preventDefault();
+    try {
+      const updatedProjectData = {
+        ...selectedProject,
+        progress: parseInt(updateData.progress, 10),
+        budget_spent: parseFloat(updateData.budget_spent),
+        milestones: updateData.milestones
+      };
+
+      const response = await axios.put(`${API}/projects/${selectedProject.id}`, updatedProjectData);
+      
+      // Update local state
+      setProjects(prev => prev.map(p => p.id === selectedProject.id ? response.data : p));
+      setSelectedProject(response.data);
+      
+      setIsUpdateModalOpen(false);
+      alert("Project updated successfully!");
+    } catch (error) {
+      console.error('Error updating project:', error);
+      alert("Error: Failed to update project. Please try again.");
+    }
+  };
+
+  const toggleMilestone = (index) => {
+    const newMilestones = [...updateData.milestones];
+    newMilestones[index].completed = !newMilestones[index].completed;
+    setUpdateData(prev => ({ ...prev, milestones: newMilestones }));
+  };
+
   const [managers, setManagers] = useState([]);
   const [newProject, setNewProject] = useState({
     name: '',
@@ -79,7 +125,7 @@ const Projects = () => {
   };
 
   const filterProjects = () => {
-    let filtered = projects;
+    let filtered = [...projects];
 
     // Search filter
     if (searchQuery) {
@@ -533,9 +579,16 @@ const Projects = () => {
           {selectedProject && (
             <>
               <div className="modal-header">
-                <h1>
-                  {selectedProject.name}
-                </h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h1>{selectedProject.name}</h1>
+                  <Button 
+                    variant="outline"
+                    onClick={openUpdateModal}
+                    data-testid="open-update-modal-btn"
+                  >
+                    Update Progress
+                  </Button>
+                </div>
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -978,6 +1031,130 @@ const Projects = () => {
             No projects found
           </h3>
           <p>Try adjusting your search criteria or filters</p>
+        </div>
+      )}
+      {/* Update Project Modal */}
+      {isUpdateModalOpen && selectedProject && (
+        <div 
+          className="modal-overlay"
+          onClick={() => setIsUpdateModalOpen(false)}
+          style={{ zIndex: 1100 }}
+        >
+          <div 
+            className="project-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsUpdateModalOpen(false)}
+              className="modal-close-btn"
+            >
+              ✕
+            </button>
+            
+            <div className="modal-header">
+              <h1>Update Project</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Update progress, budget, and milestone status for {selectedProject.name}
+              </p>
+            </div>
+
+            <form onSubmit={handleUpdateProject} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="update-progress">Progress (%) *</Label>
+                  <Input
+                    id="update-progress"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={updateData.progress}
+                    onChange={(e) => setUpdateData(prev => ({...prev, progress: e.target.value}))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="update-budget">Budget Spent (USD) *</Label>
+                  <Input
+                    id="update-budget"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={updateData.budget_spent}
+                    onChange={(e) => setUpdateData(prev => ({...prev, budget_spent: e.target.value}))}
+                    required
+                  />
+                  <div style={{ fontSize: '12px', color: 'var(--sony-gray-500)', marginTop: '4px' }}>
+                    Allocated Budget: {formatCurrency(selectedProject.budget_allocated)}
+                  </div>
+                </div>
+              </div>
+
+              {updateData.milestones && updateData.milestones.length > 0 && (
+                <div>
+                  <Label>Milestones</Label>
+                  <div style={{ 
+                    border: '1px solid var(--sony-gray-200)', 
+                    borderRadius: '8px',
+                    padding: '12px',
+                    marginTop: '8px',
+                    display: 'grid',
+                    gap: '12px'
+                  }}>
+                    {updateData.milestones.map((milestone, index) => (
+                      <label 
+                        key={index} 
+                        style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '12px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        <input 
+                          type="checkbox" 
+                          checked={milestone.completed}
+                          onChange={() => toggleMilestone(index)}
+                          style={{ width: '16px', height: '16px' }}
+                        />
+                        <span style={{ fontSize: '14px', flex: 1, textDecoration: milestone.completed ? 'line-through' : 'none', color: milestone.completed ? 'var(--sony-gray-500)' : 'inherit' }}>
+                          {milestone.name}
+                        </span>
+                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-500)' }}>
+                          {formatDate(milestone.date)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                gap: '12px',
+                paddingTop: '20px',
+                borderTop: '1px solid var(--sony-gray-200)'
+              }}>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsUpdateModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  style={{ 
+                    background: 'var(--sony-red)',
+                    color: 'white',
+                    border: 'none'
+                  }}
+                >
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

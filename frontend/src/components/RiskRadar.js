@@ -72,7 +72,7 @@ const RiskRadar = () => {
   };
 
   const filterRisks = () => {
-    let filtered = risks;
+    let filtered = [...risks];
 
     if (searchQuery) {
       filtered = filtered.filter(risk => 
@@ -98,7 +98,7 @@ const RiskRadar = () => {
   };
 
   const getSeverityColor = (severity) => {
-    switch (severity.toLowerCase()) {
+    switch (severity?.toLowerCase()) {
       case 'critical': return 'var(--sony-red)';
       case 'high': return '#F59E0B';
       case 'medium': return '#3B82F6';
@@ -162,11 +162,11 @@ const RiskRadar = () => {
       const riskData = {
         ...newRisk,
         severity,
-        status: 'Active',
-        id: `risk-${Date.now()}`
+        status: 'Active'
       };
       
-      setRisks(prev => [...prev, riskData]);
+      const response = await axios.post(`${API}/risk-radar`, riskData);
+      setRisks(prev => [...prev, response.data]);
       
       // Reset form
       setNewRisk({
@@ -185,6 +185,47 @@ const RiskRadar = () => {
       console.error('Error creating risk:', error);
       alert("Error: Failed to report risk. Please try again.");
     }
+  };
+
+  const handleUpdateRisk = async (e) => {
+    e.preventDefault();
+    try {
+      const riskScore = calculateRiskScore(editRisk.probability, editRisk.impact);
+      let severity = 'Low';
+      if (riskScore >= 9) severity = 'Critical';
+      else if (riskScore >= 6) severity = 'High';
+      else if (riskScore >= 3) severity = 'Medium';
+
+      const riskData = {
+        ...editRisk,
+        severity
+      };
+      
+      const response = await axios.put(`${API}/risk-radar/${selectedRisk.id}`, riskData);
+      setRisks(prev => prev.map(r => r.id === selectedRisk.id ? response.data : r));
+      
+      setIsEditRiskModalOpen(false);
+      setSelectedRisk(null);
+      alert("Risk updated successfully!");
+    } catch (error) {
+      console.error('Error updating risk:', error);
+      alert("Error: Failed to update risk. Please try again.");
+    }
+  };
+
+  const openEditModal = (risk) => {
+    setSelectedRisk(risk);
+    setEditRisk({
+      project: risk.project,
+      risk: risk.risk,
+      probability: risk.probability,
+      impact: risk.impact,
+      category: risk.category,
+      mitigation: risk.mitigation,
+      owner: risk.owner,
+      status: risk.status
+    });
+    setIsEditRiskModalOpen(true);
   };
 
   if (loading) {
@@ -441,6 +482,7 @@ const RiskRadar = () => {
                   <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid var(--sony-gray-200)', fontSize: '14px', fontWeight: '600' }}>Status</th>
                   <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid var(--sony-gray-200)', fontSize: '14px', fontWeight: '600' }}>Mitigation</th>
                   <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid var(--sony-gray-200)', fontSize: '14px', fontWeight: '600' }}>Owner</th>
+                  <th style={{ padding: '12px', textAlign: 'center', borderBottom: '2px solid var(--sony-gray-200)', fontSize: '14px', fontWeight: '600' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -515,6 +557,16 @@ const RiskRadar = () => {
                         {risk.mitigation.length > 50 ? risk.mitigation.substring(0, 50) + '...' : risk.mitigation}
                       </td>
                       <td style={{ padding: '16px', textAlign: 'center', fontSize: '14px' }}>{risk.owner}</td>
+                      <td style={{ padding: '16px', textAlign: 'center' }}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openEditModal(risk)}
+                          data-testid={`edit-risk-${risk.id}`}
+                        >
+                          Edit
+                        </Button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -698,6 +750,192 @@ const RiskRadar = () => {
                   }}
                 >
                   Report Risk
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Edit Risk Modal */}
+      {isEditRiskModalOpen && (
+        <div 
+          className="modal-overlay"
+          onClick={() => setIsEditRiskModalOpen(false)}
+        >
+          <div 
+            className="project-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsEditRiskModalOpen(false)}
+              className="modal-close-btn"
+            >
+              ✕
+            </button>
+            
+            <div className="modal-header">
+              <h1>Edit Risk</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Update risk status and details
+              </p>
+            </div>
+
+            <form onSubmit={handleUpdateRisk} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="edit-risk-project">Project Name *</Label>
+                  <Input
+                    id="edit-risk-project"
+                    value={editRisk.project}
+                    onChange={(e) => setEditRisk(prev => ({...prev, project: e.target.value}))}
+                    placeholder="Enter project name"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-risk-category">Category *</Label>
+                  <select 
+                    id="edit-risk-category"
+                    value={editRisk.category} 
+                    onChange={(e) => setEditRisk(prev => ({...prev, category: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Technical">Technical</option>
+                    <option value="Compliance">Compliance</option>
+                    <option value="Market">Market</option>
+                    <option value="Operational">Operational</option>
+                    <option value="Financial">Financial</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="edit-risk-description">Risk Description *</Label>
+                <Input
+                  id="edit-risk-description"
+                  value={editRisk.risk}
+                  onChange={(e) => setEditRisk(prev => ({...prev, risk: e.target.value}))}
+                  placeholder="Describe the potential risk"
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="edit-risk-probability">Probability *</Label>
+                  <select 
+                    id="edit-risk-probability"
+                    value={editRisk.probability} 
+                    onChange={(e) => setEditRisk(prev => ({...prev, probability: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-risk-impact">Impact *</Label>
+                  <select 
+                    id="edit-risk-impact"
+                    value={editRisk.impact} 
+                    onChange={(e) => setEditRisk(prev => ({...prev, impact: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-risk-status">Status *</Label>
+                  <select 
+                    id="edit-risk-status"
+                    value={editRisk.status} 
+                    onChange={(e) => setEditRisk(prev => ({...prev, status: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Monitoring">Monitoring</option>
+                    <option value="Mitigated">Mitigated</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-risk-owner">Risk Owner *</Label>
+                  <Input
+                    id="edit-risk-owner"
+                    value={editRisk.owner}
+                    onChange={(e) => setEditRisk(prev => ({...prev, owner: e.target.value}))}
+                    placeholder="Responsible person"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="edit-risk-mitigation">Mitigation Strategy</Label>
+                <Textarea
+                  id="edit-risk-mitigation"
+                  value={editRisk.mitigation}
+                  onChange={(e) => setEditRisk(prev => ({...prev, mitigation: e.target.value}))}
+                  placeholder="Describe mitigation actions and contingency plans"
+                  rows={3}
+                />
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                gap: '12px',
+                paddingTop: '20px',
+                borderTop: '1px solid var(--sony-gray-200)'
+              }}>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditRiskModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  style={{ 
+                    background: 'var(--sony-red)',
+                    color: 'white',
+                    border: 'none'
+                  }}
+                >
+                  Update Risk
                 </Button>
               </div>
             </form>
