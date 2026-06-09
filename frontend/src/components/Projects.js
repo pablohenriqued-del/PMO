@@ -912,12 +912,22 @@ const Projects = () => {
                     required
                   >
                     <option value="Global">Global</option>
-                    <option value="Brazil">Brazil</option>
-                    <option value="Mexico">Mexico</option>
-                    <option value="Argentina">Argentina</option>
-                    <option value="Colombia">Colombia</option>
-                    <option value="Chile">Chile</option>
-                    <option value="Peru">Peru</option>
+                    <optgroup label="South America">
+                      <option value="Brazil">Brazil</option>
+                      <option value="Argentina">Argentina</option>
+                      <option value="Colombia">Colombia</option>
+                      <option value="Chile">Chile</option>
+                      <option value="Peru">Peru</option>
+                    </optgroup>
+                    <optgroup label="North America">
+                      <option value="USA">USA</option>
+                      <option value="Canada">Canada</option>
+                      <option value="Mexico">Mexico</option>
+                    </optgroup>
+                    <optgroup label="Europe">
+                      <option value="Spain">Spain</option>
+                      <option value="Portugal">Portugal</option>
+                    </optgroup>
                   </select>
                 </div>
                 <div>
