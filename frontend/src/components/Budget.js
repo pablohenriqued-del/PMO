@@ -167,6 +167,18 @@ const Budget = () => {
       return acc;
     }, {});
 
+    // Budget by Country
+    const budgetByCountry = filteredProjects.reduce((acc, project) => {
+      const country = project.country || "Global";
+      if (!acc[country]) {
+        acc[country] = { allocated: 0, spent: 0, count: 0 };
+      }
+      acc[country].allocated += project.budget_allocated;
+      acc[country].spent += project.budget_spent;
+      acc[country].count += 1;
+      return acc;
+    }, {});
+
     // Projects with budget variance
     const projectsWithVariance = filteredProjects.map(project => ({
       ...project,
@@ -181,6 +193,7 @@ const Budget = () => {
       utilizationRate,
       budgetByStatus,
       budgetByManager,
+      budgetByCountry,
       projectsWithVariance: projectsWithVariance.slice(0, 10) // Top 10 by variance
     });
   };
@@ -523,6 +536,98 @@ const Budget = () => {
                         color: 'var(--sony-gray-900)'
                       }}>
                         {manager} ({data.count} projects)
+                      </span>
+                      <span style={{ 
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: data.spent > data.allocated ? 'var(--sony-red)' : '#10B981'
+                      }}>
+                        {((data.spent / data.allocated) * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    
+                    <div style={{ marginBottom: '8px' }}>
+                      <div style={{ 
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontSize: '14px',
+                        marginBottom: '4px'
+                      }}>
+                        <span>Allocated:</span>
+                        <strong>{formatCurrency(data.allocated)}</strong>
+                      </div>
+                      <div style={{ 
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        fontSize: '14px'
+                      }}>
+                        <span>Spent:</span>
+                        <strong style={{ color: 'var(--sony-red)' }}>
+                          {formatCurrency(data.spent)}
+                        </strong>
+                      </div>
+                    </div>
+
+                    <div className="progress-bar" style={{ height: '6px' }}>
+                      <div 
+                        className="progress-fill" 
+                        style={{ 
+                          width: `${Math.min((data.spent / data.allocated) * 100, 100)}%`,
+                          background: data.spent > data.allocated ? 'var(--sony-red)' : '#10B981'
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Budget by Country */}
+            <div style={{ 
+              background: 'var(--sony-white)',
+              borderRadius: '16px',
+              padding: '24px',
+              boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+              border: '1px solid var(--sony-gray-200)',
+              gridColumn: '1 / -1'
+            }}>
+              <h3 style={{ 
+                fontSize: '20px', 
+                fontWeight: '700', 
+                marginBottom: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <BarChart3 size={20} />
+                Budget Analysis by Country
+              </h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                {Object.entries(budgetSummary.budgetByCountry)
+                  .sort(([,a], [,b]) => b.allocated - a.allocated)
+                  .map(([country, data]) => (
+                  <div 
+                    key={country}
+                    style={{ 
+                      padding: '16px',
+                      background: 'var(--sony-gray-50)',
+                      borderRadius: '12px',
+                      border: '1px solid var(--sony-gray-200)'
+                    }}
+                  >
+                    <div style={{ 
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '8px'
+                    }}>
+                      <span style={{ 
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        color: 'var(--sony-gray-900)'
+                      }}>
+                        {country} ({data.count} projects)
                       </span>
                       <span style={{ 
                         fontSize: '12px',
