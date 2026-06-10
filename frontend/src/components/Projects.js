@@ -202,6 +202,22 @@ const Projects = () => {
     }
   };
 
+  const getCountryFlag = (country) => {
+    switch(country) {
+      case 'Brazil': return '🇧🇷';
+      case 'Argentina': return '🇦🇷';
+      case 'Colombia': return '🇨🇴';
+      case 'Chile': return '🇨🇱';
+      case 'Peru': return '🇵🇪';
+      case 'Mexico': return '🇲🇽';
+      case 'USA': return '🇺🇸';
+      case 'Canada': return '🇨🇦';
+      case 'Spain': return '🇪🇸';
+      case 'Portugal': return '🇵🇹';
+      default: return '🌍';
+    }
+  };
+
   const getBudgetStatus = (allocated, spent) => {
     const percentage = (spent / allocated) * 100;
     if (percentage > 100) return { color: 'var(--sony-red)', status: 'Over Budget' };
@@ -438,7 +454,12 @@ const Projects = () => {
               <div className="project-header">
                 <div>
                   <h3 className="project-title">{project.name}</h3>
-                  <p className="project-manager">Manager: {project.manager}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <p className="project-manager">Manager: {project.manager}</p>
+                    <span style={{ fontSize: '14px' }} title={project.country || 'Global'}>
+                      {getCountryFlag(project.country || 'Global')}
+                    </span>
+                  </div>
                   <div style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
@@ -672,7 +693,8 @@ const Projects = () => {
                       </div>
                       <div>
                         <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Country</span>
-                        <div style={{ fontSize: '14px', fontWeight: '600' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>{getCountryFlag(selectedProject.country || 'Global')}</span>
                           {selectedProject.country || 'Global'}
                         </div>
                       </div>

@@ -42,6 +42,22 @@ const RegionalDashboard = () => {
     }).format(value / 100);
   };
 
+  const getCountryFlag = (country) => {
+    switch(country) {
+      case 'Brazil': return '🇧🇷';
+      case 'Argentina': return '🇦🇷';
+      case 'Colombia': return '🇨🇴';
+      case 'Chile': return '🇨🇱';
+      case 'Peru': return '🇵🇪';
+      case 'Mexico': return '🇲🇽';
+      case 'USA': return '🇺🇸';
+      case 'Canada': return '🇨🇦';
+      case 'Spain': return '🇪🇸';
+      case 'Portugal': return '🇵🇹';
+      default: return '🌍';
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ padding: '32px' }}>
@@ -145,6 +161,7 @@ const RegionalDashboard = () => {
                 {countryData.map((data, index) => (
                   <tr key={index} style={{ borderBottom: '1px solid var(--sony-gray-200)' }}>
                     <td style={{ padding: '16px', fontWeight: '600', color: 'var(--sony-gray-900)' }}>
+                      <span style={{ marginRight: '8px', fontSize: '18px' }}>{getCountryFlag(data.country)}</span>
                       {data.country}
                     </td>
                     <td style={{ padding: '16px', textAlign: 'center', color: 'var(--sony-gray-800)' }}>
