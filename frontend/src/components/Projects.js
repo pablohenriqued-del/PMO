@@ -202,20 +202,36 @@ const Projects = () => {
     }
   };
 
-  const getCountryFlag = (country) => {
-    switch(country) {
-      case 'Brazil': return '🇧🇷';
-      case 'Argentina': return '🇦🇷';
-      case 'Colombia': return '🇨🇴';
-      case 'Chile': return '🇨🇱';
-      case 'Peru': return '🇵🇪';
-      case 'Mexico': return '🇲🇽';
-      case 'USA': return '🇺🇸';
-      case 'Canada': return '🇨🇦';
-      case 'Spain': return '🇪🇸';
-      case 'Portugal': return '🇵🇹';
-      default: return '🌍';
+  const CountryFlag = ({ country, size = 16 }) => {
+    const getCountryCode = (c) => {
+      switch(c) {
+        case 'Brazil': return 'br';
+        case 'Argentina': return 'ar';
+        case 'Colombia': return 'co';
+        case 'Chile': return 'cl';
+        case 'Peru': return 'pe';
+        case 'Mexico': return 'mx';
+        case 'USA': return 'us';
+        case 'Canada': return 'ca';
+        case 'Spain': return 'es';
+        case 'Portugal': return 'pt';
+        default: return 'global';
+      }
+    };
+
+    const code = getCountryCode(country);
+    if (code === 'global') {
+      return <span style={{ fontSize: `${size}px`, lineHeight: 1 }}>🌍</span>;
     }
+    return (
+      <img 
+        src={`https://flagcdn.com/w40/${code}.png`} 
+        height={size} 
+        alt={country} 
+        title={country}
+        style={{ borderRadius: '2px', objectFit: 'cover', display: 'inline-block' }}
+      />
+    );
   };
 
   const getBudgetStatus = (allocated, spent) => {
@@ -456,9 +472,7 @@ const Projects = () => {
                   <h3 className="project-title">{project.name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <p className="project-manager">Manager: {project.manager}</p>
-                    <span style={{ fontSize: '14px' }} title={project.country || 'Global'}>
-                      {getCountryFlag(project.country || 'Global')}
-                    </span>
+                    <CountryFlag country={project.country || 'Global'} size={14} />
                   </div>
                   <div style={{ 
                     display: 'flex', 
@@ -694,7 +708,7 @@ const Projects = () => {
                       <div>
                         <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>Country</span>
                         <div style={{ fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span>{getCountryFlag(selectedProject.country || 'Global')}</span>
+                          <CountryFlag country={selectedProject.country || 'Global'} size={16} />
                           {selectedProject.country || 'Global'}
                         </div>
                       </div>
