@@ -82,6 +82,32 @@ const Projects = () => {
     setUpdateData(prev => ({ ...prev, milestones: newMilestones }));
   };
 
+    const addMilestone = () => {
+    setUpdateData(prev => ({
+      ...prev,
+      milestones: [...prev.milestones, { name: '', date: new Date().toISOString().split('T')[0], completed: false, assigned_to: null }]
+    }));
+  };
+
+  const removeMilestone = (index) => {
+    setUpdateData(prev => ({
+      ...prev,
+      milestones: prev.milestones.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateMilestoneName = (index, name) => {
+    const newMilestones = [...updateData.milestones];
+    newMilestones[index].name = name;
+    setUpdateData(prev => ({ ...prev, milestones: newMilestones }));
+  };
+
+  const updateMilestoneDate = (index, date) => {
+    const newMilestones = [...updateData.milestones];
+    newMilestones[index].date = date;
+    setUpdateData(prev => ({ ...prev, milestones: newMilestones }));
+  };
+
   const assignUserToMilestone = (index, userId) => {
     const newMilestones = [...updateData.milestones];
     newMilestones[index].assigned_to = userId;
@@ -1225,18 +1251,31 @@ const Projects = () => {
                 </div>
               </div>
 
-              {updateData.milestones && updateData.milestones.length > 0 && (
-                <div>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Label>Milestones & Resource Allocation (AD/LDAP)</Label>
-                  <div style={{ 
-                    border: '1px solid var(--sony-gray-200)', 
-                    borderRadius: '8px',
-                    padding: '12px',
-                    marginTop: '8px',
-                    display: 'grid',
-                    gap: '12px'
-                  }}>
-                    {updateData.milestones.map((milestone, index) => (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={addMilestone}
+                    style={{ fontSize: '12px', padding: '4px 8px', height: 'auto' }}
+                  >
+                    + Add Milestone
+                  </Button>
+                </div>
+                <div style={{ 
+                  border: '1px solid var(--sony-gray-200)', 
+                  borderRadius: '8px',
+                  padding: '12px',
+                  marginTop: '8px',
+                  display: 'grid',
+                  gap: '12px'
+                }}>
+                  {updateData.milestones.length === 0 ? (
+                    <div style={{ fontSize: '12px', color: 'var(--sony-gray-500)', textAlign: 'center' }}>No milestones added yet.</div>
+                  ) : (
+                    updateData.milestones.map((milestone, index) => (
                       <div 
                         key={index} 
                         style={{ 
@@ -1251,9 +1290,14 @@ const Projects = () => {
                           onChange={() => toggleMilestone(index)}
                           style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                         />
-                        <span style={{ fontSize: '14px', flex: 1, textDecoration: milestone.completed ? 'line-through' : 'none', color: milestone.completed ? 'var(--sony-gray-500)' : 'inherit' }}>
-                          {milestone.name}
-                        </span>
+                        
+                        <Input 
+                          value={milestone.name}
+                          onChange={(e) => updateMilestoneName(index, e.target.value)}
+                          placeholder="Milestone name"
+                          style={{ flex: 1, height: '32px', fontSize: '14px' }}
+                          required
+                        />
                         
                         <select
                           value={milestone.assigned_to || ''}
@@ -1263,7 +1307,8 @@ const Projects = () => {
                             border: '1px solid var(--sony-gray-300)',
                             borderRadius: '4px',
                             fontSize: '12px',
-                            maxWidth: '200px'
+                            maxWidth: '180px',
+                            height: '32px'
                           }}
                         >
                           <option value="">Unassigned</option>
@@ -1274,14 +1319,33 @@ const Projects = () => {
                           ))}
                         </select>
 
-                        <span style={{ fontSize: '12px', color: 'var(--sony-gray-500)', minWidth: '80px', textAlign: 'right' }}>
-                          {formatDate(milestone.date)}
-                        </span>
+                        <Input 
+                          type="date"
+                          value={milestone.date.split('T')[0]}
+                          onChange={(e) => updateMilestoneDate(index, e.target.value)}
+                          style={{ width: '130px', height: '32px', fontSize: '12px' }}
+                          required
+                        />
+
+                        <button 
+                          type="button"
+                          onClick={() => removeMilestone(index)}
+                          style={{ 
+                            background: 'none', 
+                            border: 'none', 
+                            color: 'var(--sony-red)', 
+                            cursor: 'pointer',
+                            padding: '4px' 
+                          }}
+                          title="Remove milestone"
+                        >
+                          ✕
+                        </button>
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  )}
                 </div>
-              )}
+              </div>
 
               <div style={{ 
                 display: 'flex', 
