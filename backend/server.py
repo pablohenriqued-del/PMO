@@ -124,6 +124,26 @@ class DashboardStats(BaseModel):
     delayed_projects: int
 
 # Helper function for datetime serialization
+
+# Email Mock Service
+async def send_allocation_email_mock(user_id: str, milestone_name: str, project_name: str):
+    """Mock email sending service for project task allocation"""
+    try:
+        user = await db.users.find_one({"id": user_id})
+        if user:
+            user_email = user.get("email")
+            user_name = user.get("name")
+            logger.info(f"==================================================")
+            logger.info(f"📧 EMAIL SENT (MOCK)")
+            logger.info(f"To: {user_name} <{user_email}>")
+            logger.info(f"Subject: You have been allocated to a new task in {project_name}")
+            logger.info(f"Body: Hello {user_name}, you have been assigned to the milestone/task '{milestone_name}' in the project '{project_name}'. Please check the PMO Dashboard for more details.")
+            logger.info(f"==================================================")
+            return True
+    except Exception as e:
+        logger.error(f"Failed to send mock email: {e}")
+    return False
+
 def prepare_for_mongo(data):
     """Prepare data for MongoDB storage"""
     return data
@@ -499,6 +519,25 @@ async def update_project(project_id: str, project_data: ProjectCreate):
     existing_project = await db.projects.find_one({"id": project_id})
     if not existing_project:
         raise HTTPException(status_code=404, detail="Project not found")
+    
+    # Check for new allocations to send emails
+    old_milestones = existing_project.get("milestones", [])
+    new_milestones = project_data.milestones
+    
+    for new_ms in new_milestones:
+        assigned_user = new_ms.get("assigned_to")
+        if assigned_user:
+            # Check if this assignment is new
+            was_already_assigned = False
+            for old_ms in old_milestones:
+                if old_ms.get("name") == new_ms.get("name") and old_ms.get("assigned_to") == assigned_user:
+                    was_already_assigned = True
+                    break
+            
+            if not was_already_assigned:
+                # Send email notification asynchronously
+                import asyncio
+                asyncio.create_task(send_allocation_email_mock(assigned_user, new_ms.get("name", "Task"), project_data.name))
     
     project_dict = project_data.dict()
     project_dict["id"] = project_id
