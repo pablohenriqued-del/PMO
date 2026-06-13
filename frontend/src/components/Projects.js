@@ -10,8 +10,10 @@ import {
   AlertTriangle,
   CheckCircle2,
   Clock,
-  X
+  X,
+  Image as ImageIcon
 } from "lucide-react";
+import html2canvas from "html2canvas";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -273,6 +275,34 @@ const Projects = () => {
     setIsModalOpen(true);
   };
 
+  const downloadProjectCard = async (e, projectId, projectName) => {
+    e.stopPropagation();
+    try {
+      const cardElement = document.getElementById(`project-card-${projectId}`);
+      if (!cardElement) return;
+      
+      // Temporarily hide the download button to not include it in the image
+      const downloadBtn = cardElement.querySelector('.download-card-btn');
+      if (downloadBtn) downloadBtn.style.display = 'none';
+
+      const canvas = await html2canvas(cardElement, {
+        backgroundColor: '#1E1E1E', // Match the dark theme background
+        scale: 2 // Higher resolution
+      });
+
+      if (downloadBtn) downloadBtn.style.display = 'flex';
+
+      const image = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.download = `Project_${projectName.replace(/\s+/g, '_')}.png`;
+      link.href = image;
+      link.click();
+    } catch (error) {
+      console.error('Error downloading image:', error);
+      alert('Failed to generate image.');
+    }
+  };
+
   const handleCreateProject = async (e) => {
     e.preventDefault();
     try {
@@ -489,11 +519,38 @@ const Projects = () => {
           return (
             <div 
               key={project.id} 
+              id={`project-card-${project.id}`}
               className="project-card"
               onClick={() => openProjectModal(project)}
               data-testid={`project-${project.id}`}
+              style={{ position: 'relative' }}
             >
-              <div className="project-header">
+              <button
+                className="download-card-btn"
+                onClick={(e) => downloadProjectCard(e, project.id, project.name)}
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  background: 'var(--sony-gray-100)',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: 'var(--sony-gray-600)',
+                  zIndex: 10,
+                  transition: 'all 0.2s ease'
+                }}
+                title="Download as Image"
+              >
+                <ImageIcon size={16} />
+              </button>
+              
+              <div className="project-header" style={{ paddingRight: '32px' }}>
                 <div>
                   <h3 className="project-title">{project.name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

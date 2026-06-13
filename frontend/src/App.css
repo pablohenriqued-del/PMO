@@ -583,3 +583,8 @@ html, body {
     background-position: -200% 0;
   }
 }
+
+.download-card-btn:hover {
+  background: var(--sony-gray-200) !important;
+  color: var(--sony-white) !important;
+}
