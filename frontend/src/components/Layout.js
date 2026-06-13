@@ -34,12 +34,6 @@ const Layout = ({ children }) => {
       current: location.pathname === "/regional"
     },
     {
-      name: "User Administration",
-      href: "/admin/users",
-      icon: Users,
-      current: location.pathname === "/admin/users"
-    },
-    {
       name: "Projects",
       href: "/projects", 
       icon: FolderOpen,
@@ -86,6 +80,12 @@ const Layout = ({ children }) => {
       href: "/innovation-radar",
       icon: Zap,
       current: location.pathname === "/innovation-radar"
+    },
+    {
+      name: "User Administration",
+      href: "/admin/users",
+      icon: Users,
+      current: location.pathname === "/admin/users"
     }
   ];
 
