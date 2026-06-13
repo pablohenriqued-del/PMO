@@ -140,7 +140,7 @@ const Projects = () => {
 
   const fetchLdapUsers = async () => {
     try {
-      const response = await axios.get(`${API}/ldap/users`);
+      const response = await axios.get(`${API}/users`);
       setLdapUsers(response.data);
     } catch (error) {
       console.error('Error fetching LDAP users:', error);

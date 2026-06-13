@@ -103,6 +103,16 @@ class ProjectCreate(BaseModel):
     team_members: List[str] = []
     streaming_platforms: List[str] = []
 
+class UserCreate(BaseModel):
+    name: str
+    email: str
+    department: str
+    role: str
+
+class User(UserCreate):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 class DashboardStats(BaseModel):
     total_projects: int
     active_projects: int
@@ -391,6 +401,20 @@ async def initialize_mock_data():
         ]
         await db.risks.insert_many(mock_risks)
         logger.info("Mock risks initialized successfully")
+    existing_users = await db.users.count_documents({})
+    if existing_users == 0:
+        mock_users = [
+            {"id": "u1", "name": "João Silva", "email": "joao.silva@sonymusic.com", "department": "Engineering", "role": "Senior Developer"},
+            {"id": "u2", "name": "Maria Garcia", "email": "maria.garcia@sonymusic.com", "department": "Engineering", "role": "Frontend Developer"},
+            {"id": "u3", "name": "Carlos Santos", "email": "carlos.santos@sonymusic.com", "department": "QA", "role": "QA Engineer"},
+            {"id": "u4", "name": "Ana Rodriguez", "email": "ana.rodriguez@sonymusic.com", "department": "Legal", "role": "Legal Consultant"},
+            {"id": "u5", "name": "Luis Gomez", "email": "luis.gomez@sonymusic.com", "department": "Data Science", "role": "Data Analyst"},
+            {"id": "u6", "name": "Camila Alves", "email": "camila.alves@sonymusic.com", "department": "Marketing", "role": "Marketing Manager"},
+            {"id": "u7", "name": "Pedro Lima", "email": "pedro.lima@sonymusic.com", "department": "Product", "role": "Product Owner"},
+            {"id": "u8", "name": "Sofia Costa", "email": "sofia.costa@sonymusic.com", "department": "Operations", "role": "Regional Manager"}
+        ]
+        await db.users.insert_many(mock_users)
+        logger.info("Mock users initialized successfully")
 
 # API Routes
 @api_router.get("/")
@@ -515,20 +539,43 @@ async def get_streaming_platforms():
         {"name": "Tidal", "streams": 200000000, "growth": 4.2}
     ]
 
-# LDAP Mock endpoint
-@api_router.get("/ldap/users")
-async def get_ldap_users():
-    """Mock endpoint to simulate Active Directory / LDAP resources"""
-    return [
-        {"id": "u1", "name": "João Silva", "email": "joao.silva@sonymusic.com", "department": "Engineering", "role": "Senior Developer"},
-        {"id": "u2", "name": "Maria Garcia", "email": "maria.garcia@sonymusic.com", "department": "Engineering", "role": "Frontend Developer"},
-        {"id": "u3", "name": "Carlos Santos", "email": "carlos.santos@sonymusic.com", "department": "QA", "role": "QA Engineer"},
-        {"id": "u4", "name": "Ana Rodriguez", "email": "ana.rodriguez@sonymusic.com", "department": "Legal", "role": "Legal Consultant"},
-        {"id": "u5", "name": "Luis Gomez", "email": "luis.gomez@sonymusic.com", "department": "Data Science", "role": "Data Analyst"},
-        {"id": "u6", "name": "Camila Alves", "email": "camila.alves@sonymusic.com", "department": "Marketing", "role": "Marketing Manager"},
-        {"id": "u7", "name": "Pedro Lima", "email": "pedro.lima@sonymusic.com", "department": "Product", "role": "Product Owner"},
-        {"id": "u8", "name": "Sofia Costa", "email": "sofia.costa@sonymusic.com", "department": "Operations", "role": "Regional Manager"}
-    ]
+# User Administration endpoints
+@api_router.get("/users", response_model=List[User])
+async def get_users():
+    """Get all users"""
+    users = await db.users.find().to_list(1000)
+    return [User(**parse_from_mongo(u)) for u in users]
+
+@api_router.post("/users", response_model=User)
+async def create_user(user_data: UserCreate):
+    """Create a new user"""
+    user_dict = user_data.dict()
+    user = User(**user_dict)
+    await db.users.insert_one(prepare_for_mongo(user.dict()))
+    return user
+
+@api_router.put("/users/{user_id}", response_model=User)
+async def update_user(user_id: str, user_data: UserCreate):
+    """Update an existing user"""
+    existing_user = await db.users.find_one({"id": user_id})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    user_dict = user_data.dict()
+    user_dict["id"] = user_id
+    user_dict["created_at"] = existing_user.get("created_at", datetime.now(timezone.utc).isoformat())
+    
+    user = User(**user_dict)
+    await db.users.replace_one({"id": user_id}, prepare_for_mongo(user.dict()))
+    return user
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str):
+    """Delete a user"""
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted successfully"}
 
 # Analytics endpoints
 @api_router.get("/analytics/countries")
@@ -577,6 +624,7 @@ async def reset_data():
     """Reset and reinitialize mock data"""
     await db.projects.delete_many({})
     await db.risks.delete_many({})
+    await db.users.delete_many({})
     await initialize_mock_data()
     return {"message": "Data reset successfully"}
 

@@ -11,6 +11,7 @@ import {
   FileText,
   Search,
   Zap,
+  Users,
   Menu,
   X
 } from "lucide-react";
@@ -31,6 +32,12 @@ const Layout = ({ children }) => {
       href: "/regional",
       icon: Globe,
       current: location.pathname === "/regional"
+    },
+    {
+      name: "User Administration",
+      href: "/admin/users",
+      icon: Users,
+      current: location.pathname === "/admin/users"
     },
     {
       name: "Projects",
