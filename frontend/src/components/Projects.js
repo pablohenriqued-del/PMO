@@ -131,7 +131,9 @@ const Projects = () => {
     start_date: '',
     end_date: '',
     team_members: '',
-    streaming_platforms: ''
+    streaming_platforms: '',
+    documentations: '',
+    envs: ''
   });
 
   useEffect(() => {
@@ -333,7 +335,9 @@ const Projects = () => {
         start_date: '',
         end_date: '',
         team_members: '',
-        streaming_platforms: ''
+        streaming_platforms: '',
+        documentations: '',
+        envs: ''
       });
       
       setIsCreateModalOpen(false);
@@ -657,6 +661,17 @@ const Projects = () => {
                 </div>
               </div>
 
+              {project.documentations && (
+                <div style={{ marginTop: '12px', fontSize: '12px', color: 'var(--sony-gray-600)' }}>
+                  <strong>Docs:</strong> {project.documentations.length > 30 ? project.documentations.substring(0, 30) + '...' : project.documentations}
+                </div>
+              )}
+              {project.envs && (
+                <div style={{ marginTop: '4px', fontSize: '12px', color: 'var(--sony-gray-600)' }}>
+                  <strong>ENVs:</strong> {project.envs.length > 30 ? project.envs.substring(0, 30) + '...' : project.envs}
+                </div>
+              )}
+
               {project.streaming_platforms && project.streaming_platforms.length > 0 && (
                 <div style={{ marginTop: '12px' }}>
                   <div style={{ 
@@ -768,9 +783,23 @@ const Projects = () => {
                     <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '8px' }}>
                       Description
                     </h4>
-                    <p style={{ fontSize: '14px', lineHeight: '1.6', color: 'var(--sony-gray-600)' }}>
+                    <p style={{ fontSize: '14px', lineHeight: '1.6', color: 'var(--sony-gray-600)', marginBottom: '16px' }}>
                       {selectedProject.description || 'No description available'}
                     </p>
+                    
+                    {selectedProject.documentations && (
+                      <div style={{ marginBottom: '16px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>Documentations</h4>
+                        <p style={{ fontSize: '13px', color: 'var(--sony-gray-600)', whiteSpace: 'pre-line' }}>{selectedProject.documentations}</p>
+                      </div>
+                    )}
+                    
+                    {selectedProject.envs && (
+                      <div>
+                        <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>ENVs</h4>
+                        <p style={{ fontSize: '13px', color: 'var(--sony-gray-600)', whiteSpace: 'pre-line' }}>{selectedProject.envs}</p>
+                      </div>
+                    )}
                   </div>
                   
                   <div style={{ 
@@ -1190,6 +1219,29 @@ const Projects = () => {
                     value={newProject.streaming_platforms}
                     onChange={(e) => setNewProject(prev => ({...prev, streaming_platforms: e.target.value}))}
                     placeholder="Spotify, Apple Music (comma separated)"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-docs">Documentations</Label>
+                  <Textarea
+                    id="project-docs"
+                    value={newProject.documentations}
+                    onChange={(e) => setNewProject(prev => ({...prev, documentations: e.target.value}))}
+                    placeholder="Links or reference to documentation"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-envs">Environment Variables</Label>
+                  <Textarea
+                    id="project-envs"
+                    value={newProject.envs}
+                    onChange={(e) => setNewProject(prev => ({...prev, envs: e.target.value}))}
+                    placeholder="E.g. API_KEY, DB_HOST (Comma separated or new line)"
+                    rows={2}
                   />
                 </div>
               </div>

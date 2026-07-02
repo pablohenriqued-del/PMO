@@ -9,6 +9,7 @@ import {
   Workflow,
   Settings,
   ArrowRight,
+  Code,
   Play
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -242,7 +243,7 @@ POST-RELEASE:
           <Tabs defaultValue="frameworks" style={{ width: '100%' }}>
             <TabsList style={{ 
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: 'repeat(4, 1fr)',
               width: '100%',
               background: 'var(--sony-white)',
               border: '1px solid var(--sony-gray-200)',
@@ -261,6 +262,10 @@ POST-RELEASE:
               <TabsTrigger value="templates" data-testid="templates-tab">
                 <FileText size={16} style={{ marginRight: '8px' }} />
                 Templates
+              </TabsTrigger>
+              <TabsTrigger value="dev-manual" data-testid="dev-manual-tab">
+                <Code size={16} style={{ marginRight: '8px' }} />
+                Manual do DEV
               </TabsTrigger>
             </TabsList>
 
@@ -622,6 +627,66 @@ POST-RELEASE:
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Dev Manual Tab */}
+            <TabsContent value="dev-manual">
+              <div style={{
+                background: 'var(--sony-white)',
+                borderRadius: '16px',
+                padding: '32px',
+                boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
+                border: '1px solid var(--sony-gray-200)'
+              }}>
+                <h3 style={{ 
+                  fontSize: '20px', 
+                  fontWeight: '700',
+                  color: 'var(--sony-gray-900)',
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <Code size={20} color="var(--sony-red)" />
+                  Manual do DEV (Developer Guide)
+                </h3>
+                
+                <div style={{ display: 'grid', gap: '24px' }}>
+                  
+                  <div style={{ background: 'var(--sony-gray-50)', padding: '24px', borderRadius: '12px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px', color: 'var(--sony-gray-900)' }}>1. Arquitetura do Projeto</h4>
+                    <p style={{ fontSize: '14px', color: 'var(--sony-gray-600)', lineHeight: '1.6', marginBottom: '12px' }}>
+                      O painel do PMO é uma aplicação Full-Stack composta por:
+                    </p>
+                    <ul style={{ fontSize: '14px', color: 'var(--sony-gray-700)', paddingLeft: '20px', lineHeight: '1.8' }}>
+                      <li><strong>Frontend:</strong> React 18, React Router, Tailwind CSS, Componentes shadcn/ui.</li>
+                      <li><strong>Backend:</strong> FastAPI (Python 3), Motor (MongoDB Async Driver).</li>
+                      <li><strong>Banco de Dados:</strong> MongoDB (Coleções: projects, risks, users).</li>
+                    </ul>
+                  </div>
+
+                  <div style={{ background: 'var(--sony-gray-50)', padding: '24px', borderRadius: '12px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px', color: 'var(--sony-gray-900)' }}>2. Padrões de Código</h4>
+                    <ul style={{ fontSize: '14px', color: 'var(--sony-gray-700)', paddingLeft: '20px', lineHeight: '1.8' }}>
+                      <li>Utilize <strong>Hooks customizados</strong> (ou manipulação de estado local via <code>useState/useEffect</code>) para chamadas na API.</li>
+                      <li>Para componentes visuais, reaproveite a pasta <code>/src/components/ui/</code>.</li>
+                      <li>As rotas de backend do FastAPI obrigatoriamente possuem o prefixo <code>/api</code>. Ex: <code>/api/projects</code>.</li>
+                      <li>No MongoDB, sempre exclua o campo <code>_id</code> antes de retornar o modelo e trabalhe com IDs customizados mapeados no Pydantic.</li>
+                    </ul>
+                  </div>
+
+                  <div style={{ background: 'var(--sony-gray-50)', padding: '24px', borderRadius: '12px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px', color: 'var(--sony-gray-900)' }}>3. Integrações e Variáveis de Ambiente</h4>
+                    <p style={{ fontSize: '14px', color: 'var(--sony-gray-600)', lineHeight: '1.6' }}>
+                      As variáveis necessárias para rodar o projeto estão definidas no arquivo <code>.env</code>.
+                      No Frontend, para apontar corretamente para a API, deve ser usada a variável: <code>REACT_APP_BACKEND_URL</code>.
+                      <br /><br />
+                      Para simulações de AD/LDAP, foi implementada uma coleção <code>users</code> onde a aba "User Administration" atualiza os recursos para alocação.
+                    </p>
+                  </div>
+
                 </div>
               </div>
             </TabsContent>

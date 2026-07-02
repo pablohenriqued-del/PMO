@@ -81,6 +81,8 @@ class Project(BaseModel):
     milestones: List[Dict[str, Any]] = []
     team_members: List[str] = []
     streaming_platforms: List[str] = []
+    documentations: str = ""
+    envs: str = ""
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -102,6 +104,8 @@ class ProjectCreate(BaseModel):
     milestones: List[Dict[str, Any]] = []
     team_members: List[str] = []
     streaming_platforms: List[str] = []
+    documentations: str = ""
+    envs: str = ""
 
 class UserCreate(BaseModel):
     name: str
