@@ -1,8 +1,10 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Query, UploadFile, File
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import csv
+import io
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
@@ -875,6 +877,117 @@ async def get_innovation_radar():
     }
 
 # Include the router in the main app
+
+@api_router.get("/notifications")
+async def get_notifications():
+    notifications = []
+    
+    # 1. Budget Overruns
+    projects = await db.projects.find().to_list(1000)
+    for p in projects:
+        if p.get("budget_spent", 0) > p.get("budget_allocated", 0):
+            notifications.append({
+                "id": f"notif-budget-{p['id']}",
+                "type": "budget",
+                "title": "Budget Excedido",
+                "message": f"O projeto '{p['name']}' excedeu o orçamento.",
+                "date": datetime.now(timezone.utc).isoformat(),
+                "priority": "high",
+                "project_id": p['id']
+            })
+            
+        # 2. Upcoming Milestones (next 7 days)
+        today = datetime.now(timezone.utc).date()
+        for ms in p.get("milestones", []):
+            if not ms.get("completed") and ms.get("date"):
+                try:
+                    ms_date = datetime.fromisoformat(ms["date"].replace("Z", "+00:00")).date()
+                    days_diff = (ms_date - today).days
+                    if 0 <= days_diff <= 7:
+                        notifications.append({
+                            "id": f"notif-ms-{p['id']}-{ms['name']}",
+                            "type": "deadline",
+                            "title": "Entrega Próxima",
+                            "message": f"Marco '{ms['name']}' do projeto '{p['name']}' vence em {days_diff} dia(s).",
+                            "date": datetime.now(timezone.utc).isoformat(),
+                            "priority": "medium",
+                            "project_id": p['id']
+                        })
+                except Exception:
+                    pass
+
+    # 3. Critical Risks
+    risks = await db.risks.find({"severity": "Critical", "status": "Active"}).to_list(1000)
+    for r in risks:
+        notifications.append({
+            "id": f"notif-risk-{r['id']}",
+            "type": "risk",
+            "title": "Risco Crítico Ativo",
+            "message": f"Risco '{r.get('risk')}' no projeto '{r.get('project')}' precisa de atenção.",
+            "date": datetime.now(timezone.utc).isoformat(),
+            "priority": "critical",
+            "risk_id": r['id']
+        })
+        
+    # Sort
+    priority_weight = {"critical": 3, "high": 2, "medium": 1, "low": 0}
+    notifications.sort(key=lambda x: priority_weight.get(x["priority"], 0), reverse=True)
+    return notifications
+
+@api_router.post("/projects/{project_id}/import-schedule", response_model=Project)
+async def import_project_schedule(project_id: str, file: UploadFile = File(...)):
+    existing_project = await db.projects.find_one({"id": project_id})
+    if not existing_project:
+        raise HTTPException(status_code=404, detail="Project not found")
+        
+    try:
+        content = await file.read()
+        text = content.decode('utf-8')
+        reader = csv.DictReader(io.StringIO(text))
+        
+        imported_milestones = []
+        for row in reader:
+            # Map standard columns from Excel/Monday/Planner CSV exports
+            name = row.get('Name') or row.get('Task Name') or row.get('Item') or row.get('Title') or 'Tarefa Importada'
+            date_str = row.get('Due Date') or row.get('End Date') or row.get('Date') or row.get('Deadline') or ''
+            status = row.get('Status') or row.get('State') or row.get('Progress') or ''
+            
+            if '/' in date_str: 
+                parts = date_str.split('/')
+                if len(parts) == 3 and len(parts[2]) == 4:
+                    date_str = f"{parts[2]}-{parts[0].zfill(2)}-{parts[1].zfill(2)}"
+                    
+            completed = str(status).lower() in ['done', 'completed', 'concluído', 'fechado', '100%']
+            
+            imported_milestones.append({
+                "name": name,
+                "date": date_str,
+                "completed": completed,
+                "assigned_to": None,
+                "is_key_milestone": False 
+            })
+            
+        existing_milestones = existing_project.get("milestones", [])
+        for ms in existing_milestones:
+            if "is_key_milestone" not in ms:
+                ms["is_key_milestone"] = True
+                
+        existing_milestones.extend(imported_milestones)
+        
+        await db.projects.update_one(
+            {"id": project_id},
+            {"$set": {
+                "milestones": existing_milestones,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        updated_project = await db.projects.find_one({"id": project_id})
+        return Project(**parse_from_mongo(updated_project))
+    except Exception as e:
+        logger.error(f"Error importing schedule: {e}")
+        raise HTTPException(status_code=400, detail=f"Failed to parse CSV file: {str(e)}")
+
 app.include_router(api_router)
 
 app.add_middleware(

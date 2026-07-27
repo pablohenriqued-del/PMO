@@ -305,6 +305,35 @@ const Projects = () => {
     }
   };
 
+  
+  const fileInputRef = React.useRef(null);
+  
+  const handleImportSchedule = async (e, projectId) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(`${API}/projects/${projectId}/import-schedule`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      setProjects(prev => prev.map(p => p.id === projectId ? response.data : p));
+      if (selectedProject && selectedProject.id === projectId) {
+        setSelectedProject(response.data);
+      }
+      alert("Cronograma importado com sucesso (Planner/Monday)!");
+    } catch (error) {
+      console.error("Erro na importação", error);
+      alert("Falha ao importar o arquivo CSV.");
+    }
+    
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleCreateProject = async (e) => {
     e.preventDefault();
     try {
@@ -737,15 +766,31 @@ const Projects = () => {
           {selectedProject && (
             <>
               <div className="modal-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h1>{selectedProject.name}</h1>
-                  <Button 
-                    variant="outline"
-                    onClick={openUpdateModal}
-                    data-testid="open-update-modal-btn"
-                  >
-                    Update Progress
-                  </Button>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <input 
+                      type="file" 
+                      accept=".csv" 
+                      ref={fileInputRef} 
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleImportSchedule(e, selectedProject.id)}
+                    />
+                    <Button 
+                      variant="outline"
+                      onClick={() => fileInputRef.current.click()}
+                      title="Importar CSV do Monday.com ou MS Planner"
+                    >
+                      ⬇️ Import Planner/Monday (CSV)
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={openUpdateModal}
+                      data-testid="open-update-modal-btn"
+                    >
+                      Update Progress
+                    </Button>
+                  </div>
                 </div>
                 <div style={{
                   display: 'flex',
