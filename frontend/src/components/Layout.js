@@ -5,6 +5,7 @@ import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard,
+  LayoutGrid,
   LineChart,
   BrainCircuit, 
   BarChart, 
@@ -77,6 +78,12 @@ const Layout = ({ children }) => {
       href: "/regional",
       icon: Globe,
       current: location.pathname === "/regional"
+    },
+    {
+      name: "CRM & Demandas",
+      href: "/crm",
+      icon: LayoutGrid,
+      current: location.pathname === "/crm"
     },
     {
       name: "Projects",

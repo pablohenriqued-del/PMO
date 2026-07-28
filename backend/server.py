@@ -119,6 +119,25 @@ class User(UserCreate):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+
+class OpportunityStage(str, Enum):
+    LEAD = "lead"
+    NEGOTIATION = "negotiation"
+    CLOSED_WON = "closed_won"
+    CLOSED_LOST = "closed_lost"
+
+class OpportunityCreate(BaseModel):
+    title: str
+    artist: str
+    country: str = "Global"
+    estimated_revenue: float = 0.0
+    estimated_cost: float = 0.0
+    stage: OpportunityStage = OpportunityStage.LEAD
+
+class Opportunity(OpportunityCreate):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 class DashboardStats(BaseModel):
     total_projects: int
     active_projects: int
@@ -452,6 +471,28 @@ async def initialize_mock_data():
         ]
         await db.users.insert_many(mock_users)
         logger.info("Mock users initialized successfully")
+    existing_opps = await db.opportunities.count_documents({})
+    if existing_opps == 0:
+        mock_opps = [
+            {
+                "id": "opp-1", "title": "Turnê Shakira LATAM 2025", "artist": "Shakira", "country": "Colombia",
+                "estimated_revenue": 5000000.0, "estimated_cost": 1500000.0, "stage": "negotiation",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "opp-2", "title": "Lançamento Álbum Anitta Global", "artist": "Anitta", "country": "Brazil",
+                "estimated_revenue": 3000000.0, "estimated_cost": 800000.0, "stage": "lead",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "opp-3", "title": "Merch Store Rosalía Europa", "artist": "Rosalía", "country": "Spain",
+                "estimated_revenue": 800000.0, "estimated_cost": 200000.0, "stage": "negotiation",
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        await db.opportunities.insert_many(mock_opps)
+        logger.info("Mock opportunities initialized successfully")
+
 
 # API Routes
 @api_router.get("/")
@@ -681,6 +722,7 @@ async def reset_data():
     await db.projects.delete_many({})
     await db.risks.delete_many({})
     await db.users.delete_many({})
+    await db.opportunities.delete_many({})
     await initialize_mock_data()
     return {"message": "Data reset successfully"}
 
@@ -1155,6 +1197,56 @@ async def get_capacity_planning():
         })
         
     return {"months": months, "data": capacity_data}
+
+
+# CRM / Pipeline Endpoints
+@api_router.get("/crm/opportunities", response_model=List[Opportunity])
+async def get_opportunities():
+    opps = await db.opportunities.find().to_list(1000)
+    return [Opportunity(**parse_from_mongo(o)) for o in opps]
+
+@api_router.post("/crm/opportunities", response_model=Opportunity)
+async def create_opportunity(opp_data: OpportunityCreate):
+    opp_dict = opp_data.dict()
+    opp = Opportunity(**opp_dict)
+    await db.opportunities.insert_one(prepare_for_mongo(opp.dict()))
+    return opp
+
+@api_router.put("/crm/opportunities/{opp_id}/stage")
+async def update_opportunity_stage(opp_id: str, stage: str):
+    opp = await db.opportunities.find_one({"id": opp_id})
+    if not opp:
+        raise HTTPException(status_code=404, detail="Opportunity not found")
+        
+    old_stage = opp.get("stage")
+    await db.opportunities.update_one({"id": opp_id}, {"$set": {"stage": stage}})
+    
+    # Auto-convert to project if moved to CLOSED_WON
+    if stage == "closed_won" and old_stage != "closed_won":
+        new_project = Project(
+            name=opp["title"],
+            description=f"Projeto gerado automaticamente a partir da oportunidade do CRM (Artista: {opp.get('artist')}).",
+            status=ProjectStatus.PLANNING,
+            priority=ProjectPriority.HIGH,
+            type=ProjectType.DIGITAL,
+            manager="A Definir (PMO)",
+            department="Unassigned",
+            country=opp.get("country", "Global"),
+            budget_allocated=opp.get("estimated_cost", 0.0),
+            budget_spent=0.0,
+            revenue_expected=opp.get("estimated_revenue", 0.0),
+            revenue_generated=0.0,
+            start_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            end_date=(datetime.now(timezone.utc) + __import__('datetime').timedelta(days=90)).strftime("%Y-%m-%d"),
+            progress=0,
+            milestones=[],
+            team_members=[],
+            streaming_platforms=[]
+        )
+        await db.projects.insert_one(prepare_for_mongo(new_project.dict()))
+        return {"message": "Opportunity moved to Closed Won and Project automatically created!", "project_id": new_project.id}
+
+    return {"message": "Opportunity stage updated."}
 
 app.include_router(api_router)
 

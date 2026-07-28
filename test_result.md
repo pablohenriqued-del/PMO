@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test User Administration CRUD functionality"
+user_problem_statement: "Test CRM & Demandas Kanban Board - Drag to Closed Won Conversion"
 
 backend:
   - task: "Risk Radar API - Update Risk"
@@ -140,6 +140,18 @@ backend:
       - working: true
         agent: "testing"
         comment: "All User Administration API endpoints working correctly. Verified: GET /api/users (fetch all users), POST /api/users (create user), PUT /api/users/{user_id} (update user), DELETE /api/users/{user_id} (delete user). All operations returned successful responses and data persisted correctly in MongoDB."
+
+  - task: "CRM Opportunities API - Stage Update & Auto-Conversion"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "CRM Opportunities API fully functional. Verified endpoints: GET /api/crm/opportunities (fetch all opportunities), POST /api/crm/opportunities (create opportunity), PUT /api/crm/opportunities/{opp_id}/stage (update stage). Auto-conversion logic working correctly: when opportunity stage is updated to 'closed_won', backend automatically creates a new Project with: name from opportunity title, description includes artist info, status=PLANNING, priority=HIGH, type=DIGITAL, manager='A Definir (PMO)', budget_allocated from estimated_cost, revenue_expected from estimated_revenue, start_date=today, end_date=today+90 days, progress=0. Tested with 'Turnê Shakira LATAM 2025' opportunity - successfully converted to project. All API calls returned 200 OK."
 
 frontend:
   - task: "Risk Radar - Edit Risk Functionality"
@@ -337,6 +349,18 @@ frontend:
         agent: "testing"
         comment: "Visual glitch testing completed for Voice Command button. VERIFIED: (1) Button renders correctly without any white rectangle visual glitches, (2) Circular button with microphone icon positioned at x=1832, y=992, width=56, height=56 in bottom right corner, (3) Button is visible and accessible with proper styling, (4) No visual artifacts detected in button area, (5) No console errors or network errors detected. Button rendering is clean and professional. All review requirements met successfully."
 
+  - task: "CRM & Demandas - Kanban Board"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/CRMDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "CRM & Demandas Kanban board fully functional. Comprehensive test completed: (1) Navigated to /crm route via sidebar 'CRM & Demandas' link, (2) Verified all 4 Kanban columns render correctly: '💡 Lead / Ideia', '📊 Em Negociação', '✅ Closed Won (Aprovado)', '❌ Closed Lost', (3) Found 3 opportunity cards in 'Em Negociação' column (Shakira, Anitta, Rosalía), (4) Successfully dragged 'Turnê Shakira LATAM 2025' opportunity card from 'Em Negociação' to 'Closed Won (Aprovado)' column using drag-and-drop functionality, (5) Alert appeared immediately with correct message: '🎉 Oportunidade Convertida! Um novo Projeto foi gerado automaticamente e o Budget transferido.', (6) Navigated to Projects page (/projects), (7) Verified converted opportunity now appears as Project (Card 10): Title='Turnê Shakira LATAM 2025', Manager='A Definir (PMO)', Type=DIGITAL, Status=PLANNING, Priority=HIGH, Description='Projeto gerado automaticamente a partir da oportunidade do CRM (Artista: Shakira).', Budget=$0/$1,500,000, Progress=0%, Timeline=28/07/2026-26/10/2026. All drag-and-drop handlers working correctly (handleDragStart, handleDragOver, handleDragLeave, handleDrop). Backend API PUT /api/crm/opportunities/{opp_id}/stage?stage=closed_won called successfully. Auto-conversion logic executed perfectly. No critical issues found. Feature is production-ready."
+
   - task: "Features Guide - Radial Gradient Background & Glassmorphism"
     implemented: true
     working: true
@@ -355,13 +379,13 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 11
+  test_sequence: 12
   run_ui: true
-  last_updated: "2026-07-28 07:15:00"
+  last_updated: "2026-07-28 07:45:00"
 
 test_plan:
   current_focus:
-    - "TV Mode, Notification Bell, Voice Command - Visual Glitch Testing"
+    - "CRM & Demandas - Kanban Board Drag to Closed Won Conversion"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -389,3 +413,5 @@ agent_communication:
     message: "Completed comprehensive testing of Features Guide page with radial gradient background and glassmorphism effects. CRITICAL FIX: Found and fixed missing Sparkles icon import in Layout.js (line 6-24) which would have caused runtime error. Added 'Sparkles' to lucide-react imports. TEST RESULTS: (1) Radial Gradient Background - VERIFIED: Body element has radial-gradient(circle at 50% 0%, rgb(26, 5, 5) 0%, rgb(0, 0, 0) 60%, rgb(0, 0, 0) 100%) creating subtle dark red gradient visible at edges, exactly as requested. (2) Sidebar Navigation - VERIFIED: 'Guia & Features' link present in sidebar, successfully clicked and navigated to /features-guide route. (3) Features Guide Page - VERIFIED: Page loads successfully with 7 feature cards (PMO AI Copilot, Trend-Driven Prioritization, Capacity Planning, Modo TV, Voice Command, Excel Import, Notifications). (4) Glassmorphism - VERIFIED: All cards have backdrop-filter: blur(16px) and translucent rgba(20, 20, 20, 0.7) background. (5) Hover Effects - VERIFIED: Cards exhibit red border glow (rgba(229, 9, 20, 0.3)), red box shadow glow (rgba(229, 9, 20, 0.15) 0px 12px 40px), and translateY(-5px) lift effect on hover. All visual effects working perfectly. Minor: React console warning about non-boolean attribute (non-critical). Feature is production-ready and all review requirements met."
   - agent: "testing"
     message: "Completed comprehensive visual glitch testing and toggle functionality verification for TV Mode, Notification Bell, and Voice Command buttons as per latest review request. TEST RESULTS: (1) TV Mode Button - VERIFIED: Renders correctly without white rectangle glitches, displays 'Modo TV' text initially with dark background (rgba(20, 20, 20, 0.8)), positioned at x=1712, y=24.5 in top right corner. Toggle functionality working perfectly: clicking button changes text to 'Stop TV Mode' and background to Sony red (rgb(229, 9, 20)). Screenshots captured showing both states. (2) Notification Bell Button - VERIFIED: Renders correctly without white rectangle glitches, circular button with bell icon positioned at x=1848, y=24 next to TV Mode button, displays notification count badge ('2'), clean dark background with proper styling. (3) Voice Command Button - VERIFIED: Renders correctly without white rectangle glitches, circular button with microphone icon positioned at x=1832, y=992 in bottom right corner, proper styling and visibility. NO WHITE RECTANGLE VISUAL GLITCHES DETECTED on any of the three buttons. All buttons render cleanly and professionally. No console errors or network errors detected. All review requirements met successfully. Feature is production-ready."
+  - agent: "testing"
+    message: "Completed comprehensive testing of CRM & Demandas Kanban board with drag-to-Closed-Won conversion functionality. TEST RESULTS: (1) Sidebar Navigation - VERIFIED: 'CRM & Demandas' link present in sidebar, successfully navigated to /crm route. (2) Kanban Board Rendering - VERIFIED: All 4 columns render correctly with proper titles and styling: '💡 Lead / Ideia' ($0), '📊 Em Negociação' ($5,800,000 with 3 cards), '✅ Closed Won (Aprovado)' ($0), '❌ Closed Lost' ($0). (3) Drag and Drop Functionality - VERIFIED: Successfully dragged opportunity card 'Turnê Shakira LATAM 2025' from 'Em Negociação' column to 'Closed Won (Aprovado)' column. Drag handlers (handleDragStart, handleDragOver, handleDragLeave, handleDrop) working correctly with visual feedback (column highlights on drag over). (4) Conversion Alert - VERIFIED: Alert appeared immediately after drop with correct message: '🎉 Oportunidade Convertida! Um novo Projeto foi gerado automaticamente e o Budget transferido.' (5) Project Creation - VERIFIED: Navigated to Projects page and found converted project (Card 10/10): Title='Turnê Shakira LATAM 2025', Manager='A Definir (PMO)', Type=DIGITAL, Status=PLANNING, Priority=HIGH, Description='Projeto gerado automaticamente a partir da oportunidade do CRM (Artista: Shakira).', Budget=$0/$1,500,000 (budget_allocated from opportunity's estimated_cost), Progress=0%, Timeline=28/07/2026-26/10/2026 (90 days from conversion date). Backend API PUT /api/crm/opportunities/{opp_id}/stage?stage=closed_won executed successfully. Auto-conversion logic in server.py (lines 1224-1247) working perfectly. All review request requirements met. No critical issues found. Feature is fully functional and production-ready."

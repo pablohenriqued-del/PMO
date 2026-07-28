@@ -20,6 +20,7 @@ import StatusReport from "./components/StatusReport";
 import AICopilot from "./components/AICopilot";
 import CapacityPlanning from "./components/CapacityPlanning";
 import FeaturesGuide from "./components/FeaturesGuide";
+import CRMDashboard from "./components/CRMDashboard";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/ai-copilot" element={<AICopilot />} />
             <Route path="/capacity-planning" element={<CapacityPlanning />} />
             <Route path="/features-guide" element={<FeaturesGuide />} />
+            <Route path="/crm" element={<CRMDashboard />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/timeline" element={<Timeline />} />
             <Route path="/budget" element={<Budget />} />
