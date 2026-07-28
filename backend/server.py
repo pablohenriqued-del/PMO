@@ -1324,7 +1324,7 @@ async def create_magic_link(project_id: str):
     magic_token = str(uuid.uuid4())
     await db.projects.update_one({"id": project_id}, {"$set": {"magic_token": magic_token}})
     
-    return {"magic_link": f"http://localhost:3000/shared/{magic_token}", "token": magic_token}
+    return {"magic_link": f"https://sony-music-projects.preview.emergentagent.com/shared/{magic_token}", "token": magic_token}
 
 @api_router.get("/magic-link/{token}")
 async def get_shared_project(token: str):

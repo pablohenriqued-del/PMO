@@ -448,6 +448,18 @@ const Projects = () => {
             <Plus size={16} style={{ marginRight: '8px' }} />
             New Project
           </Button>
+          <Button 
+            style={{ 
+              background: 'linear-gradient(90deg, #8B5CF6, #EC4899)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 0 15px rgba(139, 92, 246, 0.5)',
+              marginLeft: '12px'
+            }}
+            onClick={() => setIsPromptModalOpen(true)}
+          >
+            ✨ Gerar com IA
+          </Button>
         </div>
       </div>
 

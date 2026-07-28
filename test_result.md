@@ -381,8 +381,8 @@ frontend:
 
 
   - task: "Projects - AI Generate Button"
-    implemented: false
-    working: false
+    implemented: true
+    working: true
     file: "/app/frontend/src/components/Projects.js"
     stuck_count: 0
     priority: "high"
@@ -391,6 +391,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "CRITICAL: '✨ Generate with AI' button is MISSING from Projects page header. The infrastructure exists (AI Prompt Modal at lines 1571-1610, handleGenerateAI function at lines 341-355, backend API endpoint /api/ai/prompt-to-project), but there is NO BUTTON in the header to trigger the modal. Need to add a button next to 'New Project' button (around line 439-450) that calls setIsPromptModalOpen(true). Button should have text '✨ Generate with AI' or similar."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing completed for AI Generate Button feature. VERIFIED ALL REQUIREMENTS: (1) '✨ Gerar com IA' button is now visible in Projects page header (lines 451-462) with gradient background styling, positioned next to 'New Project' button, (2) Clicking button successfully opens 'Prompt-to-Project' modal with correct title and subtitle, (3) Filled prompt 'Projeto teste de festival em portugal com 50k de budget' and submitted form, (4) Loading state appeared with message 'A Mágica está acontecendo...' and GPT-5.4 reference, (5) Modal closed after AI generation completed, (6) New project 'Projeto Teste de Festival' appeared in projects list (11 total projects), (7) Project has Manager='A Definir (PMO)' and budget information, (8) Backend API POST /api/ai/prompt-to-project returned 200 OK, (9) Backend uses Emergent LLM integration with GPT-5.4 model. All functionality working perfectly. Minor: Clipboard write permission error in test environment (expected, not a real issue). Feature is production-ready."
 
   - task: "Projects - Generate Magic Link"
     implemented: true
@@ -403,6 +406,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Generate Magic Link button exists in project detail modal (line 810-815) and is clickable. Button successfully triggers API call to /api/projects/{project_id}/magic-link. Alert popup appears with message '🔗 Magic Link copiado para a área de transferência! Envie para o empresário/artista no WhatsApp.' Clipboard copy functionality works (though permission denied in test environment is expected). ISSUE: Backend returns hardcoded localhost URL (http://localhost:3000/shared/{token}) instead of production URL. Backend server.py line 1327 should use environment variable or construct proper URL: https://sony-music-projects.preview.emergentagent.com/shared/{token}"
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing completed for Generate Magic Link feature. VERIFIED ALL REQUIREMENTS: (1) Clicked on first project card to open project detail modal, (2) '🔗 Generate Magic Link' button is visible in modal header, (3) Clicked button and alert appeared with correct message '🔗 Magic Link copiado para a área de transferência! Envie para o empresário/artista no WhatsApp.', (4) Backend API POST /api/projects/{project_id}/magic-link returned 200 OK, (5) VERIFIED: Magic Link URL format is CORRECT - uses production URL 'https://sony-music-projects.preview.emergentagent.com/shared/{token}' (not localhost), (6) Backend server.py line 1327 correctly returns production URL. All functionality working perfectly. Minor: Clipboard write permission error in test environment (expected, not a real issue in production). Feature is production-ready."
 
   - task: "Shared Project Route - Sidebar Hidden"
     implemented: true
@@ -419,12 +425,10 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 14
+  test_sequence: 15
   run_ui: true
-  - agent: "testing"
-    message: "Completed testing of AI Generate Button and Magic Link features as per latest review request. CRITICAL FINDING: '✨ Generate with AI' button is MISSING from Projects page header. All infrastructure exists (modal, API endpoint, handler function) but the trigger button was not implemented. This is a blocking issue for the feature. WORKING: (1) Generate Magic Link button exists in project detail modal and triggers API successfully, (2) Shared route (/shared/token) correctly hides sidebar and shows dark background, (3) Error message displays for invalid tokens. ISSUE: Backend magic link URL is hardcoded to localhost:3000 instead of production URL. Main agent needs to: (1) Add '✨ Generate with AI' button to Projects header next to 'New Project' button, (2) Fix backend magic link URL generation to use proper domain."
 
-  last_updated: "2026-07-28 08:20:00"
+  last_updated: "2026-07-28 08:25:00"
 
 test_plan:
   current_focus:
@@ -460,3 +464,5 @@ agent_communication:
     message: "Completed comprehensive testing of CRM & Demandas Kanban board with drag-to-Closed-Won conversion functionality. TEST RESULTS: (1) Sidebar Navigation - VERIFIED: 'CRM & Demandas' link present in sidebar, successfully navigated to /crm route. (2) Kanban Board Rendering - VERIFIED: All 4 columns render correctly with proper titles and styling: '💡 Lead / Ideia' ($0), '📊 Em Negociação' ($5,800,000 with 3 cards), '✅ Closed Won (Aprovado)' ($0), '❌ Closed Lost' ($0). (3) Drag and Drop Functionality - VERIFIED: Successfully dragged opportunity card 'Turnê Shakira LATAM 2025' from 'Em Negociação' column to 'Closed Won (Aprovado)' column. Drag handlers (handleDragStart, handleDragOver, handleDragLeave, handleDrop) working correctly with visual feedback (column highlights on drag over). (4) Conversion Alert - VERIFIED: Alert appeared immediately after drop with correct message: '🎉 Oportunidade Convertida! Um novo Projeto foi gerado automaticamente e o Budget transferido.' (5) Project Creation - VERIFIED: Navigated to Projects page and found converted project (Card 10/10): Title='Turnê Shakira LATAM 2025', Manager='A Definir (PMO)', Type=DIGITAL, Status=PLANNING, Priority=HIGH, Description='Projeto gerado automaticamente a partir da oportunidade do CRM (Artista: Shakira).', Budget=$0/$1,500,000 (budget_allocated from opportunity's estimated_cost), Progress=0%, Timeline=28/07/2026-26/10/2026 (90 days from conversion date). Backend API PUT /api/crm/opportunities/{opp_id}/stage?stage=closed_won executed successfully. Auto-conversion logic in server.py (lines 1224-1247) working perfectly. All review request requirements met. No critical issues found. Feature is fully functional and production-ready."
   - agent: "testing"
     message: "Completed bug fix verification testing for CRM & Demandas page as per latest review request. VERIFIED ALL THREE REVIEW REQUIREMENTS: (1) + Novo Lead Button Visibility - Button is clearly visible and clickable in top right corner at position x=1521, y=32 with red background (var(--sony-red)), proper styling, and correct text '+ Novo Lead'. Button is NOT blocked by Modo TV or Notification Bell controls. All three buttons are properly separated with no overlap (+ Novo Lead at x=1521, Modo TV at x=1712, Notification Bell at x=1848). (2) Modal Opening - Clicking + Novo Lead button successfully opens 'Nova Oportunidade (Lead)' modal with correct title, subtitle 'Cadastre uma nova demanda/projeto no funil.', and all required form fields (Título da Oportunidade, Artista/Cliente, País, Receita Estimada, Custo Estimado). Modal closes correctly when clicking close button or outside modal area. (3) Modo TV Button - Button does NOT have any solid white rectangle covering it. Verified through DOM inspection and visual artifact detection (0 white rectangles found in button area with dimensions >50x20px near coordinates x>1600, y<100). Toggle functionality works perfectly: clicking changes text from 'Modo TV' to 'Stop TV Mode', background correctly changes to Sony red (rgb(229, 9, 20)), button successfully toggles back to original state without any weird overlapping artifacts. All bug fixes verified and working correctly. No critical issues found. Feature is production-ready."
+  - agent: "testing"
+    message: "Completed comprehensive testing of AI Generate Button and Magic Link features as per latest review request. ALL FEATURES NOW WORKING PERFECTLY: (1) AI Generate Button - '✨ Gerar com IA' button is now visible in Projects page header with gradient background, clicking opens Prompt-to-Project modal, submitted prompt 'Projeto teste de festival em portugal com 50k de budget', AI generation completed successfully using GPT-5.4, new project 'Projeto Teste de Festival' appeared in projects list with Manager='A Definir (PMO)' and budget information. Backend API POST /api/ai/prompt-to-project returned 200 OK. (2) Generate Magic Link - Clicked on project to open modal, clicked '🔗 Generate Magic Link' button, alert appeared with correct message, backend API POST /api/projects/{project_id}/magic-link returned 200 OK, VERIFIED: Magic Link URL format is CORRECT using production URL 'https://sony-music-projects.preview.emergentagent.com/shared/{token}' (not localhost). Backend server.py line 1327 correctly returns production URL. Both features are production-ready. Minor: Clipboard write permission error in test environment (expected, not a real issue in production). No critical issues found."
