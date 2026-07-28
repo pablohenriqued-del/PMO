@@ -17,6 +17,7 @@ import InnovationRadar from "./components/InnovationRadar";
 import RegionalDashboard from "./components/RegionalDashboard";
 import AdminUsers from "./components/AdminUsers";
 import StatusReport from "./components/StatusReport";
+import AICopilot from "./components/AICopilot";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -30,6 +31,7 @@ function App() {
             <Route path="/regional" element={<RegionalDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/status-report" element={<StatusReport />} />
+            <Route path="/ai-copilot" element={<AICopilot />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/timeline" element={<Timeline />} />
             <Route path="/budget" element={<Budget />} />

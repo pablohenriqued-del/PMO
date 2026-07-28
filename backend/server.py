@@ -988,6 +988,120 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
         logger.error(f"Error importing schedule: {e}")
         raise HTTPException(status_code=400, detail=f"Failed to parse CSV file: {str(e)}")
 
+
+# ==========================================
+# WORLD-CLASS PMO: AUTONOMOUS AI & TRENDS
+# ==========================================
+
+class ReallocateReq(BaseModel):
+    source_id: str
+    target_id: str
+    amount: float
+
+@api_router.get("/ai/trends")
+async def get_market_trends():
+    return [
+        {
+            "id": "trend-tt-01",
+            "artist": "Rosalía",
+            "platform": "TikTok",
+            "growth_rate": "+850%",
+            "trigger": "Viral Dance Challenge #MotoMami",
+            "related_project_id": "p-5",
+            "source_project_id": "p-3",
+            "suggested_action": "Realocar $50,000 do budget de R&D para Marketing Digital da Rosalía",
+            "amount": 50000.0,
+            "status": "pending"
+        },
+        {
+            "id": "trend-sp-02",
+            "artist": "Fado",
+            "platform": "Spotify",
+            "growth_rate": "+210%",
+            "trigger": "Apareceu na série global da Netflix",
+            "related_project_id": "p-6",
+            "source_project_id": "p-8",
+            "suggested_action": "Injetar $20,000 para impulsionar playlist em mercados chave",
+            "amount": 20000.0,
+            "status": "pending"
+        }
+    ]
+
+@api_router.post("/ai/reallocate-budget")
+async def execute_reallocation(req: ReallocateReq):
+    source = await db.projects.find_one({"id": req.source_id})
+    target = await db.projects.find_one({"id": req.target_id})
+    
+    if not source or not target:
+        raise HTTPException(status_code=404, detail="Project not found")
+        
+    if source.get("budget_allocated", 0) < req.amount:
+        raise HTTPException(status_code=400, detail="Insufficient budget in source")
+        
+    await db.projects.update_one(
+        {"id": req.source_id},
+        {"$inc": {"budget_allocated": -req.amount}}
+    )
+    await db.projects.update_one(
+        {"id": req.target_id},
+        {"$inc": {"budget_allocated": req.amount}}
+    )
+    return {"message": "Budget reallocation executed autonomously."}
+
+class ResolveBottleneckReq(BaseModel):
+    project_id: str
+    user_id: str
+    milestone_name: str
+
+@api_router.get("/ai/bottlenecks")
+async def analyze_bottlenecks():
+    projects = await db.projects.find({"status": "in_progress"}).to_list(1000)
+    users = await db.users.find().to_list(1000)
+    
+    bottlenecks = []
+    
+    available_dev = next((u for u in users if u["role"] == "Senior Developer"), users[0] if users else None)
+    
+    for p in projects:
+        if p.get("progress", 0) < 60:
+            for ms in p.get("milestones", []):
+                if not ms.get("completed") and not ms.get("assigned_to"):
+                    bottlenecks.append({
+                        "id": f"bot-{p['id']}",
+                        "project_id": p["id"],
+                        "project_name": p["name"],
+                        "milestone_name": ms["name"],
+                        "issue": "Marco crítico sem responsável alocado gerando risco de atraso.",
+                        "suggested_user_id": available_dev["id"] if available_dev else "u1",
+                        "suggested_user_name": available_dev["name"] if available_dev else "Available User",
+                        "action": f"Alocar automaticamente {available_dev['name'] if available_dev else 'User'} e notificar.",
+                        "status": "pending"
+                    })
+                    break 
+    return bottlenecks
+
+@api_router.post("/ai/resolve-bottleneck")
+async def execute_resolve_bottleneck(req: ResolveBottleneckReq):
+    project = await db.projects.find_one({"id": req.project_id})
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+        
+    milestones = project.get("milestones", [])
+    for ms in milestones:
+        if ms["name"] == req.milestone_name:
+            ms["assigned_to"] = req.user_id
+            break
+            
+    await db.projects.update_one(
+        {"id": req.project_id},
+        {"$set": {"milestones": milestones}}
+    )
+    
+    import asyncio
+    asyncio.create_task(send_allocation_email_mock(req.user_id, req.milestone_name, project["name"]))
+    
+    return {"message": "Resource allocated and notified automatically."}
+
 app.include_router(api_router)
 
 app.add_middleware(

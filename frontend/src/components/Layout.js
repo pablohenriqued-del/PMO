@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import { 
-  LayoutDashboard, 
+  LayoutDashboard,
+  BrainCircuit, 
   BarChart, 
   Bell, 
   FolderOpen, 
@@ -48,6 +49,12 @@ const Layout = ({ children }) => {
       href: "/",
       icon: LayoutDashboard,
       current: location.pathname === "/"
+    },
+    {
+      name: "AI Copilot",
+      href: "/ai-copilot",
+      icon: BrainCircuit,
+      current: location.pathname === "/ai-copilot"
     },
     {
       name: "Status Report",
