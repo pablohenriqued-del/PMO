@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import VoiceCommand from "./VoiceCommand";
+import PresentationMode from "./PresentationMode";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard,
+  LineChart,
   BrainCircuit, 
   BarChart, 
   Bell, 
@@ -49,6 +52,12 @@ const Layout = ({ children }) => {
       href: "/",
       icon: LayoutDashboard,
       current: location.pathname === "/"
+    },
+    {
+      name: "Capacity Planning",
+      href: "/capacity-planning",
+      icon: LineChart,
+      current: location.pathname === "/capacity-planning"
     },
     {
       name: "AI Copilot",
@@ -204,8 +213,10 @@ const Layout = ({ children }) => {
 
       {/* Main Content */}
       <main className="main-content">
-        {/* Notification Bell (Global) */}
-        <div style={{ position: 'fixed', top: '24px', right: '32px', zIndex: 1000 }}>
+        {/* Global Controls */}
+        <div style={{ position: 'fixed', top: '24px', right: '32px', zIndex: 1000, display: 'flex', alignItems: 'center' }}>
+          <PresentationMode />
+          <div style={{ position: 'relative', marginLeft: '16px' }}>
           <button 
             onClick={() => setShowNotif(!showNotif)}
             style={{ 
@@ -259,6 +270,7 @@ const Layout = ({ children }) => {
             </div>
           )}
         </div>
+        </div>
 
         {/* Mobile Header */}
         <div className="mobile-header" style={{
@@ -289,6 +301,7 @@ const Layout = ({ children }) => {
 
         {children}
       </main>
+      <VoiceCommand />
 
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (

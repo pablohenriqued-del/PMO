@@ -132,6 +132,17 @@ class DashboardStats(BaseModel):
 # Helper function for datetime serialization
 
 # Email Mock Service
+
+# Microsoft Teams Mock Service
+async def send_teams_notification_mock(message: str, channel: str = "PMO General"):
+    """Mock Teams webhook sending"""
+    logger.info(f"==================================================")
+    logger.info(f"💬 MICROSOFT TEAMS NOTIFICATION (MOCK)")
+    logger.info(f"Channel: #{channel}")
+    logger.info(f"Message: {message}")
+    logger.info(f"==================================================")
+    return True
+
 async def send_allocation_email_mock(user_id: str, milestone_name: str, project_name: str):
     """Mock email sending service for project task allocation"""
     try:
@@ -1099,8 +1110,51 @@ async def execute_resolve_bottleneck(req: ResolveBottleneckReq):
     
     import asyncio
     asyncio.create_task(send_allocation_email_mock(req.user_id, req.milestone_name, project["name"]))
+    asyncio.create_task(send_teams_notification_mock(f"Recurso {req.user_id} alocado automaticamente no marco '{req.milestone_name}' do projeto {project['name']} devido a risco de atraso.", "PMO Alerts"))
     
     return {"message": "Resource allocated and notified automatically."}
+
+
+@api_router.get("/capacity-planning")
+async def get_capacity_planning():
+    users = await db.users.find().to_list(1000)
+    projects = await db.projects.find().to_list(1000)
+    
+    # We will calculate allocation for the next 3 months
+    import datetime
+    from dateutil.relativedelta import relativedelta
+    today = datetime.datetime.now(timezone.utc).date()
+    months = [(today + relativedelta(months=i)).strftime("%Y-%m") for i in range(4)]
+    
+    capacity_data = []
+    
+    for user in users:
+        user_allocations = {m: 0 for m in months}
+        
+        # Calculate allocation based on assigned milestones
+        for p in projects:
+            for ms in p.get("milestones", []):
+                if ms.get("assigned_to") == user["id"] and not ms.get("completed"):
+                    ms_date_str = ms.get("date")
+                    if ms_date_str:
+                        ms_month = ms_date_str[:7]
+                        if ms_month in user_allocations:
+                            # Assume each milestone takes 25% of capacity for that month
+                            user_allocations[ms_month] += 25
+                            
+        # Baseline capacity (some people might have fixed support tasks)
+        if user["role"] == "Senior Developer":
+            for m in months: user_allocations[m] += 30
+            
+        capacity_data.append({
+            "user_id": user["id"],
+            "name": user["name"],
+            "role": user["role"],
+            "department": user["department"],
+            "allocations": user_allocations
+        })
+        
+    return {"months": months, "data": capacity_data}
 
 app.include_router(api_router)
 
