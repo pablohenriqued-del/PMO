@@ -146,7 +146,7 @@ html, body {
 /* Dashboard Styles */
 .dashboard-header {
   background: var(--sony-white);
-  padding: 32px;
+  padding: 32px 220px 32px 32px;
   border-bottom: 1px solid var(--sony-gray-200);
   margin-bottom: 32px;
 }
@@ -441,8 +441,11 @@ html, body {
   }
   
   .dashboard-header {
-    padding: 24px 16px;
-  }
+  background: var(--sony-white);
+  padding: 32px 220px 32px 32px;
+  border-bottom: 1px solid var(--sony-gray-200);
+  margin-bottom: 32px;
+}
 }
 
 /* Project Detail Modal */
@@ -590,6 +593,7 @@ html, body {
 }
 
 
+
 /* Premium Dark Theme Upgrades */
 body {
   background: radial-gradient(circle at 50% 0%, #1a0505 0%, var(--sony-black) 60%, var(--sony-black) 100%);
@@ -597,7 +601,7 @@ body {
   color: var(--sony-gray-900);
 }
 
-.kpi-card, .project-card, .template-card, .dashboard-header {
+.kpi-card, .project-card, .template-card {
   background: rgba(20, 20, 20, 0.6) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -606,7 +610,18 @@ body {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
+.dashboard-header {
+  background: rgba(20, 20, 20, 0.6) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding: 32px 250px 32px 32px !important;
+}
+
 .kpi-card:hover, .project-card:hover, .template-card:hover {
+
   transform: translateY(-4px);
   border-color: rgba(229, 9, 20, 0.3) !important;
   box-shadow: 0 12px 40px rgba(229, 9, 20, 0.15) !important;

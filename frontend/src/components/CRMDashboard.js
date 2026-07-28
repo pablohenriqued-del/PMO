@@ -127,7 +127,7 @@ const CRMDashboard = () => {
             onClick={() => setIsModalOpen(true)}
           >
             <Plus size={16} style={{ marginRight: '8px' }} />
-            New Opportunity
+            + Novo Lead
           </Button>
         </div>
       </div>
