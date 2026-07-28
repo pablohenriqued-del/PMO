@@ -82,7 +82,7 @@ const VoiceCommand = () => {
         style={{
           width: '56px', height: '56px',
           borderRadius: '50%',
-          background: isListening ? 'var(--sony-red)' : 'var(--sony-gray-800)',
+          background: isListening ? 'var(--sony-red)' : 'rgba(20, 20, 20, 0.8)',
           border: '2px solid rgba(255,255,255,0.1)',
           color: 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center',

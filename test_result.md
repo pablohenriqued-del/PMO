@@ -267,6 +267,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Notifications bell functionality fully working. Test completed: (1) Notification bell button visible in top-right corner of layout (fixed position), (2) Badge displays notification count (showing '1' in test), (3) Clicking bell opens notification panel with title 'Notificações & Alertas', (4) Notification panel displays notifications correctly with proper styling - tested with 'Risco Crítico Ativo' notification showing red border for critical priority, (5) Notification content displays title and message correctly. Core functionality working perfectly. Minor: Escape key doesn't close the notification panel (user must click outside or click bell again), but this doesn't affect core functionality. Backend API endpoint /api/notifications working correctly and returning notifications."
+      - working: true
+        agent: "testing"
+        comment: "Visual glitch testing completed for Notification Bell button. VERIFIED: (1) Button renders correctly without any white rectangle visual glitches, (2) Circular button with bell icon positioned at x=1848, y=24, width=40, height=40 in top right corner (next to TV Mode button), (3) Button displays notification count badge (showing '2') with proper styling, (4) Button has clean dark background (rgba(20, 20, 20, 0.8)) with proper border styling, (5) No visual artifacts detected in button area, (6) No console errors or network errors detected. Button rendering is clean and professional. All review requirements met successfully."
 
   - task: "AI Copilot - Trend-Driven Prioritization & Autonomous PMO Agent"
     implemented: true
@@ -315,6 +318,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Modo TV button successfully verified in top right header. Button displays 'Modo TV' text, positioned at coordinates x=1712, y=24.5 (top right corner as expected), located next to the notifications bell icon. Button is visible and accessible. Component implements presentation mode functionality that cycles through routes (/, /regional, /projects, /status-report, /capacity-planning) every 15 seconds and enters fullscreen mode. All functionality working correctly."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive visual and functional testing completed for TV Mode button. VERIFIED: (1) Button renders correctly without any white rectangle visual glitches, (2) Initial state displays 'Modo TV' text with dark background (rgba(20, 20, 20, 0.8)), (3) Button positioned at x=1712, y=24.5, width=120, height=39 in top right corner, (4) Clicking button successfully toggles text to 'Stop TV Mode', (5) Background correctly changes to Sony red (rgb(229, 9, 20)) when toggled, (6) No console errors or network errors detected. Toggle functionality working perfectly. Screenshots captured showing both initial state (Modo TV with dark background) and toggled state (Stop TV Mode with red background). All review requirements met successfully."
 
   - task: "Voice Command - Microphone Button"
     implemented: true
@@ -327,6 +333,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Voice Command microphone button successfully verified at bottom right corner. Button positioned at coordinates x=1832, y=992 (bottom right corner as expected), displays as a circular button with microphone icon, has title attribute 'Voice Command (Comando de Voz)'. Component implements voice recognition functionality using Web Speech API (webkitSpeechRecognition) with Portuguese language support (pt-BR). Voice commands can navigate to different pages (projetos, dashboard, copilot, capacidade). Button is visible, accessible, and positioned correctly. Note: Actual voice recognition functionality not tested due to system limitations (requires microphone access), but button rendering and positioning verified successfully."
+      - working: true
+        agent: "testing"
+        comment: "Visual glitch testing completed for Voice Command button. VERIFIED: (1) Button renders correctly without any white rectangle visual glitches, (2) Circular button with microphone icon positioned at x=1832, y=992, width=56, height=56 in bottom right corner, (3) Button is visible and accessible with proper styling, (4) No visual artifacts detected in button area, (5) No console errors or network errors detected. Button rendering is clean and professional. All review requirements met successfully."
 
   - task: "Features Guide - Radial Gradient Background & Glassmorphism"
     implemented: true
@@ -346,13 +355,13 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 10
+  test_sequence: 11
   run_ui: true
-  last_updated: "2026-07-28 06:55:00"
+  last_updated: "2026-07-28 07:15:00"
 
 test_plan:
   current_focus:
-    - "Features Guide - Radial Gradient Background & Glassmorphism"
+    - "TV Mode, Notification Bell, Voice Command - Visual Glitch Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -378,3 +387,5 @@ agent_communication:
     message: "Completed comprehensive testing of latest review request items: (1) Capacity Planning Sidebar Navigation - Verified 'Capacity Planning' link is visible in sidebar as 2nd item, displays correct text, and navigates to /capacity-planning route successfully. (2) Capacity Planning Heatmap Page - Successfully navigated to page, verified title 'Capacity Planning & Heatmap' displays correctly, heatmap table renders with proper structure showing Resource, Role, 4 months (2026-07 to 2026-10), and Burnout Risk columns, 9 data rows present with color-coded allocation percentages, legend visible, backend API /api/capacity-planning called successfully. (3) Modo TV Button - Verified button displays 'Modo TV' text, positioned at top right corner (x=1712, y=24.5) next to notifications bell, implements presentation mode with auto-rotation through routes every 15 seconds and fullscreen functionality. (4) Voice Command Microphone Button - Verified circular button with microphone icon positioned at bottom right corner (x=1832, y=992), has correct title attribute, implements Web Speech API voice recognition with Portuguese language support. All features tested and working correctly. No critical issues found. All review request items verified successfully."
   - agent: "testing"
     message: "Completed comprehensive testing of Features Guide page with radial gradient background and glassmorphism effects. CRITICAL FIX: Found and fixed missing Sparkles icon import in Layout.js (line 6-24) which would have caused runtime error. Added 'Sparkles' to lucide-react imports. TEST RESULTS: (1) Radial Gradient Background - VERIFIED: Body element has radial-gradient(circle at 50% 0%, rgb(26, 5, 5) 0%, rgb(0, 0, 0) 60%, rgb(0, 0, 0) 100%) creating subtle dark red gradient visible at edges, exactly as requested. (2) Sidebar Navigation - VERIFIED: 'Guia & Features' link present in sidebar, successfully clicked and navigated to /features-guide route. (3) Features Guide Page - VERIFIED: Page loads successfully with 7 feature cards (PMO AI Copilot, Trend-Driven Prioritization, Capacity Planning, Modo TV, Voice Command, Excel Import, Notifications). (4) Glassmorphism - VERIFIED: All cards have backdrop-filter: blur(16px) and translucent rgba(20, 20, 20, 0.7) background. (5) Hover Effects - VERIFIED: Cards exhibit red border glow (rgba(229, 9, 20, 0.3)), red box shadow glow (rgba(229, 9, 20, 0.15) 0px 12px 40px), and translateY(-5px) lift effect on hover. All visual effects working perfectly. Minor: React console warning about non-boolean attribute (non-critical). Feature is production-ready and all review requirements met."
+  - agent: "testing"
+    message: "Completed comprehensive visual glitch testing and toggle functionality verification for TV Mode, Notification Bell, and Voice Command buttons as per latest review request. TEST RESULTS: (1) TV Mode Button - VERIFIED: Renders correctly without white rectangle glitches, displays 'Modo TV' text initially with dark background (rgba(20, 20, 20, 0.8)), positioned at x=1712, y=24.5 in top right corner. Toggle functionality working perfectly: clicking button changes text to 'Stop TV Mode' and background to Sony red (rgb(229, 9, 20)). Screenshots captured showing both states. (2) Notification Bell Button - VERIFIED: Renders correctly without white rectangle glitches, circular button with bell icon positioned at x=1848, y=24 next to TV Mode button, displays notification count badge ('2'), clean dark background with proper styling. (3) Voice Command Button - VERIFIED: Renders correctly without white rectangle glitches, circular button with microphone icon positioned at x=1832, y=992 in bottom right corner, proper styling and visibility. NO WHITE RECTANGLE VISUAL GLITCHES DETECTED on any of the three buttons. All buttons render cleanly and professionally. No console errors or network errors detected. All review requirements met successfully. Feature is production-ready."

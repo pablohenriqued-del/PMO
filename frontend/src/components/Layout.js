@@ -227,12 +227,12 @@ const Layout = ({ children }) => {
           <button 
             onClick={() => setShowNotif(!showNotif)}
             style={{ 
-              background: 'var(--sony-gray-900)', 
-              border: '1px solid var(--sony-gray-200)',
+              background: 'rgba(20, 20, 20, 0.8)', 
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '50%',
               width: '40px', height: '40px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--sony-white)', cursor: 'pointer', position: 'relative'
+              color: 'var(--pure-white)', cursor: 'pointer', position: 'relative'
             }}
           >
             <Bell size={20} />

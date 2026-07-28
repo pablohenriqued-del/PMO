@@ -37,8 +37,8 @@ const PresentationMode = () => {
     <button
       onClick={togglePresentation}
       style={{
-        background: isActive ? 'var(--sony-red)' : 'var(--sony-gray-900)',
-        border: '1px solid var(--sony-gray-200)',
+        background: isActive ? 'var(--sony-red)' : 'rgba(20, 20, 20, 0.8)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
         borderRadius: '8px',
         padding: '8px 16px',
         color: 'white',
