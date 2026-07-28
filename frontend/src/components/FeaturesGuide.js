@@ -1,8 +1,28 @@
 import React from "react";
-import { Sparkles, BrainCircuit, Mic, Presentation, Users, Bell, FileSpreadsheet, Activity } from "lucide-react";
+import { Sparkles, BrainCircuit, Mic, Presentation, Users, Bell, FileSpreadsheet, Activity, Wand2, Link } from "lucide-react";
 
 const FeaturesGuide = () => {
   const features = [
+    {
+      icon: <Wand2 size={32} color="#EC4899" />,
+      title: "Prompt-to-Project (AI Generator)",
+      description: "Diga adeus ao preenchimento manual de formulários. A inteligência artificial da plataforma faz o trabalho pesado para você.",
+      rules: [
+        "Descreva seu projeto em linguagem natural. Ex: 'Lançar o álbum do Drake no Canadá com 200k de budget em 2 meses'.",
+        "A IA entende o escopo, quebra o orçamento, deduz os milestones necessários e cria o projeto automaticamente.",
+        "Projeto já nasce configurado com status, prioridade e pronto para execução."
+      ]
+    },
+    {
+      icon: <Link size={32} color="#10B981" />,
+      title: "Magic Link (Portal do Stakeholder)",
+      description: "O fim das reuniões demoradas para dar status. Compartilhe o projeto com quem importa, sem burocracia.",
+      rules: [
+        "Gera um link seguro, criptografado e único por projeto.",
+        "O empresário, artista ou diretor não precisa de senha ou login no sistema.",
+        "Eles acessam uma visão mobile-friendly e focada com apenas o que precisam saber: % de progresso, prazos gerais e cronograma visual."
+      ]
+    },
     {
       icon: <BrainCircuit size={32} color="var(--sony-red)" />,
       title: "PMO AI Copilot & Prevenção de Atrasos",
@@ -152,29 +172,29 @@ const FeaturesGuide = () => {
                 }}>
                   {feature.icon}
                 </div>
-                <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--sony-white)', lineHeight: '1.3' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#FFFFFF', lineHeight: '1.3' }}>
                   {feature.title}
                 </h3>
               </div>
               
-              <p style={{ fontSize: '14px', color: 'var(--sony-gray-400)', marginBottom: '20px', lineHeight: '1.6', position: 'relative', zIndex: 1 }}>
+              <p style={{ fontSize: '14px', color: '#E2E8F0', fontWeight: '500', marginBottom: '20px', lineHeight: '1.6', position: 'relative', zIndex: 1 }}>
                 {feature.description}
               </p>
               
               <div style={{ 
-                background: 'rgba(0, 0, 0, 0.3)', 
+                background: 'rgba(0, 0, 0, 0.6)', 
                 borderRadius: '12px', 
                 padding: '16px',
-                borderLeft: '3px solid var(--sony-gray-700)',
+                borderLeft: '3px solid rgba(255,255,255,0.2)',
                 position: 'relative',
                 zIndex: 1
               }}>
-                <h4 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--sony-gray-500)', marginBottom: '12px', fontWeight: '700' }}>
+                <h4 style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px', color: '#CBD5E1', marginBottom: '12px', fontWeight: '700' }}>
                   Regras de Negócio:
                 </h4>
                 <ul style={{ display: 'grid', gap: '10px', margin: 0, paddingLeft: '16px' }}>
                   {feature.rules.map((rule, i) => (
-                    <li key={i} style={{ fontSize: '13px', color: 'var(--sony-gray-600)', lineHeight: '1.5' }}>
+                    <li key={i} style={{ fontSize: '13px', color: '#94A3B8', lineHeight: '1.5' }}>
                       {rule}
                     </li>
                   ))}

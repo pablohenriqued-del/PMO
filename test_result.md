@@ -378,6 +378,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Comprehensive testing completed for Features Guide page. All requirements verified: (1) Radial Gradient Background - Body element has radial-gradient(circle at 50% 0%, rgb(26, 5, 5) 0%, rgb(0, 0, 0) 60%, rgb(0, 0, 0) 100%) creating subtle dark red gradient at top center fading to black, exactly as requested. (2) Sidebar Navigation - 'Guia & Features' link found in sidebar at position y=474.59, successfully clicked and navigated to /features-guide route. (3) Features Guide Page - Page loaded successfully with 7 feature cards rendered. (4) Glassmorphism Effects - All cards have backdrop-filter: blur(16px) and translucent background rgba(20, 20, 20, 0.7). (5) Hover Effects - On hover, cards exhibit: border color changes from rgba(255, 255, 255, 0.05) to rgba(229, 9, 20, 0.3) (red border), box shadow changes to rgba(229, 9, 20, 0.15) 0px 12px 40px (red glow effect), transform changes to translateY(-5px) (card lifts up). All visual effects working perfectly. Minor: React console warning about non-boolean attribute (non-critical, doesn't affect functionality). Feature is production-ready."
+      - working: true
+        agent: "testing"
+        comment: "Additional verification completed for new features visibility and text color improvements. VERIFIED ALL REVIEW REQUIREMENTS: (1) 'Prompt-to-Project (AI Generator)' feature card is VISIBLE at position 1 (first card) with complete description and business rules. (2) 'Magic Link (Portal do Stakeholder)' feature card is VISIBLE at position 2 (second card) with complete description and business rules. (3) Text color and readability VERIFIED as excellent: Description text uses rgb(226, 232, 240) = #e2e8f0 (Tailwind slate-200), Rules text uses rgb(148, 163, 184) = #94a3b8 (Tailwind slate-400). All RGB values > 140 confirming light slate/gray colors (NOT dark muddy gray). Text is highly readable against dark background. (4) Total of 9 feature cards displayed on page. Screenshots captured showing both features prominently displayed with excellent text readability. All review requirements met successfully. Feature is production-ready."
 
 
   - task: "Projects - AI Generate Button"
@@ -425,14 +428,14 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 15
+  test_sequence: 16
   run_ui: true
 
-  last_updated: "2026-07-28 08:25:00"
+  last_updated: "2026-07-28 08:28:00"
 
 test_plan:
   current_focus:
-    - "Projects - AI Generate Button & Magic Link"
+    - "Features Guide - New Features Visibility & Text Color"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -466,3 +469,5 @@ agent_communication:
     message: "Completed bug fix verification testing for CRM & Demandas page as per latest review request. VERIFIED ALL THREE REVIEW REQUIREMENTS: (1) + Novo Lead Button Visibility - Button is clearly visible and clickable in top right corner at position x=1521, y=32 with red background (var(--sony-red)), proper styling, and correct text '+ Novo Lead'. Button is NOT blocked by Modo TV or Notification Bell controls. All three buttons are properly separated with no overlap (+ Novo Lead at x=1521, Modo TV at x=1712, Notification Bell at x=1848). (2) Modal Opening - Clicking + Novo Lead button successfully opens 'Nova Oportunidade (Lead)' modal with correct title, subtitle 'Cadastre uma nova demanda/projeto no funil.', and all required form fields (Título da Oportunidade, Artista/Cliente, País, Receita Estimada, Custo Estimado). Modal closes correctly when clicking close button or outside modal area. (3) Modo TV Button - Button does NOT have any solid white rectangle covering it. Verified through DOM inspection and visual artifact detection (0 white rectangles found in button area with dimensions >50x20px near coordinates x>1600, y<100). Toggle functionality works perfectly: clicking changes text from 'Modo TV' to 'Stop TV Mode', background correctly changes to Sony red (rgb(229, 9, 20)), button successfully toggles back to original state without any weird overlapping artifacts. All bug fixes verified and working correctly. No critical issues found. Feature is production-ready."
   - agent: "testing"
     message: "Completed comprehensive testing of AI Generate Button and Magic Link features as per latest review request. ALL FEATURES NOW WORKING PERFECTLY: (1) AI Generate Button - '✨ Gerar com IA' button is now visible in Projects page header with gradient background, clicking opens Prompt-to-Project modal, submitted prompt 'Projeto teste de festival em portugal com 50k de budget', AI generation completed successfully using GPT-5.4, new project 'Projeto Teste de Festival' appeared in projects list with Manager='A Definir (PMO)' and budget information. Backend API POST /api/ai/prompt-to-project returned 200 OK. (2) Generate Magic Link - Clicked on project to open modal, clicked '🔗 Generate Magic Link' button, alert appeared with correct message, backend API POST /api/projects/{project_id}/magic-link returned 200 OK, VERIFIED: Magic Link URL format is CORRECT using production URL 'https://sony-music-projects.preview.emergentagent.com/shared/{token}' (not localhost). Backend server.py line 1327 correctly returns production URL. Both features are production-ready. Minor: Clipboard write permission error in test environment (expected, not a real issue in production). No critical issues found."
+  - agent: "testing"
+    message: "Completed verification testing for Features Guide page - New Features Visibility & Text Color improvements. VERIFIED ALL REVIEW REQUIREMENTS: (1) 'Prompt-to-Project (AI Generator)' feature card is VISIBLE and prominently displayed at position 1 (first card) with icon, title, description, and complete business rules. (2) 'Magic Link (Portal do Stakeholder)' feature card is VISIBLE and prominently displayed at position 2 (second card) with icon, title, description, and complete business rules. (3) Text color and readability EXCELLENT: Description text uses rgb(226, 232, 240) = #e2e8f0 (Tailwind slate-200 - light slate/gray), Rules text uses rgb(148, 163, 184) = #94a3b8 (Tailwind slate-400 - medium slate/gray). All RGB values > 140 confirming light colors, NOT dark muddy gray. Text is highly readable against dark background with glassmorphism effects. (4) Total of 9 feature cards displayed on page. Screenshots captured showing both new features prominently displayed with excellent text readability. All review requirements met successfully. No issues found. Feature is production-ready."
