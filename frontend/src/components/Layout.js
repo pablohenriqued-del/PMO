@@ -147,6 +147,12 @@ const Layout = ({ children }) => {
     }
   ];
 
+  const isSharedRoute = location.pathname.startsWith('/shared');
+
+  if (isSharedRoute) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="layout-container">
       {/* Sidebar */}

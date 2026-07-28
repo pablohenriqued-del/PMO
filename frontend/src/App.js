@@ -20,6 +20,7 @@ import StatusReport from "./components/StatusReport";
 import AICopilot from "./components/AICopilot";
 import CapacityPlanning from "./components/CapacityPlanning";
 import FeaturesGuide from "./components/FeaturesGuide";
+import SharedProject from "./components/SharedProject";
 import CRMDashboard from "./components/CRMDashboard";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -30,6 +31,7 @@ function App() {
       <BrowserRouter>
         <Layout>
           <Routes>
+            <Route path="/shared/:token" element={<SharedProject />} />
             <Route path="/" element={<Dashboard />} />
             <Route path="/regional" element={<RegionalDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />

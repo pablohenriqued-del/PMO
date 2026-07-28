@@ -379,16 +379,56 @@ frontend:
         agent: "testing"
         comment: "Comprehensive testing completed for Features Guide page. All requirements verified: (1) Radial Gradient Background - Body element has radial-gradient(circle at 50% 0%, rgb(26, 5, 5) 0%, rgb(0, 0, 0) 60%, rgb(0, 0, 0) 100%) creating subtle dark red gradient at top center fading to black, exactly as requested. (2) Sidebar Navigation - 'Guia & Features' link found in sidebar at position y=474.59, successfully clicked and navigated to /features-guide route. (3) Features Guide Page - Page loaded successfully with 7 feature cards rendered. (4) Glassmorphism Effects - All cards have backdrop-filter: blur(16px) and translucent background rgba(20, 20, 20, 0.7). (5) Hover Effects - On hover, cards exhibit: border color changes from rgba(255, 255, 255, 0.05) to rgba(229, 9, 20, 0.3) (red border), box shadow changes to rgba(229, 9, 20, 0.15) 0px 12px 40px (red glow effect), transform changes to translateY(-5px) (card lifts up). All visual effects working perfectly. Minor: React console warning about non-boolean attribute (non-critical, doesn't affect functionality). Feature is production-ready."
 
+
+  - task: "Projects - AI Generate Button"
+    implemented: false
+    working: false
+    file: "/app/frontend/src/components/Projects.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "CRITICAL: '✨ Generate with AI' button is MISSING from Projects page header. The infrastructure exists (AI Prompt Modal at lines 1571-1610, handleGenerateAI function at lines 341-355, backend API endpoint /api/ai/prompt-to-project), but there is NO BUTTON in the header to trigger the modal. Need to add a button next to 'New Project' button (around line 439-450) that calls setIsPromptModalOpen(true). Button should have text '✨ Generate with AI' or similar."
+
+  - task: "Projects - Generate Magic Link"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Projects.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Generate Magic Link button exists in project detail modal (line 810-815) and is clickable. Button successfully triggers API call to /api/projects/{project_id}/magic-link. Alert popup appears with message '🔗 Magic Link copiado para a área de transferência! Envie para o empresário/artista no WhatsApp.' Clipboard copy functionality works (though permission denied in test environment is expected). ISSUE: Backend returns hardcoded localhost URL (http://localhost:3000/shared/{token}) instead of production URL. Backend server.py line 1327 should use environment variable or construct proper URL: https://sony-music-projects.preview.emergentagent.com/shared/{token}"
+
+  - task: "Shared Project Route - Sidebar Hidden"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Layout.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Shared project route (/shared/:token) correctly hides sidebar. Layout.js line 150 checks if route starts with '/shared' and returns only children without sidebar layout (lines 152-154). Tested with /shared/mock-token-123 and confirmed sidebar is not rendered. Page shows dark background with radial gradient (as defined in SharedProject.js line 35). Error message 'Projeto não encontrado ou link expirado.' displays correctly for invalid tokens. All functionality working as expected."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 13
+  test_sequence: 14
   run_ui: true
-  last_updated: "2026-07-28 07:59:00"
+  - agent: "testing"
+    message: "Completed testing of AI Generate Button and Magic Link features as per latest review request. CRITICAL FINDING: '✨ Generate with AI' button is MISSING from Projects page header. All infrastructure exists (modal, API endpoint, handler function) but the trigger button was not implemented. This is a blocking issue for the feature. WORKING: (1) Generate Magic Link button exists in project detail modal and triggers API successfully, (2) Shared route (/shared/token) correctly hides sidebar and shows dark background, (3) Error message displays for invalid tokens. ISSUE: Backend magic link URL is hardcoded to localhost:3000 instead of production URL. Main agent needs to: (1) Add '✨ Generate with AI' button to Projects header next to 'New Project' button, (2) Fix backend magic link URL generation to use proper domain."
+
+  last_updated: "2026-07-28 08:20:00"
 
 test_plan:
   current_focus:
-    - "CRM & Demandas - Kanban Board Drag to Closed Won Conversion"
+    - "Projects - AI Generate Button & Magic Link"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

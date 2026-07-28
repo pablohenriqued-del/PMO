@@ -35,6 +35,9 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [updateData, setUpdateData] = useState({
     progress: 0,
@@ -332,6 +335,33 @@ const Projects = () => {
     }
     
     if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+
+  const handleGenerateAI = async (e) => {
+    e.preventDefault();
+    setIsGenerating(true);
+    try {
+      await axios.post(`${API}/ai/prompt-to-project`, { prompt: aiPrompt });
+      await fetchProjects();
+      setIsPromptModalOpen(false);
+      setAiPrompt("");
+      alert("✨ Projeto gerado com sucesso pela IA!");
+    } catch (err) {
+      alert("Erro ao gerar projeto com a IA.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+  const handleGenerateMagicLink = async (projectId) => {
+    try {
+      const res = await axios.post(`${API}/projects/${projectId}/magic-link`);
+      navigator.clipboard.writeText(res.data.magic_link);
+      alert("🔗 Magic Link copiado para a área de transferência! Envie para o empresário/artista no WhatsApp.");
+    } catch (e) {
+      alert("Erro ao gerar Magic Link");
+    }
   };
 
   const handleCreateProject = async (e) => {
@@ -777,11 +807,18 @@ const Projects = () => {
                       onChange={(e) => handleImportSchedule(e, selectedProject.id)}
                     />
                     <Button 
+                      style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', border: '1px solid #10B981' }}
+                      onClick={() => handleGenerateMagicLink(selectedProject.id)}
+                      title="Gerar Portal do Artista (Link Read-Only seguro)"
+                    >
+                      🔗 Generate Magic Link
+                    </Button>
+                    <Button 
                       variant="outline"
                       onClick={() => fileInputRef.current.click()}
                       title="Importar CSV do Monday.com ou MS Planner"
                     >
-                      ⬇️ Import Planner/Monday (CSV)
+                      ⬇️ Import Planner/Monday
                     </Button>
                     <Button 
                       variant="outline"
@@ -1527,6 +1564,47 @@ const Projects = () => {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* AI Prompt Modal */}
+      {isPromptModalOpen && (
+        <div className="modal-overlay" onClick={() => !isGenerating && setIsPromptModalOpen(false)} style={{ zIndex: 1200 }}>
+          <div className="project-detail-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            {!isGenerating && <button onClick={() => setIsPromptModalOpen(false)} className="modal-close-btn">✕</button>}
+            <div className="modal-header">
+              <h1 style={{ background: 'linear-gradient(90deg, #8B5CF6, #EC4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                ✨ Prompt-to-Project
+              </h1>
+              <p style={{ color: 'var(--sony-gray-400)', fontSize: '14px', marginBottom: '24px' }}>
+                Descreva o projeto em linguagem natural e deixe a IA montar o cronograma, orçamento e escopo em segundos.
+              </p>
+            </div>
+            {isGenerating ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <div style={{ fontSize: '48px', animation: 'spin 2s linear infinite', marginBottom: '16px' }}>✨</div>
+                <h3 style={{ color: 'white' }}>A Mágica está acontecendo...</h3>
+                <p style={{ color: 'var(--sony-gray-500)' }}>A IA (GPT-5.4) está estruturando o escopo, calculando o budget e definindo as datas de entrega.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleGenerateAI}>
+                <Textarea 
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="Ex: Vamos lançar um novo álbum do Bad Bunny na América Latina focado no TikTok em 3 meses com 300k de budget"
+                  rows={5}
+                  required
+                  style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid var(--sony-gray-300)', color: 'white' }}
+                />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+                  <Button type="button" variant="outline" onClick={() => setIsPromptModalOpen(false)}>Cancelar</Button>
+                  <Button type="submit" style={{ background: 'linear-gradient(90deg, #8B5CF6, #EC4899)', color: 'white', border: 'none' }}>
+                    Gerar Projeto
+                  </Button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
