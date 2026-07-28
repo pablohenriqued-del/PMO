@@ -328,19 +328,31 @@ frontend:
         agent: "testing"
         comment: "Voice Command microphone button successfully verified at bottom right corner. Button positioned at coordinates x=1832, y=992 (bottom right corner as expected), displays as a circular button with microphone icon, has title attribute 'Voice Command (Comando de Voz)'. Component implements voice recognition functionality using Web Speech API (webkitSpeechRecognition) with Portuguese language support (pt-BR). Voice commands can navigate to different pages (projetos, dashboard, copilot, capacidade). Button is visible, accessible, and positioned correctly. Note: Actual voice recognition functionality not tested due to system limitations (requires microphone access), but button rendering and positioning verified successfully."
 
+  - task: "Features Guide - Radial Gradient Background & Glassmorphism"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/FeaturesGuide.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Initial issue found: Layout.js was missing Sparkles icon import from lucide-react, which would cause runtime error when rendering 'Guia & Features' sidebar link. Fixed by adding Sparkles to the import statement."
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing completed for Features Guide page. All requirements verified: (1) Radial Gradient Background - Body element has radial-gradient(circle at 50% 0%, rgb(26, 5, 5) 0%, rgb(0, 0, 0) 60%, rgb(0, 0, 0) 100%) creating subtle dark red gradient at top center fading to black, exactly as requested. (2) Sidebar Navigation - 'Guia & Features' link found in sidebar at position y=474.59, successfully clicked and navigated to /features-guide route. (3) Features Guide Page - Page loaded successfully with 7 feature cards rendered. (4) Glassmorphism Effects - All cards have backdrop-filter: blur(16px) and translucent background rgba(20, 20, 20, 0.7). (5) Hover Effects - On hover, cards exhibit: border color changes from rgba(255, 255, 255, 0.05) to rgba(229, 9, 20, 0.3) (red border), box shadow changes to rgba(229, 9, 20, 0.15) 0px 12px 40px (red glow effect), transform changes to translateY(-5px) (card lifts up). All visual effects working perfectly. Minor: React console warning about non-boolean attribute (non-critical, doesn't affect functionality). Feature is production-ready."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 9
+  test_sequence: 10
   run_ui: true
-  last_updated: "2026-07-28 06:50:00"
+  last_updated: "2026-07-28 06:55:00"
 
 test_plan:
   current_focus:
-    - "Capacity Planning - Sidebar Navigation"
-    - "Capacity Planning - Heatmap Page"
-    - "Modo TV Button - Presentation Mode"
-    - "Voice Command - Microphone Button"
+    - "Features Guide - Radial Gradient Background & Glassmorphism"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -364,3 +376,5 @@ agent_communication:
     message: "Completed comprehensive testing of AI Copilot feature as per latest review request. Test flow: (1) Clicked 'AI Copilot' in sidebar and navigated to /ai-copilot, (2) Verified page title 'PMO AI Copilot & Autonomous Agent' and subtitle displayed correctly, (3) Verified both panels visible: 'Trend-Driven Prioritization (Spotify/TikTok)' and 'PMO Autônomo & Prevenção de Atrasos', (4) Trends panel displayed 2 viral trends (Rosalía +850%, Fado +210%) with suggested budget reallocation actions, (5) Clicked 'Aprovar Realocação de Budget' button and verified status changed to 'Realocação Executada' with green checkmark, (6) Bottlenecks panel displayed 1 detected bottleneck (Fado Global Reach Playlist project with unassigned milestone), (7) Clicked 'Alocar Recurso e Notificar Equipe' button and verified status changed to 'Recurso Alocado e E-mail Enviado' with green checkmark, (8) Backend logs confirmed successful API calls: POST /api/ai/reallocate-budget (200 OK), POST /api/ai/resolve-bottleneck (200 OK), (9) Email notification MOCKED and sent to João Silva for milestone 'Content Strategy Development' assignment. All functionality working perfectly. Note: Email sending is MOCKED using send_allocation_email_mock function - actual email integration not implemented. No critical issues found. Feature is production-ready."
   - agent: "testing"
     message: "Completed comprehensive testing of latest review request items: (1) Capacity Planning Sidebar Navigation - Verified 'Capacity Planning' link is visible in sidebar as 2nd item, displays correct text, and navigates to /capacity-planning route successfully. (2) Capacity Planning Heatmap Page - Successfully navigated to page, verified title 'Capacity Planning & Heatmap' displays correctly, heatmap table renders with proper structure showing Resource, Role, 4 months (2026-07 to 2026-10), and Burnout Risk columns, 9 data rows present with color-coded allocation percentages, legend visible, backend API /api/capacity-planning called successfully. (3) Modo TV Button - Verified button displays 'Modo TV' text, positioned at top right corner (x=1712, y=24.5) next to notifications bell, implements presentation mode with auto-rotation through routes every 15 seconds and fullscreen functionality. (4) Voice Command Microphone Button - Verified circular button with microphone icon positioned at bottom right corner (x=1832, y=992), has correct title attribute, implements Web Speech API voice recognition with Portuguese language support. All features tested and working correctly. No critical issues found. All review request items verified successfully."
+  - agent: "testing"
+    message: "Completed comprehensive testing of Features Guide page with radial gradient background and glassmorphism effects. CRITICAL FIX: Found and fixed missing Sparkles icon import in Layout.js (line 6-24) which would have caused runtime error. Added 'Sparkles' to lucide-react imports. TEST RESULTS: (1) Radial Gradient Background - VERIFIED: Body element has radial-gradient(circle at 50% 0%, rgb(26, 5, 5) 0%, rgb(0, 0, 0) 60%, rgb(0, 0, 0) 100%) creating subtle dark red gradient visible at edges, exactly as requested. (2) Sidebar Navigation - VERIFIED: 'Guia & Features' link present in sidebar, successfully clicked and navigated to /features-guide route. (3) Features Guide Page - VERIFIED: Page loads successfully with 7 feature cards (PMO AI Copilot, Trend-Driven Prioritization, Capacity Planning, Modo TV, Voice Command, Excel Import, Notifications). (4) Glassmorphism - VERIFIED: All cards have backdrop-filter: blur(16px) and translucent rgba(20, 20, 20, 0.7) background. (5) Hover Effects - VERIFIED: Cards exhibit red border glow (rgba(229, 9, 20, 0.3)), red box shadow glow (rgba(229, 9, 20, 0.15) 0px 12px 40px), and translateY(-5px) lift effect on hover. All visual effects working perfectly. Minor: React console warning about non-boolean attribute (non-critical). Feature is production-ready and all review requirements met."

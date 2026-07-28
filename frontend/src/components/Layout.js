@@ -20,7 +20,8 @@ import {
   Zap,
   Users,
   Menu,
-  X
+  X,
+  Sparkles
 } from "lucide-react";
 
 const Layout = ({ children }) => {
@@ -94,6 +95,12 @@ const Layout = ({ children }) => {
       href: "/budget",
       icon: PiggyBank,
       current: location.pathname === "/budget"
+    },
+    {
+      name: "Guia & Features",
+      href: "/features-guide",
+      icon: Sparkles,
+      current: location.pathname === "/features-guide"
     },
     {
       name: "Lessons Learned",
