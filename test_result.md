@@ -348,6 +348,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Visual glitch testing completed for Voice Command button. VERIFIED: (1) Button renders correctly without any white rectangle visual glitches, (2) Circular button with microphone icon positioned at x=1832, y=992, width=56, height=56 in bottom right corner, (3) Button is visible and accessible with proper styling, (4) No visual artifacts detected in button area, (5) No console errors or network errors detected. Button rendering is clean and professional. All review requirements met successfully."
+      - working: true
+        agent: "testing"
+        comment: "Voice Command bug fix verification completed. Comprehensive test of button state changes and toggle functionality: (1) Navigated to homepage (/), (2) Located voice command button at bottom right (x=1832, y=992), (3) VERIFIED initial state: background color rgba(20, 20, 20, 0.8) (dark), MicOff icon displayed, (4) Clicked button to start listening, (5) VERIFIED listening state: background color changed to rgb(229, 9, 20) (Sony red) ✓, button state correctly toggled to isListening=true, (6) VERIFIED icon logic: Mic icon displays when listening (isListening=true), MicOff icon displays when not listening (isListening=false), (7) Clicked button again to stop listening, (8) VERIFIED stopped state: background color changed back to rgba(20, 20, 20, 0.8) (dark) ✓, button state correctly toggled to isListening=false, (9) No console errors detected during test. All state transitions working perfectly. Error handling implemented (setErrorMsg for 'Permissão de microfone negada' when permission denied). Screenshots captured showing all three states (initial, listening with red background, stopped). Bug fix is working correctly and feature is production-ready."
 
   - task: "CRM & Demandas - Kanban Board"
     implemented: true
@@ -428,14 +431,14 @@ frontend:
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 16
+  test_sequence: 17
   run_ui: true
 
-  last_updated: "2026-07-28 08:28:00"
+  last_updated: "2026-07-30 19:35:00"
 
 test_plan:
   current_focus:
-    - "Features Guide - New Features Visibility & Text Color"
+    - "Voice Command - Microphone Button Bug Fix"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -471,3 +474,5 @@ agent_communication:
     message: "Completed comprehensive testing of AI Generate Button and Magic Link features as per latest review request. ALL FEATURES NOW WORKING PERFECTLY: (1) AI Generate Button - '✨ Gerar com IA' button is now visible in Projects page header with gradient background, clicking opens Prompt-to-Project modal, submitted prompt 'Projeto teste de festival em portugal com 50k de budget', AI generation completed successfully using GPT-5.4, new project 'Projeto Teste de Festival' appeared in projects list with Manager='A Definir (PMO)' and budget information. Backend API POST /api/ai/prompt-to-project returned 200 OK. (2) Generate Magic Link - Clicked on project to open modal, clicked '🔗 Generate Magic Link' button, alert appeared with correct message, backend API POST /api/projects/{project_id}/magic-link returned 200 OK, VERIFIED: Magic Link URL format is CORRECT using production URL 'https://sony-music-projects.preview.emergentagent.com/shared/{token}' (not localhost). Backend server.py line 1327 correctly returns production URL. Both features are production-ready. Minor: Clipboard write permission error in test environment (expected, not a real issue in production). No critical issues found."
   - agent: "testing"
     message: "Completed verification testing for Features Guide page - New Features Visibility & Text Color improvements. VERIFIED ALL REVIEW REQUIREMENTS: (1) 'Prompt-to-Project (AI Generator)' feature card is VISIBLE and prominently displayed at position 1 (first card) with icon, title, description, and complete business rules. (2) 'Magic Link (Portal do Stakeholder)' feature card is VISIBLE and prominently displayed at position 2 (second card) with icon, title, description, and complete business rules. (3) Text color and readability EXCELLENT: Description text uses rgb(226, 232, 240) = #e2e8f0 (Tailwind slate-200 - light slate/gray), Rules text uses rgb(148, 163, 184) = #94a3b8 (Tailwind slate-400 - medium slate/gray). All RGB values > 140 confirming light colors, NOT dark muddy gray. Text is highly readable against dark background with glassmorphism effects. (4) Total of 9 feature cards displayed on page. Screenshots captured showing both new features prominently displayed with excellent text readability. All review requirements met successfully. No issues found. Feature is production-ready."
+  - agent: "testing"
+    message: "Completed Voice Command bug fix verification as per latest review request. COMPREHENSIVE TEST OF BUTTON STATE CHANGES: (1) Navigated to homepage (/), (2) Located voice command button at bottom right corner (x=1832, y=992), (3) VERIFIED initial state: background color rgba(20, 20, 20, 0.8) (dark), MicOff icon displayed, (4) Clicked button to start listening, (5) VERIFIED listening state: background color changed to rgb(229, 9, 20) (Sony red) ✓ - this confirms isListening=true state is working, (6) VERIFIED icon toggle logic: Component correctly displays Mic icon when isListening=true and MicOff icon when isListening=false (line 134 in VoiceCommand.js), (7) Clicked button again to stop listening, (8) VERIFIED stopped state: background color changed back to rgba(20, 20, 20, 0.8) (dark) ✓ - this confirms toggle back to isListening=false works, (9) No console errors detected during test. Error handling is properly implemented (lines 51-59) - setErrorMsg('Permissão de microfone negada') when event.error === 'not-allowed'. All state transitions working perfectly. Screenshots captured showing all three states (initial with dark background, listening with red background, stopped with dark background). Bug fix is working correctly and feature is production-ready."
