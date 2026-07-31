@@ -390,6 +390,33 @@ const Projects = () => {
 
   
   const fileInputRef = React.useRef(null);
+  const projectFileInputRef = React.useRef(null);
+  
+  const handleImportProjectCSV = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(`${API}/projects/import-csv`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      // Refresh projects list after import
+      await fetchProjects();
+      alert("✅ Projects imported from CSV successfully!");
+    } catch (error) {
+      console.error("Error importing CSV:", error);
+      alert("❌ Failed to import CSV file. Please check the file format.");
+    }
+    
+    // Reset file input
+    if (projectFileInputRef.current) projectFileInputRef.current.value = "";
+  };
   
   const handleImportSchedule = async (e, projectId) => {
     const file = e.target.files[0];
@@ -569,9 +596,19 @@ const Projects = () => {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <Button variant="outline" onClick={() => handlePlannerSync('import')} title="Import from MS Planner">⬇️ Planner</Button>
-            <Button variant="outline" onClick={() => handlePlannerSync('export')} title="Export to MS Planner">⬆️ Planner</Button>
-            <Button variant="outline" onClick={handleExportCSV} title="Export as CSV/Excel">⬇️ Excel</Button>
+            <input 
+              type="file" 
+              accept=".csv" 
+              ref={projectFileInputRef} 
+              style={{ display: 'none' }}
+              onChange={handleImportProjectCSV}
+            />
+            <Button variant="outline" onClick={() => projectFileInputRef.current.click()} title="Importar Projetos (Planner/Monday via CSV)">
+              ⬇️ Import (CSV)
+            </Button>
+            <Button variant="outline" onClick={handleExportCSV} title="Exportar para Excel/CSV">
+              ⬆️ Export (Excel)
+            </Button>
             <Button style={{ background: 'var(--sony-red)', color: 'white', border: 'none' }} onClick={() => setIsCreateModalOpen(true)} data-testid="add-project-btn">
               <Plus size={16} style={{ marginRight: '8px' }} /> New Project
             </Button>
