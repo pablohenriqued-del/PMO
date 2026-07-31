@@ -70,7 +70,7 @@ const AICopilot = () => {
           <BrainCircuit color="var(--sony-red)" size={32} />
           PMO AI Copilot & Autonomous Agent
         </h1>
-        <p className="dashboard-subtitle" style={{ color: '#E2E8F0', fontWeight: '500' }}>
+        <p className="dashboard-subtitle" style={{ color: '#FFFFFF', fontWeight: '500' }}>
           Agentic AI para análise preditiva, gestão de capacidade e realocação guiada por Data Trends
         </p>
       </div>
@@ -110,12 +110,12 @@ const AICopilot = () => {
                   </div>
                 </div>
                 
-                <p style={{ fontSize: '13px', color: '#E2E8F0', fontWeight: '500', marginBottom: '16px' }}>
+                <p style={{ fontSize: '13px', color: '#FFFFFF', fontWeight: '500', marginBottom: '16px' }}>
                   <strong>Trigger:</strong> {trend.trigger}
                 </p>
 
                 <div style={{ background: 'rgba(0,0,0,0.5)', padding: '16px', borderRadius: '8px', marginBottom: '16px', borderLeft: '3px solid #F59E0B' }}>
-                  <div style={{ fontSize: '12px', color: '#94A3B8', marginBottom: '4px' }}>Ação Autônoma Sugerida:</div>
+                  <div style={{ fontSize: '12px', color: '#CBD5E1', marginBottom: '4px' }}>Ação Autônoma Sugerida:</div>
                   <div style={{ fontSize: '14px', color: 'var(--sony-white)' }}>{trend.suggested_action}</div>
                 </div>
 
@@ -166,13 +166,13 @@ const AICopilot = () => {
                   </div>
                 </div>
                 
-                <p style={{ fontSize: '13px', color: '#E2E8F0', fontWeight: '500', marginBottom: '16px' }}>
+                <p style={{ fontSize: '13px', color: '#FFFFFF', fontWeight: '500', marginBottom: '16px' }}>
                   <strong>Motivo:</strong> {bot.issue}<br/>
                   <strong>Marco Crítico:</strong> {bot.milestone_name}
                 </p>
 
                 <div style={{ background: 'rgba(0,0,0,0.5)', padding: '16px', borderRadius: '8px', marginBottom: '16px', borderLeft: '3px solid #3B82F6' }}>
-                  <div style={{ fontSize: '12px', color: '#94A3B8', marginBottom: '4px' }}>Capacidade Encontrada (AD/LDAP):</div>
+                  <div style={{ fontSize: '12px', color: '#CBD5E1', marginBottom: '4px' }}>Capacidade Encontrada (AD/LDAP):</div>
                   <div style={{ fontSize: '14px', color: 'var(--sony-white)' }}>{bot.action}</div>
                 </div>
 
@@ -191,7 +191,7 @@ const AICopilot = () => {
               </div>
             ))}
             {bottlenecks.length === 0 && (
-              <div style={{ color: '#94A3B8', textAlign: 'center', padding: '32px' }}>
+              <div style={{ color: '#CBD5E1', textAlign: 'center', padding: '32px' }}>
                 Nenhum gargalo detectado no momento.
               </div>
             )}
