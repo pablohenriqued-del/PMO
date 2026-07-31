@@ -1061,11 +1061,13 @@ def parse_upload_to_dicts(file_bytes, filename):
     return df.to_dict('records')
 
 
-def get_val(row, possible_keys):
+def get_val(row, possible_keys, fallback_to_first=False):
     for k in row.keys():
         for pk in possible_keys:
             if str(k).strip().lower() == pk.lower():
                 return row[k]
+    if fallback_to_first and row:
+        return list(row.values())[0]
     return ''
 
 @api_router.post("/projects/import-csv")
@@ -1078,11 +1080,11 @@ async def import_projects_csv(file: UploadFile = File(...)):
         projects_dict = {}
         
         for row in records:
-            proj_name = get_val(row, ['Project Name', 'Board', 'Plan Name', 'Project', 'Plan']) or filename_base
+            proj_name = get_val(row, ['Project Name', 'Board', 'Plan Name', 'Project', 'Plan', 'Quadro', 'Projeto']) or filename_base
             if proj_name not in projects_dict:
                 projects_dict[proj_name] = []
                 
-            task_name = get_val(row, ['Name', 'Task Name', 'Item', 'Title', 'Tarefa']) or ''
+            task_name = get_val(row, ['Name', 'Task Name', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade'], fallback_to_first=True) or ''
             date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo']))
             status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso']))
             
@@ -1166,7 +1168,7 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
         
         imported_milestones = []
         for row in records:
-            task_name = get_val(row, ['Name', 'Task Name', 'Item', 'Title', 'Tarefa']) or ''
+            task_name = get_val(row, ['Name', 'Task Name', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade'], fallback_to_first=True) or ''
             date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo']))
             status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso']))
             

@@ -6,6 +6,7 @@ import {
   Calendar,
   DollarSign,
   Edit2,
+  Trash2,
   Users,
   TrendingUp,
   AlertTriangle,
@@ -53,6 +54,22 @@ const Projects = () => {
     revenue_generated: 0,
     milestones: []
   });
+
+
+  const handleDeleteProject = async (projectId) => {
+    if (!window.confirm("Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita.")) return;
+    
+    try {
+      await axios.delete(`${API}/projects/${projectId}`);
+      setProjects(prev => prev.filter(p => p.id !== projectId));
+      setIsModalOpen(false);
+      setSelectedProject(null);
+      alert("Projeto excluído com sucesso!");
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao excluir o projeto.");
+    }
+  };
 
   const openEditModal = () => {
     setEditFormData({
@@ -1122,6 +1139,14 @@ const Projects = () => {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h1>{selectedProject.name}</h1>
                   <div style={{ display: 'flex', gap: '12px' }}>
+                    <Button 
+                      variant="outline"
+                      style={{ color: 'var(--sony-red)', borderColor: 'rgba(229,9,20,0.2)' }}
+                      onClick={() => handleDeleteProject(selectedProject.id)}
+                      title="Excluir Projeto"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
                     <Button 
                       variant="outline"
                       onClick={openEditModal}
