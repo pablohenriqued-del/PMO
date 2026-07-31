@@ -3,8 +3,10 @@ from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
-import csv
+
+import pandas as pd
 import io
+import csv
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
@@ -1040,6 +1042,108 @@ async def get_notifications():
     notifications.sort(key=lambda x: priority_weight.get(x["priority"], 0), reverse=True)
     return notifications
 
+
+def parse_upload_to_dicts(file_bytes, filename):
+    import pandas as pd
+    import io
+    
+    if filename.lower().endswith('.xlsx') or filename.lower().endswith('.xls'):
+        df = pd.read_excel(io.BytesIO(file_bytes))
+    else:
+        try:
+            df = pd.read_csv(io.BytesIO(file_bytes))
+        except UnicodeDecodeError:
+            df = pd.read_csv(io.BytesIO(file_bytes), encoding='latin-1')
+            
+    # Convert all column names to string and fill NaNs
+    df.columns = [str(c).strip() for c in df.columns]
+    df = df.fillna('')
+    return df.to_dict('records')
+
+@api_router.post("/projects/import-csv")
+async def import_projects_csv(file: UploadFile = File(...)):
+    try:
+        file_bytes = await file.read()
+        records = parse_upload_to_dicts(file_bytes, file.filename)
+        
+        filename_base = file.filename.rsplit('.', 1)[0] if file.filename else 'Imported Project'
+        projects_dict = {}
+        
+        for row in records:
+            # Map standard columns
+            proj_name = row.get('Project Name') or row.get('Board') or row.get('Plan Name') or row.get('Project') or filename_base
+            
+            if proj_name not in projects_dict:
+                projects_dict[proj_name] = []
+                
+            task_name = row.get('Name') or row.get('Task Name') or row.get('Item') or row.get('Title') or 'Tarefa'
+            date_str = str(row.get('Due Date') or row.get('End Date') or row.get('Date') or row.get('Deadline') or '')
+            status = str(row.get('Status') or row.get('State') or row.get('Progress') or '')
+            
+            # Simple date cleanup
+            if '/' in date_str: 
+                parts = date_str.split(' ')[0].split('/')
+                if len(parts) == 3 and len(parts[2]) == 4:
+                    # MM/DD/YYYY to YYYY-MM-DD
+                    date_str = f"{parts[2]}-{parts[0].zfill(2)}-{parts[1].zfill(2)}"
+            
+            # Ensure proper ISO string if pandas gives Timestamp
+            import pandas as pd
+            if isinstance(row.get('Due Date'), pd.Timestamp):
+                date_str = row['Due Date'].strftime('%Y-%m-%d')
+                
+            completed = status.lower() in ['done', 'completed', 'concluído', 'fechado', '100%', '100']
+            
+            if task_name.strip() and task_name.strip() != 'Tarefa':
+                projects_dict[proj_name].append({
+                    "name": str(task_name).strip(),
+                    "date": date_str.split(' ')[0] if date_str else datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                    "completed": completed,
+                    "assigned_to": None,
+                    "is_key_milestone": True
+                })
+            
+        inserted_count = 0
+        for p_name, milestones in projects_dict.items():
+            new_project = Project(
+                name=str(p_name).strip()[:100],
+                description="Projeto importado automaticamente (Planner/Monday/Excel).",
+                status=ProjectStatus.PLANNING,
+                priority=ProjectPriority.MEDIUM,
+                type=ProjectType.DIGITAL,
+                manager="Importado",
+                department="Unassigned",
+                country="Global",
+                budget_allocated=0.0,
+                budget_spent=0.0,
+                revenue_expected=0.0,
+                revenue_generated=0.0,
+                start_date=datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                end_date=(datetime.now(timezone.utc) + __import__('datetime').timedelta(days=90)).strftime("%Y-%m-%d"),
+                progress=0,
+                milestones=milestones,
+                team_members=[],
+                streaming_platforms=[],
+                documentations="",
+                envs="",
+                activities=[{
+                    "id": str(uuid.uuid4()),
+                    "type": "system",
+                    "text": "Projeto importado em lote via arquivo.",
+                    "user": "System",
+                    "date": datetime.now(timezone.utc).isoformat()
+                }]
+            )
+            await db.projects.insert_one(prepare_for_mongo(new_project.dict()))
+            inserted_count += 1
+            
+        return {"message": f"Successfully imported {inserted_count} project(s).", "count": inserted_count}
+    except Exception as e:
+        logger.error(f"Error importing projects bulk: {e}")
+        raise HTTPException(status_code=400, detail=f"Failed to parse file: {str(e)}")
+
+
+
 @api_router.post("/projects/{project_id}/import-schedule", response_model=Project)
 async def import_project_schedule(project_id: str, file: UploadFile = File(...)):
     existing_project = await db.projects.find_one({"id": project_id})
@@ -1047,31 +1151,34 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
         raise HTTPException(status_code=404, detail="Project not found")
         
     try:
-        content = await file.read()
-        text = content.decode('utf-8')
-        reader = csv.DictReader(io.StringIO(text))
+        file_bytes = await file.read()
+        records = parse_upload_to_dicts(file_bytes, file.filename)
         
         imported_milestones = []
-        for row in reader:
-            # Map standard columns from Excel/Monday/Planner CSV exports
-            name = row.get('Name') or row.get('Task Name') or row.get('Item') or row.get('Title') or 'Tarefa Importada'
-            date_str = row.get('Due Date') or row.get('End Date') or row.get('Date') or row.get('Deadline') or ''
-            status = row.get('Status') or row.get('State') or row.get('Progress') or ''
+        for row in records:
+            task_name = row.get('Name') or row.get('Task Name') or row.get('Item') or row.get('Title') or 'Tarefa Importada'
+            date_str = str(row.get('Due Date') or row.get('End Date') or row.get('Date') or row.get('Deadline') or '')
+            status = str(row.get('Status') or row.get('State') or row.get('Progress') or '')
             
             if '/' in date_str: 
-                parts = date_str.split('/')
+                parts = date_str.split(' ')[0].split('/')
                 if len(parts) == 3 and len(parts[2]) == 4:
                     date_str = f"{parts[2]}-{parts[0].zfill(2)}-{parts[1].zfill(2)}"
-                    
-            completed = str(status).lower() in ['done', 'completed', 'concluído', 'fechado', '100%']
             
-            imported_milestones.append({
-                "name": name,
-                "date": date_str,
-                "completed": completed,
-                "assigned_to": None,
-                "is_key_milestone": False 
-            })
+            import pandas as pd
+            if isinstance(row.get('Due Date'), pd.Timestamp):
+                date_str = row['Due Date'].strftime('%Y-%m-%d')
+                    
+            completed = status.lower() in ['done', 'completed', 'concluído', 'fechado', '100%', '100']
+            
+            if str(task_name).strip():
+                imported_milestones.append({
+                    "name": str(task_name).strip()[:150],
+                    "date": date_str.split(' ')[0] if date_str else datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                    "completed": completed,
+                    "assigned_to": None,
+                    "is_key_milestone": False 
+                })
             
         existing_milestones = existing_project.get("milestones", [])
         for ms in existing_milestones:
@@ -1092,7 +1199,8 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
         return Project(**parse_from_mongo(updated_project))
     except Exception as e:
         logger.error(f"Error importing schedule: {e}")
-        raise HTTPException(status_code=400, detail=f"Failed to parse CSV file: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Failed to parse file: {str(e)}")
+
 
 
 # ==========================================

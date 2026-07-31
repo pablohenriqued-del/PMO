@@ -598,13 +598,13 @@ const Projects = () => {
           <div style={{ display: 'flex', gap: '12px' }}>
             <input 
               type="file" 
-              accept=".csv" 
+              accept=".csv, .xlsx, .xls" 
               ref={projectFileInputRef} 
               style={{ display: 'none' }}
               onChange={handleImportProjectCSV}
             />
-            <Button variant="outline" onClick={() => projectFileInputRef.current.click()} title="Importar Projetos (Planner/Monday via CSV)">
-              ⬇️ Import (CSV)
+            <Button variant="outline" onClick={() => projectFileInputRef.current.click()} title="Importar Projetos (Planner/Monday via CSV/Excel)">
+              ⬇️ Import (File)
             </Button>
             <Button variant="outline" onClick={handleExportCSV} title="Exportar para Excel/CSV">
               ⬆️ Export (Excel)
@@ -1132,7 +1132,7 @@ const Projects = () => {
                     </Button>
                     <input 
                       type="file" 
-                      accept=".csv" 
+                      accept=".csv, .xlsx, .xls" 
                       ref={fileInputRef} 
                       style={{ display: 'none' }}
                       onChange={(e) => handleImportSchedule(e, selectedProject.id)}
@@ -1149,7 +1149,7 @@ const Projects = () => {
                       onClick={() => fileInputRef.current.click()}
                       title="Importar CSV do Monday.com ou MS Planner"
                     >
-                      ⬇️ Import Planner/Monday
+                      ⬇️ Import Tasks (.csv/.xlsx)
                     </Button>
                     <Button 
                       variant="outline"
