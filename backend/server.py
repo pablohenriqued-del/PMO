@@ -173,6 +173,8 @@ class DashboardStats(BaseModel):
     completed_projects: int
     total_budget: float
     budget_spent: float
+    total_revenue_expected: float
+    total_revenue_generated: float
     team_utilization: float
     on_track_projects: int
     delayed_projects: int
@@ -536,8 +538,10 @@ async def get_dashboard_stats():
     total_projects = len(projects)
     active_projects = len([p for p in projects if p["status"] in ["in_progress", "planning"]])
     completed_projects = len([p for p in projects if p["status"] == "completed"])
-    total_budget = sum(p["budget_allocated"] for p in projects)
-    budget_spent = sum(p["budget_spent"] for p in projects)
+    total_budget = sum(p.get("budget_allocated", 0) for p in projects)
+    budget_spent = sum(p.get("budget_spent", 0) for p in projects)
+    total_rev_exp = sum(p.get("revenue_expected", 0) for p in projects)
+    total_rev_gen = sum(p.get("revenue_generated", 0) for p in projects)
     
     # Calculate team utilization (mock calculation)
     team_utilization = min(85.0 + (active_projects * 5), 100.0)
@@ -552,10 +556,29 @@ async def get_dashboard_stats():
         completed_projects=completed_projects,
         total_budget=total_budget,
         budget_spent=budget_spent,
+        total_revenue_expected=total_rev_exp,
+        total_revenue_generated=total_rev_gen,
         team_utilization=team_utilization,
         on_track_projects=on_track_projects,
         delayed_projects=delayed_projects
     )
+    
+@api_router.get("/projects/recent-activities")
+async def get_recent_activities():
+    projects = await db.projects.find().to_list(1000)
+    all_activities = []
+    
+    for p in projects:
+        acts = p.get("activities", [])
+        for act in acts:
+            act["project_name"] = p.get("name")
+            act["project_id"] = p.get("id")
+            all_activities.append(act)
+            
+    # Sort by date desc
+    all_activities.sort(key=lambda x: x.get("date", ""), reverse=True)
+    return all_activities[:15]  # Return top 15
+
 
 @api_router.get("/projects", response_model=List[Project])
 async def get_projects(

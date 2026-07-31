@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [streamingData, setStreamingData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [recentActivities, setRecentActivities] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -27,15 +28,17 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [statsRes, projectsRes, streamingRes] = await Promise.all([
+      const [statsRes, projectsRes, streamingRes, activitiesRes] = await Promise.all([
         axios.get(`${API}/dashboard/stats`),
         axios.get(`${API}/projects`),
-        axios.get(`${API}/streaming-platforms`)
+        axios.get(`${API}/streaming-platforms`),
+        axios.get(`${API}/projects/recent-activities`)
       ]);
 
       setStats(statsRes.data);
       setProjects(projectsRes.data.slice(0, 6)); // Show only first 6 projects
       setStreamingData(streamingRes.data);
+      setRecentActivities(activitiesRes.data || []);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
@@ -251,70 +254,86 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Streaming Performance */}
-        <div style={{ background: 'var(--sony-white)', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--sony-gray-900)', marginBottom: '24px' }}>
-            Streaming Performance
-          </h2>
-
-          <div style={{ display: 'grid', gap: '16px' }}>
-            {streamingData.map((platform, index) => (
-              <div 
-                key={platform.name}
-                style={{ 
-                  padding: '16px',
-                  background: 'var(--sony-gray-50)',
-                  borderRadius: '12px',
-                  border: '1px solid var(--sony-gray-200)'
-                }}
-                data-testid={`streaming-platform-${platform.name.toLowerCase().replace(' ', '-')}`}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-900)' }}>
-                    {platform.name}
-                  </h4>
-                  <span style={{ 
-                    fontSize: '12px', 
-                    fontWeight: '600',
-                    color: platform.growth > 10 ? '#10B981' : '#F59E0B'
-                  }}>
-                    +{platform.growth}%
-                  </span>
+        {/* Right Column: Activities & Portfolio ROI */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+        
+          {/* Recent Activities (Premium Feed) */}
+          <div style={{ background: 'var(--sony-white)', borderRadius: '16px', padding: '24px', boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+              <Activity color="var(--sony-red)" size={20} />
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--pure-white)' }}>
+                Recent Global Activities
+              </h2>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '400px', overflowY: 'auto', paddingRight: '8px' }}>
+              {recentActivities.map((act, i) => (
+                <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', background: 'rgba(255,255,255,0.02)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: act.type === 'system' ? 'rgba(255,255,255,0.1)' : 'var(--sony-red)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '12px', fontWeight: 'bold' }}>
+                    {act.type === 'system' ? '🤖' : act.user?.substring(0,2).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: '13px', color: 'var(--sony-gray-400)', marginBottom: '4px' }}>
+                      <span style={{ color: 'var(--pure-white)', fontWeight: 'bold' }}>{act.user}</span> em 
+                      <span style={{ color: 'var(--sony-red)', fontWeight: 'bold', marginLeft: '4px' }}>{act.project_name}</span>
+                    </div>
+                    <div style={{ fontSize: '14px', color: 'var(--pure-white)', lineHeight: '1.4' }}>
+                      {act.text}
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--sony-gray-500)', marginTop: '6px' }}>
+                      {new Date(act.date).toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--sony-gray-900)', marginBottom: '8px' }}>
-                  {formatNumber(platform.streams)} streams
-                </div>
-                <div className="progress-bar" style={{ height: '6px' }}>
-                  <div 
-                    className="progress-fill" 
-                    style={{ 
-                      width: `${Math.min((platform.streams / 2500000000) * 100, 100)}%`,
-                      background: platform.growth > 10 ? '#10B981' : '#F59E0B'
-                    }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Quick Stats */}
-          <div style={{ 
-            marginTop: '24px', 
-            padding: '16px',
-            background: 'linear-gradient(135deg, var(--sony-black) 0%, var(--sony-gray-900) 100%)',
-            borderRadius: '12px',
-            color: 'var(--sony-white)'
-          }}>
-            <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
-              Recent Activities
-            </h4>
-            <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'var(--sony-gray-300)' }}>
-              <div style={{ marginBottom: '8px' }}>• Bad Bunny campaign completed with 150M+ streams</div>
-              <div style={{ marginBottom: '8px' }}>• Airplane platform milestone achieved</div>
-              <div style={{ marginBottom: '8px' }}>• SMERA legal review in progress</div>
-              <div>• Q3 budget review scheduled for next week</div>
+              ))}
+              {recentActivities.length === 0 && (
+                <div style={{ textAlign: 'center', color: 'var(--sony-gray-500)', padding: '20px' }}>Nenhuma atividade recente encontrada.</div>
+              )}
             </div>
           </div>
+
+          {/* Business Impact / ROI (Replacing old streaming data) */}
+          <div style={{ background: 'linear-gradient(145deg, #1A1A1A 0%, #0A0A0A 100%)', borderRadius: '16px', padding: '24px', border: '1px solid rgba(16, 185, 129, 0.2)', boxShadow: '0 8px 32px rgba(16, 185, 129, 0.1)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+              <TrendingUp color="#10B981" size={20} />
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--pure-white)' }}>
+                Global Portfolio ROI
+              </h2>
+            </div>
+            
+            <div style={{ textAlign: 'center', padding: '20px 0', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: '20px' }}>
+              <div style={{ fontSize: '14px', color: 'var(--sony-gray-400)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Receita Total Gerada</div>
+              <div style={{ fontSize: '42px', fontWeight: '900', color: '#10B981' }}>
+                {stats ? formatCurrency(stats.total_revenue_generated || 0) : '$0'}
+              </div>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <div style={{ fontSize: '12px', color: 'var(--sony-gray-400)', marginBottom: '4px' }}>Expectativa de Receita</div>
+                <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--pure-white)' }}>{stats ? formatCurrency(stats.total_revenue_expected || 0) : '$0'}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '12px', color: 'var(--sony-gray-400)', marginBottom: '4px' }}>Custo Operacional</div>
+                <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--sony-red)' }}>{stats ? formatCurrency(stats.budget_spent || 0) : '$0'}</div>
+              </div>
+            </div>
+            
+            <div className="progress-bar" style={{ height: '8px', marginTop: '20px', background: 'rgba(255,255,255,0.1)' }}>
+              <div 
+                className="progress-fill" 
+                style={{ 
+                  width: stats && stats.total_revenue_expected > 0 ? `${Math.min((stats.total_revenue_generated / stats.total_revenue_expected) * 100, 100)}%` : '0%',
+                  background: '#10B981',
+                  boxShadow: '0 0 10px #10B981'
+                }}
+              ></div>
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--sony-gray-500)', textAlign: 'center', marginTop: '8px' }}>
+              {stats && stats.total_revenue_expected > 0 ? ((stats.total_revenue_generated / stats.total_revenue_expected) * 100).toFixed(1) : '0'}% da meta global alcançada
+            </div>
+          </div>
+          
         </div>
       </div>
     </div>
