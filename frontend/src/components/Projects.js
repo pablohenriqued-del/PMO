@@ -5,6 +5,7 @@ import {
   Plus,
   Calendar,
   DollarSign,
+  Edit2,
   Users,
   TrendingUp,
   AlertTriangle,
@@ -38,6 +39,8 @@ const Projects = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({});
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -48,6 +51,45 @@ const Projects = () => {
     revenue_generated: 0,
     milestones: []
   });
+
+  const openEditModal = () => {
+    setEditFormData({
+      ...selectedProject,
+      team_members: Array.isArray(selectedProject.team_members) ? selectedProject.team_members.join(', ') : '',
+      streaming_platforms: Array.isArray(selectedProject.streaming_platforms) ? selectedProject.streaming_platforms.join(', ') : '',
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditProject = async (e) => {
+    e.preventDefault();
+    try {
+      const projectData = {
+        ...editFormData,
+        budget_allocated: parseFloat(editFormData.budget_allocated) || 0,
+        revenue_expected: parseFloat(editFormData.revenue_expected) || 0,
+        team_members: typeof editFormData.team_members === 'string' 
+          ? editFormData.team_members.split(',').map(m => m.trim()).filter(Boolean)
+          : editFormData.team_members,
+        streaming_platforms: typeof editFormData.streaming_platforms === 'string'
+          ? editFormData.streaming_platforms.split(',').map(p => p.trim()).filter(Boolean)
+          : editFormData.streaming_platforms
+      };
+
+      const response = await axios.put(`${API}/projects/${selectedProject.id}`, projectData);
+      
+      await fetchProjects();
+      
+      setProjects(prev => prev.map(p => p.id === selectedProject.id ? response.data : p));
+      setSelectedProject(response.data);
+      
+      setIsEditModalOpen(false);
+      alert("Project updated successfully!");
+    } catch (error) {
+      console.error('Error updating project:', error);
+      alert("Error: Failed to update project.");
+    }
+  };
 
   const openUpdateModal = () => {
     setUpdateData({
@@ -877,6 +919,14 @@ const Projects = () => {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <h1>{selectedProject.name}</h1>
                   <div style={{ display: 'flex', gap: '12px' }}>
+                    <Button 
+                      variant="outline"
+                      onClick={openEditModal}
+                      title="Edit Project Information"
+                    >
+                      <Edit2 size={16} style={{ marginRight: '8px' }} />
+                      Edit Project
+                    </Button>
                     <input 
                       type="file" 
                       accept=".csv" 
@@ -1457,6 +1507,329 @@ const Projects = () => {
                   }}
                 >
                   Create Project
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {isEditModalOpen && (
+        <div 
+          className="modal-overlay"
+          onClick={() => setIsEditModalOpen(false)}
+          data-testid="create-modal-overlay"
+        >
+          <div 
+            className="project-detail-modal"
+            onClick={(e) => e.stopPropagation()}
+            data-testid="create-project-modal"
+          >
+            <button
+              onClick={() => setIsEditModalOpen(false)}
+              className="modal-close-btn"
+              data-testid="close-create-modal-btn"
+            >
+              ✕
+            </button>
+            
+            <div className="modal-header">
+              <h1>Edit Project</h1>
+              <p style={{ color: 'var(--sony-gray-600)', fontSize: '16px', marginBottom: '24px' }}>
+                Edit the project details and metadata
+              </p>
+            </div>
+
+            <form onSubmit={handleEditProject} style={{ display: 'grid', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-name">Project Name *</Label>
+                  <Input
+                    id="project-name"
+                    value={editFormData.name}
+                    onChange={(e) => setEditFormData(prev => ({...prev, name: e.target.value}))}
+                    placeholder="Enter project name"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-manager">Project Manager *</Label>
+                  <select 
+                    id="project-manager"
+                    value={editFormData.manager} 
+                    onChange={(e) => setEditFormData(prev => ({...prev, manager: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="">Select manager</option>
+                    {managers.map(manager => (
+                      <option key={manager} value={manager}>{manager}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-department">Area / Department *</Label>
+                  <select 
+                    id="project-department"
+                    value={editFormData.department || ""} 
+                    onChange={(e) => setEditFormData(prev => ({...prev, department: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="">Select Area</option>
+                    <option value="A&R">A&R</option>
+                    <option value="MKT">MKT</option>
+                    <option value="Legal">Legal</option>
+                    <option value="IT">IT</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Sales">Sales</option>
+                    <option value="PX">PX</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="project-country">Country</Label>
+                  <select 
+                    id="project-country"
+                    value={editFormData.country} 
+                    onChange={(e) => setEditFormData(prev => ({...prev, country: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="Global">Global</option>
+                    <optgroup label="South America">
+                      <option value="Brazil">Brazil</option>
+                      <option value="Argentina">Argentina</option>
+                      <option value="Colombia">Colombia</option>
+                      <option value="Chile">Chile</option>
+                      <option value="Peru">Peru</option>
+                    </optgroup>
+                    <optgroup label="North America">
+                      <option value="USA">USA</option>
+                      <option value="Canada">Canada</option>
+                      <option value="Mexico">Mexico</option>
+                    </optgroup>
+                    <optgroup label="Europe">
+                      <option value="Spain">Spain</option>
+                      <option value="Portugal">Portugal</option>
+                    </optgroup>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="project-description">Description</Label>
+                <Textarea
+                  id="project-description"
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData(prev => ({...prev, description: e.target.value}))}
+                  placeholder="Describe the project objectives and scope"
+                  rows={3}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-status">Status</Label>
+                  <select 
+                    id="project-status"
+                    value={editFormData.status} 
+                    onChange={(e) => setEditFormData(prev => ({...prev, status: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <option value="planning">Planning</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="on_hold">On Hold</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="project-priority">Priority</Label>
+                  <select 
+                    id="project-priority"
+                    value={editFormData.priority} 
+                    onChange={(e) => setEditFormData(prev => ({...prev, priority: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+                <div>
+                  <Label htmlFor="project-type">Type</Label>
+                  <select 
+                    id="project-type"
+                    value={editFormData.type} 
+                    onChange={(e) => setEditFormData(prev => ({...prev, type: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <option value="digital">Digital</option>
+                    <option value="streaming">Streaming</option>
+                    <option value="platform">Platform</option>
+                    <option value="legal">Legal</option>
+                    <option value="release">Release</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-budget">Budget (USD) *</Label>
+                  <Input
+                    id="project-budget"
+                    type="number"
+                    value={editFormData.budget_allocated}
+                    onChange={(e) => setEditFormData(prev => ({...prev, budget_allocated: e.target.value}))}
+                    placeholder="0"
+                    min="0"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-revenue">Revenue Expected (USD)</Label>
+                  <Input
+                    id="project-revenue"
+                    type="number"
+                    value={editFormData.revenue_expected}
+                    onChange={(e) => setEditFormData(prev => ({...prev, revenue_expected: e.target.value}))}
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-start">Start Date *</Label>
+                  <Input
+                    id="project-start"
+                    type="date"
+                    value={editFormData.start_date}
+                    onChange={(e) => setEditFormData(prev => ({...prev, start_date: e.target.value}))}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-end">End Date *</Label>
+                  <Input
+                    id="project-end"
+                    type="date"
+                    value={editFormData.end_date}
+                    onChange={(e) => setEditFormData(prev => ({...prev, end_date: e.target.value}))}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-team">Team Members</Label>
+                  <Input
+                    id="project-team"
+                    value={editFormData.team_members}
+                    onChange={(e) => setEditFormData(prev => ({...prev, team_members: e.target.value}))}
+                    placeholder="Developer, Designer, QA (comma separated)"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-platforms">Streaming Platforms</Label>
+                  <Input
+                    id="project-platforms"
+                    value={editFormData.streaming_platforms}
+                    onChange={(e) => setEditFormData(prev => ({...prev, streaming_platforms: e.target.value}))}
+                    placeholder="Spotify, Apple Music (comma separated)"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div>
+                  <Label htmlFor="project-docs">Documentations</Label>
+                  <Textarea
+                    id="project-docs"
+                    value={editFormData.documentations}
+                    onChange={(e) => setEditFormData(prev => ({...prev, documentations: e.target.value}))}
+                    placeholder="Links or reference to documentation"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-envs">Environment Variables</Label>
+                  <Textarea
+                    id="project-envs"
+                    value={editFormData.envs}
+                    onChange={(e) => setEditFormData(prev => ({...prev, envs: e.target.value}))}
+                    placeholder="E.g. API_KEY, DB_HOST (Comma separated or new line)"
+                    rows={2}
+                  />
+                </div>
+              </div>
+
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'flex-end', 
+                gap: '12px',
+                paddingTop: '20px',
+                borderTop: '1px solid var(--sony-gray-200)'
+              }}>
+                <Button 
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit"
+                  style={{ 
+                    background: 'var(--sony-red)',
+                    color: 'white',
+                    border: 'none'
+                  }}
+                >
+                  Save Changes
                 </Button>
               </div>
             </form>
