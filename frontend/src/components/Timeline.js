@@ -23,9 +23,15 @@ const Timeline = () => {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
+  const [countryFilter, setCountryFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
   const [currentYear, setCurrentYear] = useState(2024);
   const [hiddenProjects, setHiddenProjects] = useState([]);
   const [managers, setManagers] = useState([]);
+  const [dbLabels, setDbLabels] = useState({
+    countries: ['Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Mexico', 'USA', 'Canada', 'Spain', 'Portugal']
+  });
 
   useEffect(() => {
     fetchProjects();
@@ -34,7 +40,7 @@ const Timeline = () => {
 
   useEffect(() => {
     filterProjects();
-  }, [projects, statusFilter, managerFilter]);
+  }, [projects, statusFilter, managerFilter, countryFilter, typeFilter, priorityFilter]);
 
   const fetchProjects = async () => {
     try {
@@ -55,6 +61,12 @@ const Timeline = () => {
     } catch (error) {
       console.error('Error fetching managers:', error);
     }
+    try {
+      const labelsRes = await axios.get(`${API}/projects/labels`);
+      setDbLabels(labelsRes.data);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const filterProjects = () => {
@@ -66,6 +78,15 @@ const Timeline = () => {
 
     if (managerFilter !== "all") {
       filtered = filtered.filter(project => project.manager === managerFilter);
+    }
+    if (countryFilter !== "all") {
+      filtered = filtered.filter(project => project.country === countryFilter);
+    }
+    if (typeFilter !== "all") {
+      filtered = filtered.filter(project => project.type === typeFilter);
+    }
+    if (priorityFilter !== "all") {
+      filtered = filtered.filter(project => project.priority === priorityFilter);
     }
 
     setFilteredProjects(filtered);
@@ -215,7 +236,7 @@ const Timeline = () => {
       }}>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: '1fr 1fr auto', 
+          gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr', 
           gap: '16px',
           alignItems: 'end'
         }}>
@@ -227,7 +248,7 @@ const Timeline = () => {
               color: 'var(--sony-gray-700)',
               marginBottom: '8px'
             }}>
-              Status Filter
+              Status
             </label>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger data-testid="timeline-status-filter">
@@ -252,7 +273,7 @@ const Timeline = () => {
               color: 'var(--sony-gray-700)',
               marginBottom: '8px'
             }}>
-              Manager Filter
+              Manager
             </label>
             <Select value={managerFilter} onValueChange={setManagerFilter}>
               <SelectTrigger data-testid="timeline-manager-filter">
@@ -267,12 +288,73 @@ const Timeline = () => {
             </Select>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Filter size={16} color="var(--sony-gray-600)" />
-            <span style={{ fontSize: '14px', color: 'var(--sony-gray-600)' }}>
-              {filteredProjects.length} projects
-            </span>
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Country
+            </label>
+            <Select value={countryFilter} onValueChange={setCountryFilter}>
+              <SelectTrigger data-testid="timeline-country-filter">
+                <SelectValue placeholder="All Countries" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Countries</SelectItem>
+                {dbLabels?.countries?.map(country => (
+                  <SelectItem key={country} value={country}>{country}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Type
+            </label>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger data-testid="timeline-type-filter">
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="digital">Digital</SelectItem>
+                <SelectItem value="streaming">Streaming</SelectItem>
+                <SelectItem value="platform">Platform</SelectItem>
+                <SelectItem value="legal">Legal</SelectItem>
+                <SelectItem value="release">Release</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Priority
+            </label>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <SelectTrigger data-testid="timeline-priority-filter">
+                <SelectValue placeholder="All Priorities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Results Summary */}
+        <div style={{ 
+          marginTop: '16px', 
+          padding: '12px 0',
+          borderTop: '1px solid var(--sony-gray-200)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span style={{ fontSize: '14px', color: 'var(--sony-gray-600)' }}>
+            Showing {filteredProjects.length} projects
+          </span>
         </div>
       </div>
 

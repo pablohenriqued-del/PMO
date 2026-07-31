@@ -32,6 +32,9 @@ const Projects = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
+  const [countryFilter, setCountryFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -121,6 +124,9 @@ const Projects = () => {
 
   const [managers, setManagers] = useState([]);
   const [ldapUsers, setLdapUsers] = useState([]);
+  const [dbLabels, setDbLabels] = useState({
+    countries: ['Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Mexico', 'USA', 'Canada', 'Spain', 'Portugal']
+  });
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -156,7 +162,7 @@ const Projects = () => {
 
   useEffect(() => {
     filterProjects();
-  }, [projects, searchQuery, statusFilter, managerFilter]);
+  }, [projects, searchQuery, statusFilter, managerFilter, countryFilter, typeFilter, priorityFilter]);
 
   const fetchProjects = async () => {
     try {
@@ -199,6 +205,15 @@ const Projects = () => {
     // Manager filter
     if (managerFilter !== "all") {
       filtered = filtered.filter(project => project.manager === managerFilter);
+    }
+    if (countryFilter !== "all") {
+      filtered = filtered.filter(project => project.country === countryFilter);
+    }
+    if (typeFilter !== "all") {
+      filtered = filtered.filter(project => project.type === typeFilter);
+    }
+    if (priorityFilter !== "all") {
+      filtered = filtered.filter(project => project.priority === priorityFilter);
     }
 
     setFilteredProjects(filtered);
@@ -472,7 +487,7 @@ const Projects = () => {
       }}>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: '2fr 1fr 1fr', 
+          gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', 
           gap: '16px',
           alignItems: 'end'
         }}>
@@ -533,13 +548,7 @@ const Projects = () => {
           </div>
 
           <div>
-            <label style={{ 
-              display: 'block', 
-              fontSize: '14px', 
-              fontWeight: '600', 
-              color: 'var(--sony-gray-700)',
-              marginBottom: '8px'
-            }}>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
               Manager
             </label>
             <Select value={managerFilter} onValueChange={setManagerFilter}>
@@ -551,6 +560,60 @@ const Projects = () => {
                 {managers.map(manager => (
                   <SelectItem key={manager} value={manager}>{manager}</SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Country
+            </label>
+            <Select value={countryFilter} onValueChange={setCountryFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Countries" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Countries</SelectItem>
+                {dbLabels?.countries?.map(country => (
+                  <SelectItem key={country} value={country}>{country}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Type
+            </label>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="digital">Digital</SelectItem>
+                <SelectItem value="streaming">Streaming</SelectItem>
+                <SelectItem value="platform">Platform</SelectItem>
+                <SelectItem value="legal">Legal</SelectItem>
+                <SelectItem value="release">Release</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Priority
+            </label>
+            <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Priorities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Priorities</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -568,7 +631,7 @@ const Projects = () => {
           <span style={{ fontSize: '14px', color: 'var(--sony-gray-600)' }}>
             Showing {filteredProjects.length} of {projects.length} projects
           </span>
-          {(searchQuery || statusFilter !== "all" || managerFilter !== "all") && (
+          {(searchQuery || statusFilter !== "all" || managerFilter !== "all" || countryFilter !== "all" || typeFilter !== "all" || priorityFilter !== "all") && (
             <Button 
               variant="outline" 
               size="sm"
@@ -576,6 +639,9 @@ const Projects = () => {
                 setSearchQuery("");
                 setStatusFilter("all");
                 setManagerFilter("all");
+                setCountryFilter("all");
+                setTypeFilter("all");
+                setPriorityFilter("all");
               }}
               data-testid="clear-filters"
             >
