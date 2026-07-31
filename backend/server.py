@@ -1062,31 +1062,21 @@ def parse_upload_to_dicts(file_bytes, filename):
 
 
 def get_val(row, possible_keys, fallback_to_first=False):
-    # 1. Exact match
+    # 1. Exact match (ignoring case and leading/trailing spaces)
     for k in row.keys():
         if k is None: continue
         k_lower = str(k).strip().lower()
         for pk in possible_keys:
-            if k_lower == pk.lower():
-                return row[k]
-                
-    # 2. Contains match (useful for things like "Nome da Tarefa" matching "Tarefa")
-    for k in row.keys():
-        if k is None: continue
-        k_lower = str(k).strip().lower()
-        for pk in possible_keys:
-            # We check if our target key is in the column name, avoiding IDs and buckets
-            if pk.lower() in k_lower and 'id' not in k_lower and 'bucket' not in k_lower:
+            if k_lower == pk.strip().lower():
                 return row[k]
 
-    # 3. Smart Fallback
+    # 3. Smart Fallback for Task Name
     if fallback_to_first and row:
         keys = list(row.keys())
         vals = list(row.values())
         if keys:
             first_key = str(keys[0]).lower()
-            # If the first column is an ID (Planner does this), the Task Name is usually the second
-            if ('id' in first_key or 'código' in first_key) and len(vals) > 1:
+            if ('id' in first_key or 'código' in first_key or 'codigo' in first_key) and len(vals) > 1:
                 return vals[1]
         return vals[0] if vals else ''
     return ''
@@ -1101,13 +1091,13 @@ async def import_projects_csv(file: UploadFile = File(...)):
         projects_dict = {}
         
         for row in records:
-            proj_name = get_val(row, ['Project Name', 'Board', 'Plan Name', 'Project', 'Plan', 'Quadro', 'Projeto']) or filename_base
+            proj_name = get_val(row, ['Project Name', 'Board', 'Plan Name', 'Nome do Plano', 'Project', 'Plan', 'Quadro', 'Projeto', 'Plano']) or filename_base
             if proj_name not in projects_dict:
                 projects_dict[proj_name] = []
                 
-            task_name = get_val(row, ['Name', 'Task Name', 'Nome da Tarefa', 'Nome da tarefa', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade', 'Título'], fallback_to_first=True) or ''
+            task_name = get_val(row, ['Task Name', 'Nome da Tarefa', 'Name', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade', 'Título', 'Titulo'], fallback_to_first=True) or ''
             date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo', 'Data de Conclusão', 'Data de Conclusao']))
-            status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso']))
+            status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso', 'Estado', 'Andamento']))
             
             # Simple date cleanup
             if '/' in date_str: 
@@ -1189,9 +1179,9 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
         
         imported_milestones = []
         for row in records:
-            task_name = get_val(row, ['Name', 'Task Name', 'Nome da Tarefa', 'Nome da tarefa', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade', 'Título'], fallback_to_first=True) or ''
+            task_name = get_val(row, ['Task Name', 'Nome da Tarefa', 'Name', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade', 'Título', 'Titulo'], fallback_to_first=True) or ''
             date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo', 'Data de Conclusão', 'Data de Conclusao']))
-            status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso']))
+            status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso', 'Estado', 'Andamento']))
             
             if '/' in date_str: 
                 parts = date_str.split(' ')[0].split('/')
