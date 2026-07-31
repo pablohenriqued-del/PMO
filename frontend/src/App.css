@@ -663,3 +663,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--sony-gray-400); 
 }
+
+.nav-accordion-header:hover { background: rgba(255,255,255,0.05) !important; color: white !important; }
+.nav-sub-item:hover { color: white !important; }

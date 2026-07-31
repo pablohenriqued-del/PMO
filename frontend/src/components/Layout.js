@@ -22,7 +22,9 @@ import {
   Users,
   Menu,
   X,
-  Sparkles
+  Sparkles,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 
 const Layout = ({ children }) => {
@@ -48,104 +50,74 @@ const Layout = ({ children }) => {
   };
 
 
-  const navigation = [
+    const navigation = [
     {
-      name: "Dashboard",
+      name: "📊 Dashboard",
       href: "/",
-      icon: LayoutDashboard,
-      current: location.pathname === "/"
+      isAccordion: false
     },
     {
-      name: "Capacity Planning",
-      href: "/capacity-planning",
-      icon: LineChart,
-      current: location.pathname === "/capacity-planning"
+      name: "🚀 Delivery",
+      isAccordion: true,
+      children: [
+        { name: "Projetos", href: "/projects" },
+        { name: "Timeline", href: "/timeline" },
+        { name: "Budget", href: "/budget" },
+        { name: "Capacity Planning", href: "/capacity-planning" }
+      ]
     },
     {
-      name: "AI Copilot",
-      href: "/ai-copilot",
-      icon: BrainCircuit,
-      current: location.pathname === "/ai-copilot"
+      name: "🧠 Analytics & IA",
+      isAccordion: true,
+      children: [
+        { name: "AI Copilot", href: "/ai-copilot" },
+        { name: "Status Report", href: "/status-report" },
+        { name: "Regional Analytics", href: "/regional" },
+        { name: "Innovation Radar", href: "/innovation-radar" }
+      ]
     },
     {
-      name: "Status Report",
-      href: "/status-report",
-      icon: BarChart,
-      current: location.pathname === "/status-report"
+      name: "🛡️ Governança PMO",
+      isAccordion: true,
+      children: [
+        { name: "Risk Radar", href: "/risk-radar" },
+        { name: "Root Cause Analysis", href: "/root-cause-analysis" },
+        { name: "Lessons Learned", href: "/lessons-learned" },
+        { name: "PMO Playbook", href: "/pmo-playbook" }
+      ]
     },
     {
-      name: "Regional Analytics",
-      href: "/regional",
-      icon: Globe,
-      current: location.pathname === "/regional"
-    },
-    {
-      name: "CRM & Demandas",
+      name: "📋 CRM & Demandas",
       href: "/crm",
-      icon: LayoutGrid,
-      current: location.pathname === "/crm"
+      isAccordion: false
     },
     {
-      name: "Projects",
-      href: "/projects", 
-      icon: FolderOpen,
-      current: location.pathname === "/projects"
-    },
-    {
-      name: "Timeline",
-      href: "/timeline",
-      icon: Calendar,
-      current: location.pathname === "/timeline"
-    },
-    {
-      name: "Budget",
-      href: "/budget",
-      icon: PiggyBank,
-      current: location.pathname === "/budget"
-    },
-    {
-      name: "Guia & Features",
-      href: "/features-guide",
-      icon: Sparkles,
-      current: location.pathname === "/features-guide"
-    },
-    {
-      name: "Lessons Learned",
-      href: "/lessons-learned",
-      icon: BookOpen,
-      current: location.pathname === "/lessons-learned"
-    },
-    {
-      name: "Risk Radar",
-      href: "/risk-radar",
-      icon: AlertTriangle,
-      current: location.pathname === "/risk-radar"
-    },
-    {
-      name: "PMO Playbook",
-      href: "/pmo-playbook",
-      icon: FileText,
-      current: location.pathname === "/pmo-playbook"
-    },
-    {
-      name: "Root Cause Analysis",
-      href: "/root-cause-analysis",
-      icon: Search,
-      current: location.pathname === "/root-cause-analysis"
-    },
-    {
-      name: "Innovation Radar",
-      href: "/innovation-radar",
-      icon: Zap,
-      current: location.pathname === "/innovation-radar"
-    },
-    {
-      name: "User Administration",
-      href: "/admin/users",
-      icon: Users,
-      current: location.pathname === "/admin/users"
+      name: "⚙️ Administração",
+      isAccordion: true,
+      children: [
+        { name: "Usuários", href: "/admin/users" },
+        { name: "Guia & Features", href: "/features-guide" }
+      ]
     }
   ];
+
+  const [expandedMenus, setExpandedMenus] = useState({
+    "🚀 Delivery": true,
+    "🧠 Analytics & IA": false,
+    "🛡️ Governança PMO": false,
+    "⚙️ Administração": false
+  });
+
+  const toggleAccordion = (name) => {
+    setExpandedMenus(prev => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  const isCurrentRoute = (href) => location.pathname === href;
+  
+  const isAnyChildActive = (children) => {
+    return children?.some(child => location.pathname === child.href);
+  };
+
 
   const isSharedRoute = location.pathname.startsWith('/shared');
 
@@ -169,20 +141,97 @@ const Layout = ({ children }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="nav-menu">
+        <nav className="nav-menu" style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '16px 12px' }}>
           {navigation.map((item) => {
-            const Icon = item.icon;
+            if (!item.isAccordion) {
+              const active = isCurrentRoute(item.href);
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`nav-item ${active ? 'active' : ''}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  style={{
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    color: active ? 'var(--pure-white)' : 'var(--sony-gray-400)',
+                    background: active ? 'rgba(229, 9, 20, 0.15)' : 'transparent',
+                    borderLeft: active ? '3px solid var(--sony-red)' : '3px solid transparent',
+                    textDecoration: 'none',
+                    fontWeight: active ? '600' : '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    transition: 'all 0.2s ease',
+                    marginBottom: '4px'
+                  }}
+                >
+                  {item.name}
+                </Link>
+              );
+            }
+
+            // Accordion Item
+            const childActive = isAnyChildActive(item.children);
+            const isExpanded = expandedMenus[item.name];
+
             return (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`nav-item ${item.current ? 'active' : ''}`}
-                onClick={() => setIsMobileMenuOpen(false)}
-                data-testid={`nav-${item.name.toLowerCase()}`}
-              >
-                <Icon className="nav-icon" />
-                {item.name}
-              </Link>
+              <div key={item.name} style={{ marginBottom: '4px' }}>
+                <div
+                  onClick={() => toggleAccordion(item.name)}
+                  style={{
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    color: childActive ? 'var(--pure-white)' : 'var(--sony-gray-400)',
+                    background: childActive ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    fontWeight: childActive ? '600' : '500',
+                    transition: 'all 0.2s ease'
+                  }}
+                  className="nav-accordion-header"
+                >
+                  <span>{item.name}</span>
+                  {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </div>
+
+                {/* Sub items */}
+                {isExpanded && (
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    paddingLeft: '32px', 
+                    marginTop: '4px',
+                    gap: '2px'
+                  }}>
+                    {item.children.map(child => {
+                      const active = isCurrentRoute(child.href);
+                      return (
+                        <Link
+                          key={child.name}
+                          to={child.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          style={{
+                            padding: '10px 16px',
+                            borderRadius: '8px',
+                            color: active ? 'var(--pure-white)' : 'var(--sony-gray-500)',
+                            background: active ? 'rgba(229, 9, 20, 0.15)' : 'transparent',
+                            borderLeft: active ? '2px solid var(--sony-red)' : '2px solid transparent',
+                            textDecoration: 'none',
+                            fontSize: '13px',
+                            fontWeight: active ? '600' : '400',
+                            transition: 'all 0.2s ease'
+                          }}
+                          className="nav-sub-item"
+                        >
+                          {child.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>

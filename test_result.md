@@ -428,17 +428,29 @@ frontend:
         agent: "testing"
         comment: "Shared project route (/shared/:token) correctly hides sidebar. Layout.js line 150 checks if route starts with '/shared' and returns only children without sidebar layout (lines 152-154). Tested with /shared/mock-token-123 and confirmed sidebar is not rendered. Page shows dark background with radial gradient (as defined in SharedProject.js line 35). Error message 'Projeto não encontrado ou link expirado.' displays correctly for invalid tokens. All functionality working as expected."
 
+  - task: "Sidebar Consolidation - 6 Main Items with Accordion"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/Layout.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing completed for sidebar consolidation. VERIFIED ALL REVIEW REQUIREMENTS: (1) Sidebar Structure - Sidebar displays exactly 6 main navigation items in correct order: '📊 Dashboard', '🚀 Delivery', '🧠 Analytics & IA', '🛡️ Governança PMO', '📋 CRM & Demandas', '⚙️ Administração'. All items match expected names perfectly. (2) Accordion Expansion - Clicked on '🧠 Analytics & IA' accordion header and it expanded successfully showing all sub-items. (3) Sub-Items Visibility - All 4 sub-items are visible after expansion: 'AI Copilot', 'Status Report', 'Regional Analytics', 'Innovation Radar'. (4) Routing Functionality - Clicked on 'AI Copilot' sub-item and successfully navigated to /ai-copilot route. Current URL confirmed as https://sony-music-projects.preview.emergentagent.com/ai-copilot. (5) Active State Highlighting - 'AI Copilot' sub-item is properly highlighted with active styling: background color rgba(229, 9, 20, 0.15) (red with transparency), border-left color rgb(229, 9, 20) (Sony red). (6) Page Content - AI Copilot page loaded correctly with title 'PMO AI Copilot & Autonomous Agent' visible. No console errors or error messages detected. Screenshots captured showing: initial sidebar state with 6 items, expanded Analytics & IA accordion with all sub-items visible, and AI Copilot active state with proper highlighting. All review requirements met successfully. Feature is production-ready."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
-  test_sequence: 17
+  test_sequence: 18
   run_ui: true
 
-  last_updated: "2026-07-30 19:35:00"
+  last_updated: "2026-07-31 02:18:00"
 
 test_plan:
   current_focus:
-    - "Voice Command - Microphone Button Bug Fix"
+    - "Sidebar Consolidation - 6 Main Items with Accordion"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -476,3 +488,5 @@ agent_communication:
     message: "Completed verification testing for Features Guide page - New Features Visibility & Text Color improvements. VERIFIED ALL REVIEW REQUIREMENTS: (1) 'Prompt-to-Project (AI Generator)' feature card is VISIBLE and prominently displayed at position 1 (first card) with icon, title, description, and complete business rules. (2) 'Magic Link (Portal do Stakeholder)' feature card is VISIBLE and prominently displayed at position 2 (second card) with icon, title, description, and complete business rules. (3) Text color and readability EXCELLENT: Description text uses rgb(226, 232, 240) = #e2e8f0 (Tailwind slate-200 - light slate/gray), Rules text uses rgb(148, 163, 184) = #94a3b8 (Tailwind slate-400 - medium slate/gray). All RGB values > 140 confirming light colors, NOT dark muddy gray. Text is highly readable against dark background with glassmorphism effects. (4) Total of 9 feature cards displayed on page. Screenshots captured showing both new features prominently displayed with excellent text readability. All review requirements met successfully. No issues found. Feature is production-ready."
   - agent: "testing"
     message: "Completed Voice Command bug fix verification as per latest review request. COMPREHENSIVE TEST OF BUTTON STATE CHANGES: (1) Navigated to homepage (/), (2) Located voice command button at bottom right corner (x=1832, y=992), (3) VERIFIED initial state: background color rgba(20, 20, 20, 0.8) (dark), MicOff icon displayed, (4) Clicked button to start listening, (5) VERIFIED listening state: background color changed to rgb(229, 9, 20) (Sony red) ✓ - this confirms isListening=true state is working, (6) VERIFIED icon toggle logic: Component correctly displays Mic icon when isListening=true and MicOff icon when isListening=false (line 134 in VoiceCommand.js), (7) Clicked button again to stop listening, (8) VERIFIED stopped state: background color changed back to rgba(20, 20, 20, 0.8) (dark) ✓ - this confirms toggle back to isListening=false works, (9) No console errors detected during test. Error handling is properly implemented (lines 51-59) - setErrorMsg('Permissão de microfone negada') when event.error === 'not-allowed'. All state transitions working perfectly. Screenshots captured showing all three states (initial with dark background, listening with red background, stopped with dark background). Bug fix is working correctly and feature is production-ready."
+  - agent: "testing"
+    message: "Completed comprehensive testing of Sidebar Consolidation feature as per latest review request. TEST RESULTS: (1) Sidebar Structure - VERIFIED: Sidebar displays exactly 6 main navigation items in correct order: '📊 Dashboard', '🚀 Delivery', '🧠 Analytics & IA', '🛡️ Governança PMO', '📋 CRM & Demandas', '⚙️ Administração'. All items match expected names perfectly. (2) Accordion Expansion - VERIFIED: Clicked on '🧠 Analytics & IA' accordion header and it expanded successfully showing all sub-items. Accordion toggle functionality working correctly with ChevronDown/ChevronRight icons. (3) Sub-Items Visibility - VERIFIED: All 4 sub-items are visible after expansion: 'AI Copilot', 'Status Report', 'Regional Analytics', 'Innovation Radar'. Sub-items are properly indented (paddingLeft: 32px) and styled. (4) Routing Functionality - VERIFIED: Clicked on 'AI Copilot' sub-item and successfully navigated to /ai-copilot route. Current URL confirmed as https://sony-music-projects.preview.emergentagent.com/ai-copilot. (5) Active State Highlighting - VERIFIED: 'AI Copilot' sub-item is properly highlighted with active styling: background color rgba(229, 9, 20, 0.15) (red with transparency), border-left color rgb(229, 9, 20) (Sony red), font-weight 600 (bold). Active state detection working correctly using isCurrentRoute function. (6) Page Content - VERIFIED: AI Copilot page loaded correctly with title 'PMO AI Copilot & Autonomous Agent' visible. No console errors or error messages detected. Screenshots captured showing: (a) initial sidebar state with 6 items and Delivery expanded by default, (b) expanded Analytics & IA accordion with all 4 sub-items visible, (c) AI Copilot active state with proper red highlighting. All review requirements met successfully. No critical issues found. Feature is production-ready."
