@@ -1402,13 +1402,24 @@ async def execute_reallocation(req: ReallocateReq):
     if source.get("budget_allocated", 0) < req.amount:
         raise HTTPException(status_code=400, detail="Insufficient budget in source")
         
+    source_act = {
+        "id": str(uuid.uuid4()), "type": "system",
+        "text": f"🤖 AI Copilot: Realocado ${req.amount:,.2f} para apoiar o projeto '{target['name']}'.",
+        "user": "AI Copilot", "date": datetime.now(timezone.utc).isoformat()
+    }
     await db.projects.update_one(
         {"id": req.source_id},
-        {"$inc": {"budget_allocated": -req.amount}}
+        {"$inc": {"budget_allocated": -req.amount}, "$push": {"activities": {"$each": [source_act], "$position": 0}}}
     )
+    
+    target_act = {
+        "id": str(uuid.uuid4()), "type": "system",
+        "text": f"🤖 AI Copilot: Recebido ${req.amount:,.2f} do projeto '{source['name']}' para alavancar Trend.",
+        "user": "AI Copilot", "date": datetime.now(timezone.utc).isoformat()
+    }
     await db.projects.update_one(
         {"id": req.target_id},
-        {"$inc": {"budget_allocated": req.amount}}
+        {"$inc": {"budget_allocated": req.amount}, "$push": {"activities": {"$each": [target_act], "$position": 0}}}
     )
     return {"message": "Budget reallocation executed autonomously."}
 
@@ -1462,20 +1473,29 @@ async def execute_resolve_bottleneck(req: ResolveBottleneckReq):
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
         
+    user = await db.users.find_one({"id": req.user_id})
+    user_name = user.get("name") if user else req.user_id
+        
     milestones = project.get("milestones", [])
     for ms in milestones:
         if ms["name"] == req.milestone_name:
             ms["assigned_to"] = req.user_id
             break
             
+    bot_act = {
+        "id": str(uuid.uuid4()), "type": "system",
+        "text": f"🤖 AI Copilot: Recurso '{user_name}' alocado automaticamente na tarefa '{req.milestone_name}' para prevenção de atraso iminente.",
+        "user": "AI Copilot", "date": datetime.now(timezone.utc).isoformat()
+    }
+            
     await db.projects.update_one(
         {"id": req.project_id},
-        {"$set": {"milestones": milestones}}
+        {"$set": {"milestones": milestones}, "$push": {"activities": {"$each": [bot_act], "$position": 0}}}
     )
     
     import asyncio
     asyncio.create_task(send_allocation_email_mock(req.user_id, req.milestone_name, project["name"]))
-    asyncio.create_task(send_teams_notification_mock(f"Recurso {req.user_id} alocado automaticamente no marco '{req.milestone_name}' do projeto {project['name']} devido a risco de atraso.", "PMO Alerts"))
+    asyncio.create_task(send_teams_notification_mock(f"Recurso {user_name} alocado automaticamente no marco '{req.milestone_name}' do projeto {project['name']} devido a risco de atraso.", "PMO Alerts"))
     
     return {"message": "Resource allocated and notified automatically."}
 
