@@ -28,6 +28,18 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 function App() {
   return (
     <div className="App">
+
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <filter id="black-to-white">
+          <feColorMatrix type="matrix" values="
+            0 0 0 0 1
+           -1 0 0 0 1
+           -1 0 0 0 1
+            0 0 0 1 0" 
+          />
+        </filter>
+      </svg>
+
       <BrowserRouter>
         <Layout>
           <Routes>

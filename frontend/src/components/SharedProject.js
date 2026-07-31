@@ -41,7 +41,7 @@ const SharedProject = () => {
         
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '40px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="sony-icon" style={{ width: '48px' }}><img src="https://customer-assets.emergentagent.com/b97cd454-e0ea-43f1-a1b4-b498f8280f27" alt="Sony Music" /></div>
+            <div className="sony-icon" style={{ width: '48px' }}><img src="https://customer-assets-jai6qajn.emergentagent.net/job_84a5e55c-26a8-4190-b713-50bfc83fd45d/artifacts/ql8q4vna_Sony_Music_Logo.png" alt="Sony Music" /></div>
             <div>
               <div style={{ fontWeight: '800', fontSize: '18px' }}>Sony Music</div>
               <div style={{ color: 'var(--sony-gray-400)', fontSize: '12px' }}>Portal do Artista / Stakeholder</div>

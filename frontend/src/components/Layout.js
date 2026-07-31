@@ -132,7 +132,7 @@ const Layout = ({ children }) => {
         {/* Brand Header */}
         <div className="brand-header">
           <div className="brand-logo">
-            <div className="sony-icon"><img src="https://customer-assets.emergentagent.com/b97cd454-e0ea-43f1-a1b4-b498f8280f27" alt="Sony Music" /></div>
+            <div className="sony-icon"><img src="https://customer-assets-jai6qajn.emergentagent.net/job_84a5e55c-26a8-4190-b713-50bfc83fd45d/artifacts/ql8q4vna_Sony_Music_Logo.png" alt="Sony Music" /></div>
             <div>
               <div className="brand-text">Sony Music</div>
               <div className="brand-subtitle">Latin Ibéria PMO</div>
@@ -351,7 +351,7 @@ const Layout = ({ children }) => {
           justifyContent: 'space-between'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div className="sony-icon"><img src="https://customer-assets.emergentagent.com/b97cd454-e0ea-43f1-a1b4-b498f8280f27" alt="Sony Music" /></div>
+            <div className="sony-icon"><img src="https://customer-assets-jai6qajn.emergentagent.net/job_84a5e55c-26a8-4190-b713-50bfc83fd45d/artifacts/ql8q4vna_Sony_Music_Logo.png" alt="Sony Music" /></div>
             <span style={{ fontWeight: '700', fontSize: '16px' }}>Sony Music PMO</span>
           </div>
           <button
