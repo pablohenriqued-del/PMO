@@ -942,6 +942,76 @@ const Projects = () => {
           );
         })}
       </div>
+      )}
+
+      {/* Kanban View */}
+      {viewMode === 'kanban' && (
+        <div style={{ display: 'flex', gap: '24px', overflowX: 'auto', padding: '0 32px 32px' }}>
+          {['planning', 'in_progress', 'on_hold', 'completed'].map(status => (
+            <div key={status} style={{ minWidth: '320px', background: 'rgba(20,20,20,0.6)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
+              <h3 style={{ color: 'white', marginBottom: '16px', textTransform: 'capitalize' }}>{status.replace('_', ' ')}</h3>
+              <div style={{ display: 'grid', gap: '16px' }}>
+                {filteredProjects.filter(p => p.status === status).map(project => (
+                  <div key={project.id} onClick={() => openProjectModal(project)} style={{ background: 'rgba(0,0,0,0.5)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }}>
+                    <div style={{ fontWeight: 'bold', color: 'white', marginBottom: '8px' }}>{project.name}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--sony-gray-400)' }}>{project.manager}</div>
+                    <div className="progress-bar" style={{ height: '4px', marginTop: '8px' }}><div className="progress-fill" style={{ width: `${project.progress}%` }}></div></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Table View */}
+      {viewMode === 'table' && (
+        <div style={{ padding: '0 32px 32px' }}>
+          <div style={{ background: 'rgba(20,20,20,0.6)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white', fontSize: '14px' }}>
+              <thead style={{ background: 'rgba(0,0,0,0.5)', textAlign: 'left' }}>
+                <tr>
+                  <th style={{ padding: '16px' }}>Project Name</th>
+                  <th style={{ padding: '16px' }}>Manager</th>
+                  <th style={{ padding: '16px' }}>Status</th>
+                  <th style={{ padding: '16px' }}>Budget Spent</th>
+                  <th style={{ padding: '16px' }}>Progress</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredProjects.map(project => (
+                  <tr key={project.id} onClick={() => openProjectModal(project)} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer' }}>
+                    <td style={{ padding: '16px', fontWeight: 'bold' }}>{project.name}</td>
+                    <td style={{ padding: '16px', color: 'var(--sony-gray-400)' }}>{project.manager}</td>
+                    <td style={{ padding: '16px' }}><span className={`status-badge status-${project.status}`}>{project.status.replace('_', ' ')}</span></td>
+                    <td style={{ padding: '16px', color: 'var(--sony-red)' }}>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(project.budget_spent)}</td>
+                    <td style={{ padding: '16px' }}>{project.progress}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Gantt View */}
+      {viewMode === 'gantt' && (
+        <div style={{ padding: '0 32px 32px' }}>
+          <div style={{ background: 'rgba(20,20,20,0.6)', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)', padding: '24px', overflowX: 'auto' }}>
+            <div style={{ minWidth: '800px' }}>
+              {filteredProjects.map(project => (
+                <div key={project.id} onClick={() => openProjectModal(project)} style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', cursor: 'pointer' }}>
+                  <div style={{ width: '250px', color: 'white', fontWeight: 'bold', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{project.name}</div>
+                  <div style={{ flex: 1, background: 'rgba(0,0,0,0.3)', height: '24px', borderRadius: '12px', position: 'relative' }}>
+                    <div style={{ width: `${project.progress}%`, background: 'var(--sony-red)', height: '100%', borderRadius: '12px' }}></div>
+                  </div>
+                  <div style={{ width: '100px', color: 'var(--sony-gray-400)', fontSize: '12px', textAlign: 'right' }}>{project.progress}%</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Project Detail Modal */}
       {isModalOpen && (
