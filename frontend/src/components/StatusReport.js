@@ -91,7 +91,7 @@ const StatusReport = () => {
   const progressExpected = 50; // Mock expected progress logic
   const healthPhysical = project.progress >= progressExpected ? 'ON TRACK' : 'WARNING';
   
-  const projectRisks = risks.filter(r => r.project === project.name && r.status === 'Active');
+  const projectRisks = risks.filter(r => r.project === project.name && r.status !== 'Resolved' && r.status !== 'Mitigated');
   const healthScope = projectRisks.some(r => r.severity === 'Critical') ? 'AT RISK' : 'ON TRACK';
   
   const getHealthColor = (status) => {
