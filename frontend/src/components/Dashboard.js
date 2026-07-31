@@ -72,9 +72,9 @@ const Dashboard = () => {
   const HEALTH_COLORS = ['#10B981', '#F59E0B', '#E50914'];
   
   const healthData = [
-    { name: 'On Track', value: stats.on_track_projects || 0, color: '#10B981' },
-    { name: 'Delayed', value: stats.delayed_projects || 0, color: '#F59E0B' },
-    { name: 'At Risk', value: atRiskProjects || 0, color: '#E50914' }
+    { name: 'On Track', value: stats.on_track_projects || 0, fill: '#10B981' },
+    { name: 'Delayed', value: stats.delayed_projects || 0, fill: '#F59E0B' },
+    { name: 'At Risk', value: atRiskProjects || 0, fill: '#E50914' }
   ];
   if (healthData.every(d => d.value === 0)) {
     healthData[0].value = 1; // Fallback to show something
@@ -224,7 +224,7 @@ const Dashboard = () => {
             <Activity color="#3B82F6" size={20} />
             Saúde do Portfólio
           </h2>
-          <div style={{ flex: 1, position: 'relative' }}>
+          <div style={{ flex: 1, position: 'relative', minHeight: '280px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -235,6 +235,7 @@ const Dashboard = () => {
                   outerRadius={100}
                   paddingAngle={5}
                   dataKey="value"
+                  nameKey="name"
                   stroke="none"
                   isAnimationActive={false}
                 >
@@ -256,7 +257,7 @@ const Dashboard = () => {
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '16px' }}>
             {healthData.map(item => (
               <div key={item.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#CBD5E1' }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color }}></div>
+                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.fill }}></div>
                 {item.name}
               </div>
             ))}
