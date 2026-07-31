@@ -107,7 +107,7 @@ const Dashboard = () => {
       <div className="dashboard-header" style={{ position: 'relative', overflow: 'hidden', padding: '40px 32px' }}>
         <div style={{ position: 'absolute', top: '-50%', left: '-5%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(229,9,20,0.15) 0%, transparent 70%)', borderRadius: '50%', zIndex: 0 }}></div>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <h1 className="dashboard-title" style={{ fontSize: '32px', marginBottom: '8px' }}>C-Level Executive Dashboard</h1>
+          <h1 className="dashboard-title" style={{ fontSize: '32px', marginBottom: '8px' }}>Executive Dashboard</h1>
           <p className="dashboard-subtitle" style={{ fontSize: '16px', color: '#94A3B8' }}>
             Visão estratégica global, saúde do portfólio e performance financeira
           </p>
