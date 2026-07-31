@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   Clock,
   X,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Activity
 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { Button } from "./ui/button";

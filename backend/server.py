@@ -1066,24 +1066,60 @@ def parse_upload_to_dicts(file_bytes, filename):
 
 
 def get_val(row, possible_keys, fallback_to_first=False):
-    # 1. Exact match (ignoring case and leading/trailing spaces)
-    for k in row.keys():
-        if k is None: continue
-        k_lower = str(k).strip().lower()
-        for pk in possible_keys:
-            if k_lower == pk.strip().lower():
-                return row[k]
-
-    # 3. Smart Fallback for Task Name
-    if fallback_to_first and row:
-        keys = list(row.keys())
-        vals = list(row.values())
-        if keys:
-            first_key = str(keys[0]).lower()
-            if ('id' in first_key or 'código' in first_key or 'codigo' in first_key) and len(vals) > 1:
-                return vals[1]
-        return vals[0] if vals else ''
+    keys_lower = [str(k).strip().lower() for k in row.keys()]
+    vals = list(row.values())
+    
+    # 1. Exact match
+    for pk in possible_keys:
+        pk_lower = pk.lower()
+        for i, k in enumerate(keys_lower):
+            if pk_lower == k:
+                return vals[i]
+                
+    # 2. Contains match (safely avoiding ID columns)
+    for pk in possible_keys:
+        pk_lower = pk.lower()
+        for i, k in enumerate(keys_lower):
+            if pk_lower in k and 'id' not in k and 'código' not in k and 'codigo' not in k and 'unnamed' not in k:
+                return vals[i]
+                
+    if fallback_to_first and vals:
+        return vals[0]
     return ''
+
+def get_task_name(row):
+    keys = list(row.keys())
+    vals = list(row.values())
+    if not keys: return 'Tarefa'
+    
+    keys_lower = [str(k).lower().strip() for k in keys]
+    
+    # 1. Partial match for known task headers
+    for i, k in enumerate(keys_lower):
+        if 'id' in k or 'cód' in k or 'cod' in k or 'unnamed' in k or 'bucket' in k or 'criado' in k or 'atribuído' in k or 'status' in k or 'date' in k or 'data' in k:
+            continue
+        if 'name' in k or 'nome' in k or 'tít' in k or 'tit' in k or 'tarefa' in k or 'item' in k:
+            val = str(vals[i]).strip()
+            if val and val.lower() not in ['true', 'false', '0', '1']:
+                return val
+                
+    # 2. Planner Heuristic: if any column has 'bucket', Task Name is ALWAYS column index 1
+    if any('bucket' in k for k in keys_lower) and len(vals) >= 2:
+        return str(vals[1]).strip()
+        
+    # 3. Fallback: skip column 0 if it looks like an ID or is unnamed
+    if len(vals) >= 2:
+        first_key = keys_lower[0]
+        if 'id' in first_key or 'cód' in first_key or 'cod' in first_key or 'unnamed' in first_key:
+            return str(vals[1]).strip()
+            
+    # 4. Ultimate fallback: string length heuristic (IDs are short, Names are long)
+    if len(vals) >= 2:
+        if len(str(vals[1])) > len(str(vals[0])):
+            return str(vals[1]).strip()
+            
+    return str(vals[0]).strip() if vals else 'Tarefa'
+
 
 @api_router.post("/projects/import-csv")
 async def import_projects_csv(file: UploadFile = File(...)):
@@ -1099,7 +1135,7 @@ async def import_projects_csv(file: UploadFile = File(...)):
             if proj_name not in projects_dict:
                 projects_dict[proj_name] = []
                 
-            task_name = get_val(row, ['Task Name', 'Nome da Tarefa', 'Name', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade', 'Título', 'Titulo'], fallback_to_first=True) or ''
+            task_name = get_task_name(row)
             date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo', 'Data de Conclusão', 'Data de Conclusao']))
             status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso', 'Estado', 'Andamento']))
             
@@ -1183,7 +1219,7 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
         
         imported_milestones = []
         for row in records:
-            task_name = get_val(row, ['Task Name', 'Nome da Tarefa', 'Name', 'Item', 'Item Name', 'Title', 'Tarefa', 'Nome', 'Atividade', 'Título', 'Titulo'], fallback_to_first=True) or ''
+            task_name = get_task_name(row)
             date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo', 'Data de Conclusão', 'Data de Conclusao']))
             status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso', 'Estado', 'Andamento']))
             
