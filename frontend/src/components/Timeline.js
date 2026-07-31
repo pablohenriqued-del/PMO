@@ -24,6 +24,7 @@ const Timeline = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
   const [countryFilter, setCountryFilter] = useState("all");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [currentYear, setCurrentYear] = useState(2024);
@@ -40,7 +41,7 @@ const Timeline = () => {
 
   useEffect(() => {
     filterProjects();
-  }, [projects, statusFilter, managerFilter, countryFilter, typeFilter, priorityFilter]);
+  }, [projects, statusFilter, managerFilter, countryFilter, departmentFilter, typeFilter, priorityFilter]);
 
   const fetchProjects = async () => {
     try {
@@ -81,6 +82,9 @@ const Timeline = () => {
     }
     if (countryFilter !== "all") {
       filtered = filtered.filter(project => project.country === countryFilter);
+    }
+    if (departmentFilter !== "all") {
+      filtered = filtered.filter(project => project.department === departmentFilter);
     }
     if (typeFilter !== "all") {
       filtered = filtered.filter(project => project.type === typeFilter);
@@ -236,7 +240,7 @@ const Timeline = () => {
       }}>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr', 
+          gridTemplateColumns: 'repeat(6, 1fr)', 
           gap: '16px',
           alignItems: 'end'
         }}>

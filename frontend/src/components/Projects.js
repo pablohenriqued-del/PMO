@@ -34,6 +34,7 @@ const Projects = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [managerFilter, setManagerFilter] = useState("all");
   const [countryFilter, setCountryFilter] = useState("all");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [selectedProject, setSelectedProject] = useState(null);
@@ -204,7 +205,7 @@ const Projects = () => {
 
   useEffect(() => {
     filterProjects();
-  }, [projects, searchQuery, statusFilter, managerFilter, countryFilter, typeFilter, priorityFilter]);
+  }, [projects, searchQuery, statusFilter, managerFilter, countryFilter, departmentFilter, typeFilter, priorityFilter]);
 
   const fetchProjects = async () => {
     try {
@@ -250,6 +251,9 @@ const Projects = () => {
     }
     if (countryFilter !== "all") {
       filtered = filtered.filter(project => project.country === countryFilter);
+    }
+    if (departmentFilter !== "all") {
+      filtered = filtered.filter(project => project.department === departmentFilter);
     }
     if (typeFilter !== "all") {
       filtered = filtered.filter(project => project.type === typeFilter);
@@ -529,7 +533,7 @@ const Projects = () => {
       }}>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr 1fr', 
+          gridTemplateColumns: '2fr repeat(6, 1fr)', 
           gap: '16px',
           alignItems: 'end'
         }}>
@@ -625,6 +629,23 @@ const Projects = () => {
 
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Area
+            </label>
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Areas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Areas</SelectItem>
+                {dbLabels?.departments?.map(dept => (
+                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
               Type
             </label>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
@@ -673,7 +694,7 @@ const Projects = () => {
           <span style={{ fontSize: '14px', color: 'var(--sony-gray-600)' }}>
             Showing {filteredProjects.length} of {projects.length} projects
           </span>
-          {(searchQuery || statusFilter !== "all" || managerFilter !== "all" || countryFilter !== "all" || typeFilter !== "all" || priorityFilter !== "all") && (
+          {(searchQuery || statusFilter !== "all" || managerFilter !== "all" || countryFilter !== "all" || typeFilter !== "all" || departmentFilter !== "all" || priorityFilter !== "all") && (
             <Button 
               variant="outline" 
               size="sm"
@@ -682,6 +703,7 @@ const Projects = () => {
                 setStatusFilter("all");
                 setManagerFilter("all");
                 setCountryFilter("all");
+                setDepartmentFilter("all");
                 setTypeFilter("all");
                 setPriorityFilter("all");
               }}
@@ -739,6 +761,11 @@ const Projects = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <p className="project-manager">Manager: {project.manager}</p>
                     <CountryFlag country={project.country || 'Global'} size={14} />
+                    {project.department && project.department !== 'Unassigned' && (
+                      <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: '4px', color: 'var(--sony-gray-400)' }}>
+                        {project.department}
+                      </span>
+                    )}
                   </div>
                   <div style={{ 
                     display: 'flex', 
