@@ -1092,14 +1092,12 @@ def get_val(row, possible_keys, fallback_to_first=False):
     keys_lower = [str(k).strip().lower() for k in row.keys()]
     vals = list(row.values())
     
-    # 1. Exact match
     for pk in possible_keys:
         pk_lower = pk.lower()
         for i, k in enumerate(keys_lower):
             if pk_lower == k:
                 return vals[i]
                 
-    # 2. Contains match (safely avoiding ID columns)
     for pk in possible_keys:
         pk_lower = pk.lower()
         for i, k in enumerate(keys_lower):
@@ -1117,7 +1115,13 @@ def get_task_name(row):
     
     keys_lower = [str(k).lower().strip() for k in keys]
     
-    # 1. Partial match for known task headers
+    # 1. Exact match first
+    for i, k in enumerate(keys_lower):
+        if k in ['task name', 'nome da tarefa', 'name', 'item', 'title', 'tarefa', 'nome']:
+            val = str(vals[i]).strip()
+            if val: return val
+            
+    # 2. Partial match
     for i, k in enumerate(keys_lower):
         if 'id' in k or 'cód' in k or 'cod' in k or 'unnamed' in k or 'bucket' in k or 'criado' in k or 'atribuído' in k or 'status' in k or 'date' in k or 'data' in k:
             continue
@@ -1126,23 +1130,78 @@ def get_task_name(row):
             if val and val.lower() not in ['true', 'false', '0', '1']:
                 return val
                 
-    # 2. Planner Heuristic: if any column has 'bucket', Task Name is ALWAYS column index 1
+    # 3. Planner Heuristic
     if any('bucket' in k for k in keys_lower) and len(vals) >= 2:
         return str(vals[1]).strip()
         
-    # 3. Fallback: skip column 0 if it looks like an ID or is unnamed
+    # 4. Fallback: skip column 0 if it looks like an ID
     if len(vals) >= 2:
         first_key = keys_lower[0]
         if 'id' in first_key or 'cód' in first_key or 'cod' in first_key or 'unnamed' in first_key:
             return str(vals[1]).strip()
             
-    # 4. Ultimate fallback: string length heuristic (IDs are short, Names are long)
+    # 5. Length heuristic
     if len(vals) >= 2:
         if len(str(vals[1])) > len(str(vals[0])):
             return str(vals[1]).strip()
             
     return str(vals[0]).strip() if vals else 'Tarefa'
 
+def parse_upload_to_dicts(file_bytes, filename):
+    import pandas as pd
+    import io
+    
+    if filename.lower().endswith('.xlsx') or filename.lower().endswith('.xls'):
+        df = pd.read_excel(io.BytesIO(file_bytes), header=None)
+    else:
+        try:
+            df = pd.read_csv(io.BytesIO(file_bytes), sep=None, engine='python', header=None)
+        except Exception:
+            try:
+                df = pd.read_csv(io.BytesIO(file_bytes), sep=None, engine='python', encoding='latin-1', header=None)
+            except Exception:
+                df = pd.read_csv(io.BytesIO(file_bytes), sep=';', encoding='utf-8', on_bad_lines='skip', header=None)
+                
+    header_idx = 0
+    max_score = -1
+    
+    # Find the real header row
+    for i in range(min(15, len(df))):
+        row_vals = [str(x).lower() for x in df.iloc[i].values if pd.notna(x)]
+        score = 0
+        for val in row_vals:
+            if any(k in val for k in ['tarefa', 'task', 'name', 'nome', 'id', 'date', 'data', 'status', 'progress', 'progresso', 'prazo', 'bucket']):
+                score += 1
+        if score > max_score:
+            max_score = score
+            header_idx = i
+            
+    extracted_plan_name = ''
+    if header_idx > 0:
+        first_cell = str(df.iloc[0, 0])
+        if 'plano' in first_cell.lower() or 'plan' in first_cell.lower() or 'project' in first_cell.lower():
+            if ':' in first_cell:
+                extracted_plan_name = first_cell.split(':', 1)[1].strip()
+            else:
+                extracted_plan_name = first_cell.strip()
+                
+    df.columns = df.iloc[header_idx]
+    df = df.iloc[header_idx + 1:]
+    
+    # Ensure column names are unique strings
+    new_cols = []
+    for c in df.columns:
+        c_str = str(c).strip()
+        if not c_str or c_str == 'nan':
+            c_str = f"unnamed_{len(new_cols)}"
+        new_cols.append(c_str)
+    df.columns = new_cols
+    
+    if extracted_plan_name:
+        df['__extracted_plan_name__'] = extracted_plan_name
+        
+    df = df.fillna('')
+    return df.to_dict('records')
 
 @api_router.post("/projects/import-csv")
 async def import_projects_csv(file: UploadFile = File(...)):
@@ -1154,7 +1213,7 @@ async def import_projects_csv(file: UploadFile = File(...)):
         projects_dict = {}
         
         for row in records:
-            proj_name = get_val(row, ['Project Name', 'Board', 'Plan Name', 'Nome do Plano', 'Project', 'Plan', 'Quadro', 'Projeto', 'Plano']) or filename_base
+            proj_name = get_val(row, ['__extracted_plan_name__', 'Project Name', 'Board', 'Plan Name', 'Nome do Plano', 'Project', 'Plan', 'Quadro', 'Projeto', 'Plano']) or filename_base
             if proj_name not in projects_dict:
                 projects_dict[proj_name] = []
                 
