@@ -30,7 +30,7 @@ const Timeline = () => {
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
-  const [currentYear, setCurrentYear] = useState(2024);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const timelineRef = React.useRef(null);
   const [isExporting, setIsExporting] = useState(false);
   const [hiddenProjects, setHiddenProjects] = useState([]);
