@@ -1051,9 +1051,13 @@ def parse_upload_to_dicts(file_bytes, filename):
         df = pd.read_excel(io.BytesIO(file_bytes))
     else:
         try:
-            df = pd.read_csv(io.BytesIO(file_bytes))
-        except UnicodeDecodeError:
-            df = pd.read_csv(io.BytesIO(file_bytes), encoding='latin-1')
+            df = pd.read_csv(io.BytesIO(file_bytes), sep=None, engine='python')
+        except Exception:
+            try:
+                df = pd.read_csv(io.BytesIO(file_bytes), sep=None, engine='python', encoding='latin-1')
+            except Exception:
+                # Fallback to strict semicolon if auto-detect fails
+                df = pd.read_csv(io.BytesIO(file_bytes), sep=';', encoding='utf-8', on_bad_lines='skip')
             
     # Convert all column names to string and fill NaNs
     df.columns = [str(c).strip() for c in df.columns]
@@ -1602,6 +1606,17 @@ async def trigger_automations(project, changes):
             new_status = action.get("action_value")
             await db.projects.update_one({"id": project["id"]}, {"$set": {"status": new_status}})
 
+
+
+class BulkDeleteReq(BaseModel):
+    ids: List[str]
+
+@api_router.post("/projects/bulk-delete")
+async def bulk_delete_projects(req: BulkDeleteReq):
+    if not req.ids:
+        return {"deleted_count": 0}
+    result = await db.projects.delete_many({"id": {"$in": req.ids}})
+    return {"deleted_count": result.deleted_count}
 
 app.include_router(api_router)
 

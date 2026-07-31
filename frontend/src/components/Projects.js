@@ -56,6 +56,28 @@ const Projects = () => {
   });
 
 
+
+  const handleBulkDelete = async () => {
+    if (filteredProjects.length === 0) {
+      alert("Nenhum projeto selecionado/filtrado para excluir.");
+      return;
+    }
+    
+    if (!window.confirm(`ATENÇÃO: Você está prestes a excluir ${filteredProjects.length} projeto(s) permanentemente. Deseja continuar?`)) {
+      return;
+    }
+    
+    try {
+      const ids = filteredProjects.map(p => p.id);
+      await axios.post(`${API}/projects/bulk-delete`, { ids });
+      await fetchProjects();
+      alert(`${ids.length} projetos excluídos com sucesso!`);
+    } catch (e) {
+      console.error(e);
+      alert("Erro ao excluir projetos em massa.");
+    }
+  };
+
   const handleDeleteProject = async (projectId) => {
     if (!window.confirm("Tem certeza que deseja excluir este projeto? Esta ação não pode ser desfeita.")) return;
     
@@ -613,6 +635,14 @@ const Projects = () => {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
+            <Button 
+              variant="outline" 
+              onClick={handleBulkDelete} 
+              style={{ color: 'var(--sony-red)', borderColor: 'rgba(229,9,20,0.3)', background: 'rgba(229,9,20,0.05)' }} 
+              title="Excluir todos os projetos que estão aparecendo na tela (filtrados)"
+            >
+              <Trash2 size={16} style={{ marginRight: '8px' }} /> Massa
+            </Button>
             <input 
               type="file" 
               accept=".csv, .xlsx, .xls" 
