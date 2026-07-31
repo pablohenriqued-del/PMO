@@ -456,7 +456,7 @@ const Timeline = () => {
             <div style={{ 
               fontSize: '16px', 
               fontWeight: '700', 
-              color: 'var(--sony-gray-900)',
+              color: 'var(--pure-white)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px'
@@ -464,28 +464,36 @@ const Timeline = () => {
               <Calendar size={20} />
               Projects
             </div>
-            <div style={{ 
-              display: 'grid',
-              gridTemplateColumns: 'repeat(12, 1fr)',
-              gap: '4px'
-            }}>
-              {[...Array(12)].map((_, index) => (
-                <div 
-                  key={index}
-                  style={{ 
-                    textAlign: 'center',
-                    fontSize: '13px',
-                    fontWeight: '700',
-                    color: 'var(--sony-gray-400)',
-                    padding: '8px 4px',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    borderLeft: index > 0 ? '1px dashed rgba(255,255,255,0.05)' : 'none'
-                  }}
-                >
-                  {getMonthName(index)}
-                </div>
-              ))}
+            <div style={{ display: 'grid', gridTemplateRows: 'auto auto', gap: '8px' }}>
+              {/* Quarters */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '4px' }}>
+                {['Q1', 'Q2', 'Q3', 'Q4'].map((q, i) => (
+                  <div key={q} style={{ 
+                    textAlign: 'center', fontSize: '14px', fontWeight: '800', 
+                    color: 'var(--pure-white)', background: 'rgba(255,255,255,0.05)',
+                    padding: '4px 0', borderRadius: '4px', letterSpacing: '2px',
+                    border: '1px solid rgba(255,255,255,0.02)'
+                  }}>
+                    {q}
+                  </div>
+                ))}
+              </div>
+              {/* Months */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '4px' }}>
+                {[...Array(12)].map((_, index) => (
+                  <div 
+                    key={index}
+                    style={{ 
+                      textAlign: 'center', fontSize: '11px', fontWeight: '700',
+                      color: 'var(--sony-gray-400)', padding: '4px 0',
+                      textTransform: 'uppercase', letterSpacing: '1px',
+                      borderLeft: index % 3 !== 0 ? '1px dashed rgba(255,255,255,0.1)' : 'none'
+                    }}
+                  >
+                    {getMonthName(index)}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -571,10 +579,10 @@ const Timeline = () => {
                         <div
                           style={{
                             position: 'absolute',
-                            top: '4px',
-                            height: '26px',
-                            background: `linear-gradient(90deg, ${getStatusColor(project.status)}, ${getStatusColor(project.status)}AA)`,
-                            borderRadius: '13px',
+                            top: '6px',
+                            height: '24px',
+                            background: `linear-gradient(90deg, ${getStatusColor(project.status)}, ${getStatusColor(project.status)}88)`,
+                            borderRadius: '12px',
                             left: position.left,
                             width: position.width,
                             minWidth: '30px',
@@ -583,11 +591,12 @@ const Timeline = () => {
                             justifyContent: 'center',
                             color: 'white',
                             fontSize: '11px',
-                            fontWeight: '700',
-                            boxShadow: '0 3px 8px rgba(0, 0, 0, 0.15)',
+                            fontWeight: '800',
+                            boxShadow: `0 0 12px ${getStatusColor(project.status)}66`,
                             cursor: 'pointer',
-                            border: '2px solid white',
-                            zIndex: 2
+                            border: `1px solid ${getStatusColor(project.status)}`,
+                            zIndex: 2,
+                            backdropFilter: 'blur(4px)'
                           }}
                           title={`${project.name}\n${formatDate(project.start_date)} - ${formatDate(project.end_date)}\nProgress: ${project.progress}%`}
                         >
@@ -616,53 +625,29 @@ const Timeline = () => {
                                   position: 'absolute',
                                   left: `${Math.max(0, Math.min(100, milestonePos))}%`,
                                   top: '-2px',
-                                  width: '3px',
+                                  width: '2px',
                                   height: '40px',
-                                  background: milestone.completed ? '#10B981' : '#F59E0B',
+                                  background: `linear-gradient(180deg, transparent, ${milestone.completed ? '#10B981' : '#F59E0B'}, transparent)`,
                                   zIndex: 15,
                                   cursor: 'pointer',
-                                  borderRadius: '2px',
                                   transform: 'translateX(-50%)'
                                 }}
                                 title={`${milestone.name}\n${formatDate(milestone.date)}\n${milestone.completed ? '✅ Completed' : '⏳ Pending'}`}
                               >
                                 <div style={{
                                   position: 'absolute',
-                                  top: '-6px',
+                                  top: '12px',
                                   left: '-6px',
-                                  width: '15px',
-                                  height: '15px',
-                                  borderRadius: '50%',
+                                  width: '14px',
+                                  height: '14px',
                                   background: milestone.completed ? '#10B981' : '#F59E0B',
-                                  border: '2px solid rgba(20,20,20,0.8)',
-                                  boxShadow: '0 3px 6px rgba(0, 0, 0, 0.2)',
+                                  border: '2px solid var(--sony-white)',
+                                  boxShadow: `0 0 10px ${milestone.completed ? '#10B981' : '#F59E0B'}`,
+                                  transform: 'rotate(45deg)',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontSize: '8px',
-                                  color: 'white',
-                                  fontWeight: '700'
+                                  justifyContent: 'center'
                                 }}>
-                                  {milestone.completed ? '✓' : '•'}
-                                </div>
-                                <div style={{
-                                  position: 'absolute',
-                                  bottom: '-6px',
-                                  left: '-6px',
-                                  width: '15px',
-                                  height: '15px',
-                                  borderRadius: '50%',
-                                  background: milestone.completed ? '#10B981' : '#F59E0B',
-                                  border: '2px solid rgba(20,20,20,0.8)',
-                                  boxShadow: '0 3px 6px rgba(0, 0, 0, 0.2)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  fontSize: '8px',
-                                  color: 'white',
-                                  fontWeight: '700'
-                                }}>
-                                  {milestone.completed ? '✓' : '•'}
                                 </div>
                               </div>
                             );
