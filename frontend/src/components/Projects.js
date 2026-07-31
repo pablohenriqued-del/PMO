@@ -444,6 +444,58 @@ const Projects = () => {
     }
   };
 
+  const handlePlannerSync = (action) => {
+    if (action === 'import') {
+      alert("⬇️ Import from MS Planner/Monday.com - Feature coming soon!");
+    } else if (action === 'export') {
+      alert("⬆️ Export to MS Planner - Feature coming soon!");
+    }
+  };
+
+  const handleExportCSV = () => {
+    try {
+      // Create CSV content
+      const headers = ['Project Name', 'Manager', 'Status', 'Priority', 'Type', 'Country', 'Department', 'Budget Allocated', 'Budget Spent', 'Revenue Expected', 'Progress', 'Start Date', 'End Date'];
+      const csvRows = [headers.join(',')];
+      
+      filteredProjects.forEach(project => {
+        const row = [
+          `"${project.name || ''}"`,
+          `"${project.manager || ''}"`,
+          project.status || '',
+          project.priority || '',
+          project.type || '',
+          project.country || '',
+          project.department || '',
+          project.budget_allocated || 0,
+          project.budget_spent || 0,
+          project.revenue_expected || 0,
+          project.progress || 0,
+          project.start_date || '',
+          project.end_date || ''
+        ];
+        csvRows.push(row.join(','));
+      });
+      
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `projects_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      alert("✅ Projects exported to CSV successfully!");
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      alert("❌ Error exporting projects to CSV");
+    }
+  };
+
+
   const handleCreateProject = async (e) => {
     e.preventDefault();
     try {
@@ -509,37 +561,32 @@ const Projects = () => {
     <div data-testid="projects-container">
       {/* Header */}
       <div className="dashboard-header">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
           <div>
             <h1 className="dashboard-title">Project Management</h1>
             <p className="dashboard-subtitle">
               Manage and track all digital projects and streaming initiatives
             </p>
           </div>
-          <Button 
-            style={{ 
-              background: 'var(--sony-red)',
-              color: 'white',
-              border: 'none'
-            }}
-            onClick={() => setIsCreateModalOpen(true)}
-            data-testid="add-project-btn"
-          >
-            <Plus size={16} style={{ marginRight: '8px' }} />
-            New Project
-          </Button>
-          <Button 
-            style={{ 
-              background: 'linear-gradient(90deg, #8B5CF6, #EC4899)',
-              color: 'white',
-              border: 'none',
-              boxShadow: '0 0 15px rgba(139, 92, 246, 0.5)',
-              marginLeft: '12px'
-            }}
-            onClick={() => setIsPromptModalOpen(true)}
-          >
-            ✨ Gerar com IA
-          </Button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Button variant="outline" onClick={() => handlePlannerSync('import')} title="Import from MS Planner">⬇️ Planner</Button>
+            <Button variant="outline" onClick={() => handlePlannerSync('export')} title="Export to MS Planner">⬆️ Planner</Button>
+            <Button variant="outline" onClick={handleExportCSV} title="Export as CSV/Excel">⬇️ Excel</Button>
+            <Button style={{ background: 'var(--sony-red)', color: 'white', border: 'none' }} onClick={() => setIsCreateModalOpen(true)} data-testid="add-project-btn">
+              <Plus size={16} style={{ marginRight: '8px' }} /> New Project
+            </Button>
+            <Button style={{ background: 'linear-gradient(90deg, #8B5CF6, #EC4899)', color: 'white', border: 'none', boxShadow: '0 0 15px rgba(139, 92, 246, 0.5)' }} onClick={() => setIsPromptModalOpen(true)}>
+              ✨ Gerar com IA
+            </Button>
+          </div>
+        </div>
+
+        {/* View Mode Toggles */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Button variant={viewMode === 'grid' ? 'default' : 'outline'} onClick={() => setViewMode('grid')} style={viewMode === 'grid' ? {background: 'var(--sony-red)', color: 'white', border: 'none'} : {}}>Grid</Button>
+          <Button variant={viewMode === 'kanban' ? 'default' : 'outline'} onClick={() => setViewMode('kanban')} style={viewMode === 'kanban' ? {background: 'var(--sony-red)', color: 'white', border: 'none'} : {}}>Kanban</Button>
+          <Button variant={viewMode === 'table' ? 'default' : 'outline'} onClick={() => setViewMode('table')} style={viewMode === 'table' ? {background: 'var(--sony-red)', color: 'white', border: 'none'} : {}}>Table</Button>
+          <Button variant={viewMode === 'gantt' ? 'default' : 'outline'} onClick={() => setViewMode('gantt')} style={viewMode === 'gantt' ? {background: 'var(--sony-red)', color: 'white', border: 'none'} : {}}>Gantt</Button>
         </div>
       </div>
 
