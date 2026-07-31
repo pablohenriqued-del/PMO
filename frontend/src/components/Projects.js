@@ -46,6 +46,7 @@ const Projects = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState("grid"); // grid, kanban, table, gantt
   const [updateData, setUpdateData] = useState({
     progress: 0,
     budget_spent: 0,
@@ -89,6 +90,22 @@ const Projects = () => {
     } catch (error) {
       console.error('Error updating project:', error);
       alert("Error: Failed to update project.");
+    }
+  };
+
+
+  const [commentText, setCommentText] = useState("");
+  const handleAddComment = async (projectId) => {
+    if (!commentText.trim()) return;
+    try {
+      const res = await axios.post(`${API}/projects/${projectId}/comments`, { text: commentText });
+      const updatedProject = { ...selectedProject };
+      updatedProject.activities = [res.data, ...(updatedProject.activities || [])];
+      setSelectedProject(updatedProject);
+      setProjects(prev => prev.map(p => p.id === projectId ? updatedProject : p));
+      setCommentText("");
+    } catch(e) {
+      console.error(e);
     }
   };
 
@@ -718,8 +735,11 @@ const Projects = () => {
         </div>
       </div>
 
-      {/* Projects Grid */}
-      <div className="projects-grid">
+
+      {/* Views Rendering */}
+      {viewMode === 'grid' && (
+        <div className="projects-grid">
+
         {filteredProjects.map((project) => {
           const budgetStatus = getBudgetStatus(project.budget_allocated, project.budget_spent);
           
@@ -1134,6 +1154,41 @@ const Projects = () => {
                   gridTemplateColumns: '1fr 1fr',
                   gap: '24px'
                 }}>
+
+                {/* Activity & Comments Stream */}
+                <div style={{ 
+                  background: 'var(--sony-gray-50)',
+                  padding: '20px',
+                  borderRadius: '12px',
+                  gridColumn: '1 / -1',
+                  marginTop: '24px'
+                }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>
+                    Activity & Comments
+                  </h4>
+                  <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+                    <Input 
+                      placeholder="Add a comment or update... (use @ to tag)" 
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleAddComment(selectedProject.id)}
+                      style={{ flex: 1 }}
+                    />
+                    <Button onClick={() => handleAddComment(selectedProject.id)} style={{ background: 'var(--sony-red)', color: 'white' }}>Post</Button>
+                  </div>
+                  <div style={{ display: 'grid', gap: '12px', maxHeight: '300px', overflowY: 'auto' }}>
+                    {selectedProject.activities?.length > 0 ? selectedProject.activities.map((act, i) => (
+                      <div key={i} style={{ padding: '12px', background: act.type === 'system' ? 'rgba(0,0,0,0.05)' : 'white', borderRadius: '8px', borderLeft: `3px solid ${act.type === 'system' ? '#F59E0B' : 'var(--sony-red)'}` }}>
+                        <div style={{ fontSize: '12px', color: 'var(--sony-gray-500)', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
+                          <strong>{act.user}</strong>
+                          <span>{new Date(act.date).toLocaleString()}</span>
+                        </div>
+                        <div style={{ fontSize: '14px', color: 'var(--sony-gray-800)' }}>{act.text}</div>
+                      </div>
+                    )) : <div style={{ fontSize: '14px', color: 'var(--sony-gray-500)' }}>No activities yet.</div>}
+                  </div>
+                </div>
+
                   <div style={{ 
                     background: 'var(--sony-gray-50)',
                     padding: '20px',

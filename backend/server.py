@@ -86,6 +86,7 @@ class Project(BaseModel):
     streaming_platforms: List[str] = []
     documentations: str = ""
     envs: str = ""
+    activities: List[Dict[str, Any]] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -110,6 +111,7 @@ class ProjectCreate(BaseModel):
     streaming_platforms: List[str] = []
     documentations: str = ""
     envs: str = ""
+    activities: List[Dict[str, Any]] = []
 
 class UserCreate(BaseModel):
     name: str
@@ -140,6 +142,28 @@ class OpportunityCreate(BaseModel):
 class Opportunity(OpportunityCreate):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+
+class AutomationTrigger(str, Enum):
+    STATUS_CHANGED = "status_changed"
+    BUDGET_EXCEEDED = "budget_exceeded"
+    PROGRESS_100 = "progress_100"
+
+class AutomationAction(str, Enum):
+    SET_STATUS = "set_status"
+    ADD_COMMENT = "add_comment"
+    SEND_TEAMS = "send_teams"
+
+class Automation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    trigger: AutomationTrigger
+    trigger_value: Optional[str] = None
+    action: AutomationAction
+    action_value: Optional[str] = None
+    is_active: bool = True
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 
 class DashboardStats(BaseModel):
     total_projects: int
@@ -578,6 +602,32 @@ async def create_project(project_data: ProjectCreate):
 async def update_project(project_id: str, project_data: ProjectCreate):
     """Update an existing project"""
     existing_project = await db.projects.find_one({"id": project_id})
+    
+    if existing_project:
+        changes = {}
+        if existing_project.get("status") != project_data.status:
+            changes["status"] = project_data.status
+        if existing_project.get("progress") != project_data.progress:
+            changes["progress"] = project_data.progress
+        if existing_project.get("budget_spent") != project_data.budget_spent:
+            changes["budget_spent"] = project_data.budget_spent
+            
+        if changes:
+            sys_activities = []
+            for k, v in changes.items():
+                sys_activities.append({
+                    "id": str(uuid.uuid4()), "type": "system", 
+                    "text": f"{k} atualizado para {v}", 
+                    "user": "System", "date": datetime.now(timezone.utc).isoformat()
+                })
+            await db.projects.update_one({"id": project_id}, {"$push": {"activities": {"$each": sys_activities, "$position": 0}}})
+            
+            # Fire automations in background
+            import asyncio
+            project_dict = project_data.dict()
+            project_dict["id"] = project_id
+            asyncio.create_task(trigger_automations(project_dict, changes))
+
     if not existing_project:
         raise HTTPException(status_code=404, detail="Project not found")
     
@@ -1335,6 +1385,86 @@ async def get_shared_project(token: str):
     if not project:
         raise HTTPException(status_code=404, detail="Invalid magic link")
     return Project(**parse_from_mongo(project))
+
+
+
+@api_router.get("/automations", response_model=List[Automation])
+async def get_automations():
+    autos = await db.automations.find().to_list(1000)
+    return [Automation(**parse_from_mongo(a)) for a in autos]
+
+@api_router.post("/automations", response_model=Automation)
+async def create_automation(auto: Automation):
+    auto_dict = auto.dict()
+    await db.automations.insert_one(prepare_for_mongo(auto_dict))
+    return auto
+
+@api_router.delete("/automations/{auto_id}")
+async def delete_automation(auto_id: str):
+    await db.automations.delete_one({"id": auto_id})
+    return {"message": "Deleted"}
+
+@api_router.post("/projects/{project_id}/comments")
+async def add_project_comment(project_id: str, comment: dict):
+    project = await db.projects.find_one({"id": project_id})
+    if not project:
+        raise HTTPException(status_code=404)
+        
+    activity = {
+        "id": str(uuid.uuid4()),
+        "type": "comment",
+        "text": comment.get("text", ""),
+        "user": comment.get("user", "PMO Manager"),
+        "date": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.projects.update_one(
+        {"id": project_id},
+        {"$push": {"activities": {"$each": [activity], "$position": 0}}}
+    )
+    return activity
+
+async def trigger_automations(project, changes):
+    autos = await db.automations.find({"is_active": True}).to_list(100)
+    
+    actions_to_take = []
+    
+    for auto in autos:
+        trigger_matched = False
+        
+        if auto["trigger"] == "status_changed" and "status" in changes:
+            if auto.get("trigger_value") == "any" or auto.get("trigger_value") == changes["status"]:
+                trigger_matched = True
+                
+        if auto["trigger"] == "budget_exceeded" and "budget_spent" in changes:
+            if project.get("budget_spent", 0) > project.get("budget_allocated", 0):
+                trigger_matched = True
+                
+        if auto["trigger"] == "progress_100" and "progress" in changes:
+            if changes["progress"] == 100:
+                trigger_matched = True
+                
+        if trigger_matched:
+            actions_to_take.append(auto)
+            
+    for action in actions_to_take:
+        if action["action"] == "add_comment":
+            act_doc = {
+                "id": str(uuid.uuid4()),
+                "type": "system",
+                "text": f"🤖 Auto-Action: {action.get('action_value')}",
+                "user": "PMO Bot",
+                "date": datetime.now(timezone.utc).isoformat()
+            }
+            await db.projects.update_one({"id": project["id"]}, {"$push": {"activities": {"$each": [act_doc], "$position": 0}}})
+            
+        elif action["action"] == "send_teams":
+            import asyncio
+            asyncio.create_task(send_teams_notification_mock(f"Project {project['name']}: {action.get('action_value')}", "PMO Alerts"))
+            
+        elif action["action"] == "set_status":
+            new_status = action.get("action_value")
+            await db.projects.update_one({"id": project["id"]}, {"$set": {"status": new_status}})
 
 
 app.include_router(api_router)
