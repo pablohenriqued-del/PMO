@@ -442,7 +442,7 @@ const Timeline = () => {
           {/* Timeline Title (Only visible in export or nice header inside) */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '16px' }}>
              <h2 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--sony-gray-900)' }}>Roadmap Anual - {currentYear}</h2>
-             <div className="sony-icon" style={{ width: '32px', height: '32px', fontSize: '14px', borderRadius: '8px' }}>SM</div>
+             <div className="sony-icon" style={{ width: '40px' }}><img src="https://customer-assets.emergentagent.com/b97cd454-e0ea-43f1-a1b4-b498f8280f27" alt="Sony Music" /></div>
           </div>
           {/* Month Headers */}
           <div style={{ 

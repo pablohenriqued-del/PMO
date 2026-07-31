@@ -95,16 +95,24 @@ html, body {
 }
 
 .sony-icon {
-  width: 32px;
-  height: 32px;
-  background: var(--sony-red);
-  border-radius: 6px;
+  width: 48px;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  color: var(--pure-white);
-  font-size: 14px;
+}
+
+.sony-icon img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  /* Add a white drop shadow/filter to make black text white if needed, 
+     but we will use a brightness filter for the image */
+  /* Make black text white, keep red red (approximate with drop shadow for visibility) */
+  filter: drop-shadow(1px 1px 0px white) drop-shadow(-1px -1px 0px white);
+  background-color: white;
+  padding: 4px;
+  border-radius: 8px;
 }
 
 /* Navigation Styles */
