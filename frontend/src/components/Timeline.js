@@ -609,8 +609,8 @@ const Timeline = () => {
                           </span>
                         </div>
 
-                        {/* Milestones */}
-                        {project.milestones && project.milestones.map((milestone, milestoneIndex) => {
+                        {/* Milestones (Filtered for Key Milestones only) */}
+                        {project.milestones && project.milestones.filter(m => m.is_key_milestone !== false).map((milestone, milestoneIndex) => {
                           const milestoneDate = new Date(milestone.date);
                           const yearStart = new Date(currentYear, 0, 1);
                           const yearEnd = new Date(currentYear, 11, 31);

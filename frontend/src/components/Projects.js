@@ -195,6 +195,13 @@ const Projects = () => {
     }
   };
 
+
+  const toggleKeyMilestone = (index) => {
+    const newMilestones = [...updateData.milestones];
+    newMilestones[index].is_key_milestone = !newMilestones[index].is_key_milestone;
+    setUpdateData(prev => ({ ...prev, milestones: newMilestones }));
+  };
+
   const toggleMilestone = (index) => {
     const newMilestones = [...updateData.milestones];
     newMilestones[index].completed = !newMilestones[index].completed;
@@ -204,7 +211,7 @@ const Projects = () => {
     const addMilestone = () => {
     setUpdateData(prev => ({
       ...prev,
-      milestones: [...prev.milestones, { name: '', date: new Date().toISOString().split('T')[0], completed: false, assigned_to: null }]
+      milestones: [...prev.milestones, { name: '', date: new Date().toISOString().split('T')[0], completed: false, assigned_to: null, is_key_milestone: false }]
     }));
   };
 
@@ -2369,10 +2376,23 @@ const Projects = () => {
                           style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                         />
                         
+                        <button
+                          type="button"
+                          onClick={() => toggleKeyMilestone(index)}
+                          style={{ 
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            color: milestone.is_key_milestone ? '#F59E0B' : 'var(--sony-gray-600)',
+                            padding: '0 4px', fontSize: '18px'
+                          }}
+                          title={milestone.is_key_milestone ? "Key Milestone (Aparece na Timeline)" : "Tarefa Normal (Oculta na Timeline)"}
+                        >
+                          {milestone.is_key_milestone ? '★' : '☆'}
+                        </button>
+                        
                         <Input 
                           value={milestone.name}
                           onChange={(e) => updateMilestoneName(index, e.target.value)}
-                          placeholder="Milestone name"
+                          placeholder="Task / Milestone name"
                           style={{ flex: 1, height: '32px', fontSize: '14px' }}
                           required
                         />

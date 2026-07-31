@@ -1419,29 +1419,41 @@ class ResolveBottleneckReq(BaseModel):
 
 @api_router.get("/ai/bottlenecks")
 async def analyze_bottlenecks():
-    projects = await db.projects.find({"status": "in_progress"}).to_list(1000)
+    projects = await db.projects.find({"status": {"$in": ["in_progress", "planning"]}}).to_list(1000)
     users = await db.users.find().to_list(1000)
     
     bottlenecks = []
+    today = datetime.now(timezone.utc).date()
     
-    available_dev = next((u for u in users if u["role"] == "Senior Developer"), users[0] if users else None)
+    # Try to find a suitable resource for rescue
+    available_rescuer = next((u for u in users if u["role"] == "Senior Developer" or u["role"] == "QA Engineer"), users[0] if users else None)
     
     for p in projects:
-        if p.get("progress", 0) < 60:
-            for ms in p.get("milestones", []):
-                if not ms.get("completed") and not ms.get("assigned_to"):
-                    bottlenecks.append({
-                        "id": f"bot-{p['id']}",
-                        "project_id": p["id"],
-                        "project_name": p["name"],
-                        "milestone_name": ms["name"],
-                        "issue": "Marco crítico sem responsável alocado gerando risco de atraso.",
-                        "suggested_user_id": available_dev["id"] if available_dev else "u1",
-                        "suggested_user_name": available_dev["name"] if available_dev else "Available User",
-                        "action": f"Alocar automaticamente {available_dev['name'] if available_dev else 'User'} e notificar.",
-                        "status": "pending"
-                    })
-                    break 
+        for ms in p.get("milestones", []):
+            if not ms.get("completed") and ms.get("date"):
+                try:
+                    ms_date = datetime.fromisoformat(ms["date"].replace("Z", "+00:00")).date()
+                    days_diff = (ms_date - today).days
+                    
+                    # Logic: If it is overdue or due in 3 days AND has no assignee
+                    if days_diff <= 3 and not ms.get("assigned_to"):
+                        issue_text = "Tarefa atrasada sem responsável." if days_diff < 0 else "Risco iminente: Tarefa vence em breve e não possui responsável."
+                        
+                        bottlenecks.append({
+                            "id": f"bot-{p['id']}-{ms['name']}",
+                            "project_id": p["id"],
+                            "project_name": p["name"],
+                            "milestone_name": ms["name"],
+                            "issue": issue_text,
+                            "suggested_user_id": available_rescuer["id"] if available_rescuer else "u1",
+                            "suggested_user_name": available_rescuer["name"] if available_rescuer else "Available User",
+                            "action": f"Alocar força-tarefa ({available_rescuer['name'] if available_rescuer else 'User'}) para resgatar o prazo.",
+                            "status": "pending"
+                        })
+                        # Add max 1 bottleneck per project to avoid spamming the UI
+                        break
+                except Exception:
+                    pass
     return bottlenecks
 
 @api_router.post("/ai/resolve-bottleneck")
