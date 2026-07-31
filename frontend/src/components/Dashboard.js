@@ -70,10 +70,13 @@ const Dashboard = () => {
   const atRiskProjects = Math.max(0, stats.active_projects - stats.on_track_projects - stats.delayed_projects);
   
   const healthData = [
-    { name: 'On Track', value: stats.on_track_projects || 1, color: '#10B981' },
+    { name: 'On Track', value: stats.on_track_projects || 0, color: '#10B981' },
     { name: 'Delayed', value: stats.delayed_projects || 0, color: '#F59E0B' },
     { name: 'At Risk', value: atRiskProjects || 0, color: '#E50914' }
   ];
+  if (healthData.every(d => d.value === 0)) {
+    healthData[0].value = 1; // Fallback to show something
+  }
 
   // Simulating 6 months of financial history
   const financialData = [
@@ -222,7 +225,7 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={healthData}
+                  data={healthData.filter(d => d.value > 0)}
                   cx="50%"
                   cy="50%"
                   innerRadius={70}
@@ -231,8 +234,8 @@ const Dashboard = () => {
                   dataKey="value"
                   stroke="none"
                 >
-                  {healthData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} style={{ filter: `drop-shadow(0 0 8px ${entry.color}66)` }} />
+                  {healthData.filter(d => d.value > 0).map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip 

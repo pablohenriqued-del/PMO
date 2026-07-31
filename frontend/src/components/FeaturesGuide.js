@@ -98,7 +98,7 @@ const FeaturesGuide = () => {
       title: "Importação Monday & Microsoft Planner",
       description: "Interoperabilidade total com ferramentas de mercado.",
       rules: [
-        "Dentro de um projeto, permite upload de arquivo CSV exportado do Planner ou Monday.com.",
+        "Dentro de um projeto, permite upload de arquivo CSV e xlsx exportado do Planner ou Monday.com.",
         "Lê colunas dinâmicas (Due Date, Status, Progress) e cria os Milestones (entregas) automaticamente no banco de dados.",
         "Exportação de botões rápidos no menu para baixar todo o portfólio para o Excel."
       ]
