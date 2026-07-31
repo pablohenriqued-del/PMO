@@ -31,7 +31,8 @@ const Timeline = () => {
   const [hiddenProjects, setHiddenProjects] = useState([]);
   const [managers, setManagers] = useState([]);
   const [dbLabels, setDbLabels] = useState({
-    countries: ['Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Mexico', 'USA', 'Canada', 'Spain', 'Portugal']
+    countries: ['Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Mexico', 'USA', 'Canada', 'Spain', 'Portugal'],
+    departments: ['A&R', 'MKT', 'Legal', 'IT', 'Finance', 'Sales', 'PX']
   });
 
   useEffect(() => {
@@ -308,6 +309,24 @@ const Timeline = () => {
               </SelectContent>
             </Select>
           </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>
+              Area
+            </label>
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger data-testid="timeline-area-filter">
+                <SelectValue placeholder="All Areas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Areas</SelectItem>
+                {dbLabels?.departments?.map(dept => (
+                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
 
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: 'var(--sony-gray-700)', marginBottom: '8px' }}>

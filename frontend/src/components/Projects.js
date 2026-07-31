@@ -167,8 +167,10 @@ const Projects = () => {
 
   const [managers, setManagers] = useState([]);
   const [ldapUsers, setLdapUsers] = useState([]);
-  const [dbLabels, setDbLabels] = useState({
-    countries: ['Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Mexico', 'USA', 'Canada', 'Spain', 'Portugal']
+  const [dbLabels, setDbLabels] = useState({ 
+    managers: [], 
+    countries: ['Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Mexico', 'USA', 'Canada', 'Spain', 'Portugal'], 
+    departments: ['A&R', 'MKT', 'Legal', 'IT', 'Finance', 'Sales', 'PX'] 
   });
   const [newProject, setNewProject] = useState({
     name: '',
