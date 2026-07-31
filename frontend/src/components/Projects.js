@@ -47,7 +47,8 @@ const Projects = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState("grid"); // grid, kanban, table, gantt
+  const [viewMode, setViewMode] = useState("grid");
+  const [selectedProjects, setSelectedProjects] = useState([]); // grid, kanban, table, gantt
   const [updateData, setUpdateData] = useState({
     progress: 0,
     budget_spent: 0,
@@ -57,24 +58,33 @@ const Projects = () => {
 
 
 
-  const handleBulkDelete = async () => {
-    if (filteredProjects.length === 0) {
-      alert("Nenhum projeto selecionado/filtrado para excluir.");
-      return;
-    }
-    
-    if (!window.confirm(`ATENÇÃO: Você está prestes a excluir ${filteredProjects.length} projeto(s) permanentemente. Deseja continuar?`)) {
-      return;
-    }
+  const handleBulkDeleteSelected = async () => {
+    if (selectedProjects.length === 0) return;
+    if (!window.confirm(`ATENÇÃO: Você está prestes a excluir ${selectedProjects.length} projeto(s) permanentemente. Deseja continuar?`)) return;
     
     try {
-      const ids = filteredProjects.map(p => p.id);
-      await axios.post(`${API}/projects/bulk-delete`, { ids });
+      await axios.post(`${API}/projects/bulk-delete`, { ids: selectedProjects });
       await fetchProjects();
-      alert(`${ids.length} projetos excluídos com sucesso!`);
+      setSelectedProjects([]);
     } catch (e) {
       console.error(e);
-      alert("Erro ao excluir projetos em massa.");
+      alert("Erro ao excluir projetos.");
+    }
+  };
+
+  const toggleProjectSelection = (id, e) => {
+    e.stopPropagation();
+    setSelectedProjects(prev => prev.includes(id) ? prev.filter(pId => pId !== id) : [...prev, id]);
+  };
+  
+  const selectAllFiltered = () => {
+    const allIds = filteredProjects.map(p => p.id);
+    const allSelected = allIds.length > 0 && allIds.every(id => selectedProjects.includes(id));
+    if (allSelected) {
+      setSelectedProjects(prev => prev.filter(id => !allIds.includes(id)));
+    } else {
+      const newSelections = new Set([...selectedProjects, ...allIds]);
+      setSelectedProjects(Array.from(newSelections));
     }
   };
 
@@ -635,14 +645,7 @@ const Projects = () => {
             </p>
           </div>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <Button 
-              variant="outline" 
-              onClick={handleBulkDelete} 
-              style={{ color: 'var(--sony-red)', borderColor: 'rgba(229,9,20,0.3)', background: 'rgba(229,9,20,0.05)' }} 
-              title="Excluir todos os projetos que estão aparecendo na tela (filtrados)"
-            >
-              <Trash2 size={16} style={{ marginRight: '8px' }} /> Massa
-            </Button>
+            
             <input 
               type="file" 
               accept=".csv, .xlsx, .xls" 
@@ -836,14 +839,21 @@ const Projects = () => {
         <div style={{ 
           marginTop: '16px', 
           padding: '12px 0',
-          borderTop: '1px solid var(--sony-gray-200)',
+          borderTop: '1px solid rgba(255,255,255,0.1)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span style={{ fontSize: '14px', color: 'var(--sony-gray-600)' }}>
-            Showing {filteredProjects.length} of {projects.length} projects
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ fontSize: '14px', color: 'var(--sony-gray-600)' }}>
+              Showing {filteredProjects.length} of {projects.length} projects
+            </span>
+            {filteredProjects.length > 0 && viewMode !== 'table' && (
+              <Button variant="ghost" size="sm" onClick={selectAllFiltered} style={{ fontSize: '12px', color: 'var(--sony-red)' }}>
+                Selecionar Todos
+              </Button>
+            )}
+          </div>
           {(searchQuery || statusFilter !== "all" || managerFilter !== "all" || countryFilter !== "all" || typeFilter !== "all" || departmentFilter !== "all" || priorityFilter !== "all") && (
             <Button 
               variant="outline" 
@@ -881,8 +891,19 @@ const Projects = () => {
               className="project-card"
               onClick={() => openProjectModal(project)}
               data-testid={`project-${project.id}`}
-              style={{ position: 'relative' }}
+              style={{ position: 'relative', border: selectedProjects.includes(project.id) ? '1px solid var(--sony-red)' : '1px solid rgba(255, 255, 255, 0.05)' }}
             >
+              <div 
+                style={{ position: 'absolute', top: '22px', left: '16px', zIndex: 10 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <input 
+                  type="checkbox" 
+                  checked={selectedProjects.includes(project.id)}
+                  onChange={(e) => toggleProjectSelection(project.id, e)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--sony-red)' }}
+                />
+              </div>
               <button
                 className="download-card-btn"
                 onClick={(e) => downloadProjectCard(e, project.id, project.name)}
@@ -908,7 +929,7 @@ const Projects = () => {
                 <ImageIcon size={16} />
               </button>
               
-              <div className="project-header" style={{ paddingRight: '32px' }}>
+              <div className="project-header" style={{ paddingRight: '32px', paddingLeft: '24px' }}>
                 <div>
                   <h3 className="project-title">{project.name}</h3>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1102,6 +1123,14 @@ const Projects = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse', color: 'white', fontSize: '14px' }}>
               <thead style={{ background: 'rgba(0,0,0,0.5)', textAlign: 'left' }}>
                 <tr>
+                  <th style={{ padding: '16px', width: '40px' }}>
+                    <input 
+                      type="checkbox" 
+                      onChange={selectAllFiltered}
+                      checked={filteredProjects.length > 0 && filteredProjects.every(p => selectedProjects.includes(p.id))}
+                      style={{ cursor: 'pointer', accentColor: 'var(--sony-red)' }}
+                    />
+                  </th>
                   <th style={{ padding: '16px' }}>Project Name</th>
                   <th style={{ padding: '16px' }}>Manager</th>
                   <th style={{ padding: '16px' }}>Status</th>
@@ -1111,7 +1140,15 @@ const Projects = () => {
               </thead>
               <tbody>
                 {filteredProjects.map(project => (
-                  <tr key={project.id} onClick={() => openProjectModal(project)} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer' }}>
+                  <tr key={project.id} onClick={() => openProjectModal(project)} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', background: selectedProjects.includes(project.id) ? 'rgba(229,9,20,0.05)' : 'transparent' }}>
+                    <td style={{ padding: '16px' }} onClick={e => e.stopPropagation()}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedProjects.includes(project.id)}
+                        onChange={(e) => toggleProjectSelection(project.id, e)}
+                        style={{ cursor: 'pointer', accentColor: 'var(--sony-red)' }}
+                      />
+                    </td>
                     <td style={{ padding: '16px', fontWeight: 'bold' }}>{project.name}</td>
                     <td style={{ padding: '16px', color: 'var(--sony-gray-400)' }}>{project.manager}</td>
                     <td style={{ padding: '16px' }}><span className={`status-badge status-${project.status}`}>{project.status.replace('_', ' ')}</span></td>
@@ -1364,37 +1401,81 @@ const Projects = () => {
                   gap: '24px'
                 }}>
 
-                {/* Activity & Comments Stream */}
+                {/* Activity & Comments Stream (Premium Design) */}
                 <div style={{ 
-                  background: 'var(--sony-gray-50)',
-                  padding: '20px',
-                  borderRadius: '12px',
+                  background: 'rgba(0,0,0,0.2)',
+                  border: '1px solid rgba(255,255,255,0.05)',
+                  padding: '24px',
+                  borderRadius: '16px',
                   gridColumn: '1 / -1',
                   marginTop: '24px'
                 }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '16px' }}>
-                    Activity & Comments
+                  <h4 style={{ fontSize: '18px', fontWeight: '700', marginBottom: '20px', color: 'var(--pure-white)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Users size={18} color="var(--sony-red)" />
+                    Recent Activities & Comments
                   </h4>
-                  <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-                    <Input 
-                      placeholder="Add a comment or update... (use @ to tag)" 
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleAddComment(selectedProject.id)}
-                      style={{ flex: 1 }}
-                    />
-                    <Button onClick={() => handleAddComment(selectedProject.id)} style={{ background: 'var(--sony-red)', color: 'white' }}>Post</Button>
+                  
+                  <div style={{ display: 'flex', gap: '12px', marginBottom: '32px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--sony-red)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                      PM
+                    </div>
+                    <div style={{ flex: 1, display: 'flex', gap: '8px' }}>
+                      <Input 
+                        placeholder="Adicione um comentário... (use @ para mencionar)" 
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddComment(selectedProject.id)}
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', height: '40px' }}
+                      />
+                      <Button onClick={() => handleAddComment(selectedProject.id)} style={{ background: 'var(--sony-red)', color: 'white', height: '40px' }}>Post</Button>
+                    </div>
                   </div>
-                  <div style={{ display: 'grid', gap: '12px', maxHeight: '300px', overflowY: 'auto' }}>
-                    {selectedProject.activities?.length > 0 ? selectedProject.activities.map((act, i) => (
-                      <div key={i} style={{ padding: '12px', background: act.type === 'system' ? 'rgba(0,0,0,0.05)' : 'white', borderRadius: '8px', borderLeft: `3px solid ${act.type === 'system' ? '#F59E0B' : 'var(--sony-red)'}` }}>
-                        <div style={{ fontSize: '12px', color: 'var(--sony-gray-500)', marginBottom: '4px', display: 'flex', justifyContent: 'space-between' }}>
-                          <strong>{act.user}</strong>
-                          <span>{new Date(act.date).toLocaleString()}</span>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0', maxHeight: '400px', overflowY: 'auto', paddingRight: '12px' }}>
+                    {selectedProject.activities?.length > 0 ? selectedProject.activities.map((act, i) => {
+                      const isSystem = act.type === 'system';
+                      return (
+                        <div key={i} style={{ display: 'flex', gap: '16px', position: 'relative', paddingBottom: '24px' }}>
+                          {/* Timeline Line */}
+                          {i < selectedProject.activities.length - 1 && (
+                            <div style={{ position: 'absolute', left: '19px', top: '40px', bottom: 0, width: '2px', background: 'rgba(255,255,255,0.05)' }}></div>
+                          )}
+                          
+                          {/* Avatar / Icon */}
+                          <div style={{ 
+                            width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
+                            background: isSystem ? 'rgba(255,255,255,0.05)' : 'var(--sony-red)',
+                            border: isSystem ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'white', fontWeight: 'bold', fontSize: '14px', zIndex: 2
+                          }}>
+                            {isSystem ? <Activity size={16} color="var(--sony-gray-400)" /> : act.user.substring(0,2).toUpperCase()}
+                          </div>
+                          
+                          {/* Content Bubble */}
+                          <div style={{ 
+                            flex: 1, 
+                            background: isSystem ? 'transparent' : 'rgba(20,20,20,0.6)',
+                            border: isSystem ? 'none' : '1px solid rgba(255,255,255,0.05)',
+                            padding: isSystem ? '8px 0' : '16px',
+                            borderRadius: '12px',
+                            marginTop: isSystem ? '2px' : '0'
+                          }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px' }}>
+                              <strong style={{ color: isSystem ? 'var(--sony-gray-500)' : 'var(--pure-white)', fontSize: '14px' }}>
+                                {act.user}
+                              </strong>
+                              <span style={{ fontSize: '12px', color: 'var(--sony-gray-600)' }}>
+                                {new Date(act.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '14px', color: isSystem ? 'var(--sony-gray-400)' : 'var(--sony-gray-300)', lineHeight: '1.5' }}>
+                              {act.text}
+                            </div>
+                          </div>
                         </div>
-                        <div style={{ fontSize: '14px', color: 'var(--sony-gray-800)' }}>{act.text}</div>
-                      </div>
-                    )) : <div style={{ fontSize: '14px', color: 'var(--sony-gray-500)' }}>No activities yet.</div>}
+                      );
+                    }) : <div style={{ fontSize: '14px', color: 'var(--sony-gray-600)', textAlign: 'center', padding: '24px' }}>Nenhuma atividade registrada ainda.</div>}
                   </div>
                 </div>
 
@@ -2380,6 +2461,54 @@ const Projects = () => {
           </div>
         </div>
       )}
+
+      {/* Floating Bulk Selection Bar */}
+      {selectedProjects.length > 0 && (
+        <div style={{
+          position: 'fixed',
+          bottom: '32px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(20, 20, 20, 0.9)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(229, 9, 20, 0.5)',
+          padding: '16px 24px',
+          borderRadius: '32px',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(229,9,20,0.2)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '24px',
+          zIndex: 9999,
+          animation: 'slideUp 0.3s ease-out'
+        }}>
+          <div style={{ color: 'white', fontWeight: '600' }}>
+            <span style={{ color: 'var(--sony-red)' }}>{selectedProjects.length}</span> projeto(s) selecionado(s)
+          </div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Button 
+              variant="ghost" 
+              onClick={() => setSelectedProjects([])}
+              style={{ color: 'var(--sony-gray-400)' }}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleBulkDeleteSelected}
+              style={{ background: 'var(--sony-red)', color: 'white', border: 'none', borderRadius: '16px' }}
+            >
+              <Trash2 size={16} style={{ marginRight: '8px' }} />
+              Excluir Selecionados
+            </Button>
+          </div>
+          <style jsx>{`
+            @keyframes slideUp {
+              from { transform: translate(-50%, 100%); opacity: 0; }
+              to { transform: translate(-50%, 0); opacity: 1; }
+            }
+          `}</style>
+        </div>
+      )}
+
     </div>
   );
 };
