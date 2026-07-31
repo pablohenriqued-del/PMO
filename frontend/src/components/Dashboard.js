@@ -72,7 +72,7 @@ const Dashboard = () => {
   const healthData = [
     { name: 'On Track', value: stats.on_track_projects || 1, color: '#10B981' },
     { name: 'Delayed', value: stats.delayed_projects || 0, color: '#F59E0B' },
-    { name: 'At Risk', value: atRiskProjects || 0, color: 'var(--sony-red)' }
+    { name: 'At Risk', value: atRiskProjects || 0, color: '#E50914' }
   ];
 
   // Simulating 6 months of financial history
@@ -145,7 +145,7 @@ const Dashboard = () => {
         <div className="kpi-card" style={{ background: 'linear-gradient(145deg, rgba(20,20,20,0.8) 0%, rgba(10,10,10,0.9) 100%)' }}>
           <div className="kpi-header">
             <span className="kpi-title">Budget Consumido</span>
-            <div className="kpi-icon" style={{ background: 'rgba(229, 9, 20, 0.2)', color: 'var(--sony-red)' }}>
+            <div className="kpi-icon" style={{ background: 'rgba(229, 9, 20, 0.2)', color: '#E50914' }}>
               <Activity size={20} />
             </div>
           </div>

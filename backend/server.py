@@ -120,6 +120,7 @@ class UserCreate(BaseModel):
     email: str
     department: str
     role: str
+    is_admin: bool = False
 
 class User(UserCreate):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -498,7 +499,7 @@ async def initialize_mock_data():
             {"id": "u5", "name": "Luis Gomez", "email": "luis.gomez@sonymusic.com", "department": "Data Science", "role": "Data Analyst"},
             {"id": "u6", "name": "Camila Alves", "email": "camila.alves@sonymusic.com", "department": "Marketing", "role": "Marketing Manager"},
             {"id": "u7", "name": "Pedro Lima", "email": "pedro.lima@sonymusic.com", "department": "Product", "role": "Product Owner"},
-            {"id": "u8", "name": "Sofia Costa", "email": "sofia.costa@sonymusic.com", "department": "Operations", "role": "Regional Manager"}
+            {"id": "u8", "name": "Sofia Costa", "email": "sofia.costa@sonymusic.com", "department": "Operations", "role": "Regional Manager", "is_admin": True}
         ]
         await db.users.insert_many(mock_users)
         logger.info("Mock users initialized successfully")

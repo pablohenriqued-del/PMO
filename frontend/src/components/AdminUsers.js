@@ -19,7 +19,8 @@ const AdminUsers = () => {
     name: '',
     email: '',
     department: '',
-    role: ''
+    role: '',
+    is_admin: false
   });
 
   useEffect(() => {
@@ -44,7 +45,8 @@ const AdminUsers = () => {
       name: '',
       email: '',
       department: '',
-      role: ''
+      role: '',
+      is_admin: false
     });
     setIsModalOpen(true);
   };
@@ -56,7 +58,8 @@ const AdminUsers = () => {
       name: user.name,
       email: user.email,
       department: user.department,
-      role: user.role
+      role: user.role,
+      is_admin: user.is_admin || false
     });
     setIsModalOpen(true);
   };
@@ -146,6 +149,7 @@ const AdminUsers = () => {
                   <th style={{ padding: '16px', textAlign: 'left', borderBottom: '2px solid var(--sony-gray-200)', color: 'var(--sony-gray-600)' }}>Email</th>
                   <th style={{ padding: '16px', textAlign: 'left', borderBottom: '2px solid var(--sony-gray-200)', color: 'var(--sony-gray-600)' }}>Department</th>
                   <th style={{ padding: '16px', textAlign: 'left', borderBottom: '2px solid var(--sony-gray-200)', color: 'var(--sony-gray-600)' }}>Role</th>
+                  <th style={{ padding: '16px', textAlign: 'center', borderBottom: '2px solid var(--sony-gray-200)', color: 'var(--sony-gray-600)' }}>Admin</th>
                   <th style={{ padding: '16px', textAlign: 'center', borderBottom: '2px solid var(--sony-gray-200)', color: 'var(--sony-gray-600)' }}>Actions</th>
                 </tr>
               </thead>
@@ -172,6 +176,13 @@ const AdminUsers = () => {
                         <Briefcase size={14} color="var(--sony-gray-500)" />
                         {user.role}
                       </div>
+                    </td>
+                    <td style={{ padding: '16px', textAlign: 'center' }}>
+                      {user.is_admin ? (
+                        <span style={{ background: 'rgba(229,9,20,0.1)', color: 'var(--sony-red)', padding: '4px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold' }}>ADMIN</span>
+                      ) : (
+                        <span style={{ color: 'var(--sony-gray-500)', fontSize: '11px' }}>User</span>
+                      )}
                     </td>
                     <td style={{ padding: '16px', textAlign: 'center' }}>
                       <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
@@ -278,6 +289,17 @@ const AdminUsers = () => {
                     required
                   />
                 </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(229,9,20,0.05)', padding: '16px', borderRadius: '8px', border: '1px solid rgba(229,9,20,0.1)' }}>
+                <input 
+                  type="checkbox" 
+                  id="user-admin"
+                  checked={formData.is_admin}
+                  onChange={(e) => setFormData(prev => ({...prev, is_admin: e.target.checked}))}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--sony-red)' }}
+                />
+                <Label htmlFor="user-admin" style={{ cursor: 'pointer', margin: 0, fontWeight: 'bold' }}>Usuário é Administrador do Portal</Label>
               </div>
 
               <div style={{ 

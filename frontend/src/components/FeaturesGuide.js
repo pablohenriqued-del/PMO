@@ -1,8 +1,28 @@
 import React from "react";
-import { Sparkles, BrainCircuit, Mic, Presentation, Users, Bell, FileSpreadsheet, Activity, Wand2, Link } from "lucide-react";
+import { Sparkles, BrainCircuit, Mic, Presentation, Users, Bell, FileSpreadsheet, Activity, Wand2, Link, FileText, Calendar } from "lucide-react";
 
 const FeaturesGuide = () => {
   const features = [
+    {
+      icon: <FileText size={32} color="#F59E0B" />,
+      title: "Status Report Executivo (PDF/PPT)",
+      description: "Relatório de status automatizado gerado em tempo real com base nos dados vivos da plataforma.",
+      rules: [
+        "Reúne e calcula os indicadores de saúde (Health Indicators) do projeto (Cronograma, Budget, Escopo).",
+        "Puxa automaticamente do Risk Radar os riscos críticos e seus respectivos donos e planos de mitigação.",
+        "Possui opção de exportação em 1 clique para PNG (pronto para colar no PowerPoint) ou impressão em PDF."
+      ]
+    },
+    {
+      icon: <Calendar size={32} color="#3B82F6" />,
+      title: "Roadmap Anual (Gantt Chart Premium)",
+      description: "Visão macro do portfólio inteiro em uma linha do tempo elegante.",
+      rules: [
+        "Permite alternar entre os anos para visualizar a duração dos projetos.",
+        "Divide a visão em trimestres (Q1, Q2, Q3, Q4) e meses, destacando o percentual de conclusão.",
+        "Diferencia 'Tarefas Normais' de 'Key Milestones' (representados por losangos brilhantes) para não poluir a visão executiva."
+      ]
+    },
     {
       icon: <Wand2 size={32} color="#EC4899" />,
       title: "Prompt-to-Project (AI Generator)",
@@ -75,7 +95,7 @@ const FeaturesGuide = () => {
     },
     {
       icon: <FileSpreadsheet size={32} color="#10B981" />,
-      title: "Importação Excel & Microsoft Planner",
+      title: "Importação Monday & Microsoft Planner",
       description: "Interoperabilidade total com ferramentas de mercado.",
       rules: [
         "Dentro de um projeto, permite upload de arquivo CSV exportado do Planner ou Monday.com.",
