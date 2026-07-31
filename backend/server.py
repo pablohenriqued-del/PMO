@@ -72,6 +72,7 @@ class Project(BaseModel):
     priority: ProjectPriority
     type: ProjectType
     manager: str
+    department: str = "Unassigned"
     country: str = "Global"
     budget_allocated: float
     budget_spent: float
@@ -95,6 +96,7 @@ class ProjectCreate(BaseModel):
     priority: ProjectPriority
     type: ProjectType
     manager: str
+    department: str = "Unassigned"
     country: str = "Global"
     budget_allocated: float
     budget_spent: float = 0.0
@@ -130,6 +132,7 @@ class OpportunityCreate(BaseModel):
     title: str
     artist: str
     country: str = "Global"
+    department: str = "Unassigned"
     estimated_revenue: float = 0.0
     estimated_cost: float = 0.0
     stage: OpportunityStage = OpportunityStage.LEAD
