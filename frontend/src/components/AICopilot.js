@@ -66,7 +66,7 @@ const AICopilot = () => {
   return (
     <div data-testid="ai-copilot-container">
       <div className="dashboard-header" style={{ marginBottom: '32px', background: 'var(--sony-black)', borderBottom: '1px solid var(--sony-gray-200)' }}>
-        <h1 className="dashboard-title" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--sony-white)' }}>
+        <h1 className="dashboard-title" style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--pure-white)' }}>
           <BrainCircuit color="var(--sony-red)" size={32} />
           PMO AI Copilot & Autonomous Agent
         </h1>
@@ -85,7 +85,7 @@ const AICopilot = () => {
           border: '1px solid rgba(229, 9, 20, 0.2)',
           boxShadow: '0 8px 32px rgba(229, 9, 20, 0.1)'
         }}>
-          <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--sony-white)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--pure-white)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Activity color="var(--sony-red)" size={24} />
             Trend-Driven Prioritization (Spotify/TikTok)
           </h3>
@@ -103,7 +103,7 @@ const AICopilot = () => {
                     <div style={{ fontSize: '12px', color: '#10B981', fontWeight: 'bold', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
                       🔥 VIRAL TREND DETECTADA
                     </div>
-                    <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--sony-white)' }}>{trend.artist} no {trend.platform}</div>
+                    <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--pure-white)' }}>{trend.artist} no {trend.platform}</div>
                   </div>
                   <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10B981', padding: '4px 8px', borderRadius: '8px', fontWeight: 'bold' }}>
                     {trend.growth_rate}
@@ -116,7 +116,7 @@ const AICopilot = () => {
 
                 <div style={{ background: 'rgba(0,0,0,0.5)', padding: '16px', borderRadius: '8px', marginBottom: '16px', borderLeft: '3px solid #F59E0B' }}>
                   <div style={{ fontSize: '12px', color: '#CBD5E1', marginBottom: '4px' }}>Ação Autônoma Sugerida:</div>
-                  <div style={{ fontSize: '14px', color: 'var(--sony-white)' }}>{trend.suggested_action}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--pure-white)' }}>{trend.suggested_action}</div>
                 </div>
 
                 {trend.status === 'pending' ? (
@@ -144,7 +144,7 @@ const AICopilot = () => {
           border: '1px solid rgba(59, 130, 246, 0.2)',
           boxShadow: '0 8px 32px rgba(59, 130, 246, 0.1)'
         }}>
-          <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--sony-white)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h3 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--pure-white)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Users color="#3B82F6" size={24} />
             PMO Autônomo & Prevenção de Atrasos
           </h3>
@@ -162,7 +162,7 @@ const AICopilot = () => {
                     <div style={{ fontSize: '12px', color: '#F59E0B', fontWeight: 'bold', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>
                       ⚠️ RISCO DE ATRASO DETECTADO
                     </div>
-                    <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--sony-white)' }}>{bot.project_name}</div>
+                    <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--pure-white)' }}>{bot.project_name}</div>
                   </div>
                 </div>
                 
@@ -173,7 +173,7 @@ const AICopilot = () => {
 
                 <div style={{ background: 'rgba(0,0,0,0.5)', padding: '16px', borderRadius: '8px', marginBottom: '16px', borderLeft: '3px solid #3B82F6' }}>
                   <div style={{ fontSize: '12px', color: '#CBD5E1', marginBottom: '4px' }}>Capacidade Encontrada (AD/LDAP):</div>
-                  <div style={{ fontSize: '14px', color: 'var(--sony-white)' }}>{bot.action}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--pure-white)' }}>{bot.action}</div>
                 </div>
 
                 {bot.status === 'pending' ? (
