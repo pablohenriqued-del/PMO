@@ -8,8 +8,11 @@ import {
   ChevronRight,
   Clock,
   TrendingUp,
-  AlertTriangle
+  AlertTriangle,
+  Download,
+  Image as ImageIcon
 } from "lucide-react";
+import html2canvas from "html2canvas";
 import { Button } from "./ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import axios from "axios";
@@ -28,6 +31,8 @@ const Timeline = () => {
   const [typeFilter, setTypeFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [currentYear, setCurrentYear] = useState(2024);
+  const timelineRef = React.useRef(null);
+  const [isExporting, setIsExporting] = useState(false);
   const [hiddenProjects, setHiddenProjects] = useState([]);
   const [managers, setManagers] = useState([]);
   const [dbLabels, setDbLabels] = useState({
@@ -95,6 +100,35 @@ const Timeline = () => {
     }
 
     setFilteredProjects(filtered);
+  };
+
+
+  const handleExportTimeline = async () => {
+    if (!timelineRef.current) return;
+    setIsExporting(true);
+    
+    // Tiny delay to ensure UI updates if needed
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    try {
+      const canvas = await html2canvas(timelineRef.current, {
+        backgroundColor: '#121212', // Match dark theme
+        scale: 2, // High resolution for presentations
+        logging: false,
+        useCORS: true
+      });
+      
+      const image = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.download = `PMO_Timeline_${currentYear}.png`;
+      link.href = image;
+      link.click();
+    } catch (e) {
+      console.error("Error exporting timeline:", e);
+      alert("Failed to export timeline.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const toggleProjectVisibility = (projectId) => {
@@ -204,6 +238,17 @@ const Timeline = () => {
           
           {/* Year Navigation */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Button 
+              onClick={handleExportTimeline}
+              disabled={isExporting}
+              style={{ background: 'linear-gradient(90deg, #3B82F6, #8B5CF6)', color: 'white', border: 'none', boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)' }}
+            >
+              {isExporting ? <Clock size={16} className="animate-spin" style={{ marginRight: '8px' }}/> : <ImageIcon size={16} style={{ marginRight: '8px' }} />}
+              {isExporting ? 'Exporting...' : 'Exportar PNG (PPT)'}
+            </Button>
+            
+            <div style={{ width: '1px', height: '24px', background: 'var(--sony-gray-700)', margin: '0 8px' }}></div>
+
             <Button 
               variant="outline" 
               size="sm"
@@ -383,21 +428,30 @@ const Timeline = () => {
 
       {/* Timeline View */}
       <div style={{ padding: '0 32px', marginBottom: '32px' }}>
-        <div style={{ 
-          background: 'var(--sony-white)',
-          borderRadius: '16px',
-          padding: '24px',
-          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.06)',
-          border: '1px solid var(--sony-gray-200)'
-        }}>
+        <div 
+          ref={timelineRef}
+          style={{ 
+            background: 'var(--sony-white)',
+            borderRadius: '16px',
+            padding: '32px',
+            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            position: 'relative'
+          }}
+        >
+          {/* Timeline Title (Only visible in export or nice header inside) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '16px' }}>
+             <h2 style={{ fontSize: '24px', fontWeight: '800', color: 'var(--sony-gray-900)' }}>Roadmap Anual - {currentYear}</h2>
+             <div className="sony-icon" style={{ width: '32px', height: '32px', fontSize: '14px', borderRadius: '8px' }}>SM</div>
+          </div>
           {/* Month Headers */}
           <div style={{ 
             display: 'grid',
-            gridTemplateColumns: '200px 1fr',
+            gridTemplateColumns: '220px 1fr',
             gap: '24px',
-            marginBottom: '24px',
+            marginBottom: '16px',
             paddingBottom: '16px',
-            borderBottom: '2px solid var(--sony-gray-200)'
+            borderBottom: '2px solid rgba(255,255,255,0.1)'
           }}>
             <div style={{ 
               fontSize: '16px', 
@@ -420,10 +474,13 @@ const Timeline = () => {
                   key={index}
                   style={{ 
                     textAlign: 'center',
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: 'var(--sony-gray-600)',
-                    padding: '8px 4px'
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    color: 'var(--sony-gray-400)',
+                    padding: '8px 4px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    borderLeft: index > 0 ? '1px dashed rgba(255,255,255,0.05)' : 'none'
                   }}
                 >
                   {getMonthName(index)}
@@ -443,11 +500,11 @@ const Timeline = () => {
                   key={project.id}
                   style={{ 
                     display: 'grid',
-                    gridTemplateColumns: '200px 1fr',
+                    gridTemplateColumns: '220px 1fr',
                     gap: '24px',
                     alignItems: 'center',
                     padding: '12px 0',
-                    borderBottom: index < filteredProjects.length - 1 ? '1px solid var(--sony-gray-100)' : 'none',
+                    borderBottom: index < filteredProjects.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
                     opacity: isHidden ? 0.4 : 1,
                     transition: 'opacity 0.2s ease'
                   }}
@@ -497,12 +554,17 @@ const Timeline = () => {
                   {/* Timeline Bar */}
                   <div style={{ 
                     position: 'relative',
-                    height: '36px',
-                    background: 'var(--sony-gray-100)',
-                    borderRadius: '18px',
+                    height: '40px',
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: '8px',
                     overflow: 'visible',
-                    border: '1px solid var(--sony-gray-200)'
+                    border: '1px solid rgba(255,255,255,0.05)'
                   }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', pointerEvents: 'none' }}>
+                    {[...Array(12)].map((_, i) => (
+                      <div key={i} style={{ borderLeft: i > 0 ? '1px dashed rgba(255,255,255,0.03)' : 'none', height: '100%' }}></div>
+                    ))}
+                  </div>
                     {!isHidden && position.visible && (
                       <>
                         {/* Project Bar */}
@@ -511,7 +573,7 @@ const Timeline = () => {
                             position: 'absolute',
                             top: '4px',
                             height: '26px',
-                            background: `linear-gradient(90deg, ${getStatusColor(project.status)}, ${getStatusColor(project.status)}DD)`,
+                            background: `linear-gradient(90deg, ${getStatusColor(project.status)}, ${getStatusColor(project.status)}AA)`,
                             borderRadius: '13px',
                             left: position.left,
                             width: position.width,
@@ -572,7 +634,7 @@ const Timeline = () => {
                                   height: '15px',
                                   borderRadius: '50%',
                                   background: milestone.completed ? '#10B981' : '#F59E0B',
-                                  border: '3px solid white',
+                                  border: '2px solid rgba(20,20,20,0.8)',
                                   boxShadow: '0 3px 6px rgba(0, 0, 0, 0.2)',
                                   display: 'flex',
                                   alignItems: 'center',
@@ -591,7 +653,7 @@ const Timeline = () => {
                                   height: '15px',
                                   borderRadius: '50%',
                                   background: milestone.completed ? '#10B981' : '#F59E0B',
-                                  border: '3px solid white',
+                                  border: '2px solid rgba(20,20,20,0.8)',
                                   boxShadow: '0 3px 6px rgba(0, 0, 0, 0.2)',
                                   display: 'flex',
                                   alignItems: 'center',
