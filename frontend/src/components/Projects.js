@@ -1205,6 +1205,31 @@ const Projects = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
+                  <Label htmlFor="project-department">Area / Department *</Label>
+                  <select 
+                    id="project-department"
+                    value={newProject.department || ""} 
+                    onChange={(e) => setNewProject(prev => ({...prev, department: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                    required
+                  >
+                    <option value="">Select Area</option>
+                    <option value="A&R">A&R</option>
+                    <option value="MKT">MKT</option>
+                    <option value="Legal">Legal</option>
+                    <option value="IT">IT</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Sales">Sales</option>
+                    <option value="PX">PX</option>
+                  </select>
+                </div>
+                <div>
                   <Label htmlFor="project-country">Country</Label>
                   <select 
                     id="project-country"
@@ -1237,17 +1262,6 @@ const Projects = () => {
                       <option value="Portugal">Portugal</option>
                     </optgroup>
                   </select>
-                </div>
-                <div>
-                  <Label htmlFor="project-revenue">Revenue Expected (USD)</Label>
-                  <Input
-                    id="project-revenue"
-                    type="number"
-                    value={newProject.revenue_expected}
-                    onChange={(e) => setNewProject(prev => ({...prev, revenue_expected: e.target.value}))}
-                    placeholder="0"
-                    min="0"
-                  />
                 </div>
               </div>
 
@@ -1340,6 +1354,20 @@ const Projects = () => {
                     required
                   />
                 </div>
+                <div>
+                  <Label htmlFor="project-revenue">Revenue Expected (USD)</Label>
+                  <Input
+                    id="project-revenue"
+                    type="number"
+                    value={newProject.revenue_expected}
+                    onChange={(e) => setNewProject(prev => ({...prev, revenue_expected: e.target.value}))}
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <Label htmlFor="project-start">Start Date *</Label>
                   <Input
