@@ -31,6 +31,7 @@ const API = `${BACKEND_URL}/api`;
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const [risks, setRisks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -261,6 +262,7 @@ const Projects = () => {
     fetchProjects();
     fetchManagers();
     fetchLdapUsers();
+    fetchRisks();
   }, []);
 
   const fetchLdapUsers = async () => {
@@ -275,6 +277,15 @@ const Projects = () => {
   useEffect(() => {
     filterProjects();
   }, [projects, searchQuery, statusFilter, managerFilter, countryFilter, departmentFilter, typeFilter, priorityFilter]);
+
+    const fetchRisks = async () => {
+    try {
+      const response = await axios.get(`${API}/risk-radar`);
+      setRisks(response.data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -1306,6 +1317,28 @@ const Projects = () => {
                         <p style={{ fontSize: '13px', color: 'var(--sony-gray-600)', whiteSpace: 'pre-line' }}>{selectedProject.envs}</p>
                       </div>
                     )}
+                    
+                    {(() => {
+                      const projectRisks = risks.filter(r => r.project === selectedProject.name);
+                      if (projectRisks.length === 0) return null;
+                      return (
+                        <div style={{ marginTop: '24px', background: 'rgba(255,255,255,0.02)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--pure-white)' }}>
+                            <AlertTriangle size={16} color="var(--sony-red)" /> Riscos Associados ao Projeto
+                          </h4>
+                          <div style={{ display: 'grid', gap: '8px' }}>
+                            {projectRisks.map(r => (
+                              <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px', background: 'rgba(0,0,0,0.3)', padding: '8px 12px', borderRadius: '8px' }}>
+                                <span style={{ color: 'var(--pure-white)' }}>{r.risk}</span>
+                                <span style={{ padding: '2px 8px', borderRadius: '12px', fontSize: '11px', background: r.severity === 'Critical' ? 'rgba(229,9,20,0.1)' : 'rgba(245,158,11,0.1)', color: r.severity === 'Critical' ? 'var(--sony-red)' : '#F59E0B' }}>
+                                  {r.status} - {r.severity}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                   
                   <div style={{ 

@@ -23,6 +23,7 @@ const API = `${BACKEND_URL}/api`;
 const RiskRadar = () => {
   const [risks, setRisks] = useState([]);
   const [filteredRisks, setFilteredRisks] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [severityFilter, setSeverityFilter] = useState("all");
@@ -59,13 +60,17 @@ const RiskRadar = () => {
     filterRisks();
   }, [risks, searchQuery, severityFilter, statusFilter, categoryFilter]);
 
-  const fetchRisks = async () => {
+    const fetchRisks = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/risk-radar`);
-      setRisks(response.data);
+      const [risksRes, projRes] = await Promise.all([
+        axios.get(`${API}/risk-radar`),
+        axios.get(`${API}/projects`)
+      ]);
+      setRisks(risksRes.data);
+      setProjects(projRes.data);
     } catch (error) {
-      console.error('Error fetching risks:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -619,13 +624,22 @@ const RiskRadar = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <Label htmlFor="risk-project">Project Name *</Label>
-                  <Input
+                  <select
                     id="risk-project"
                     value={newRisk.project}
                     onChange={(e) => setNewRisk(prev => ({...prev, project: e.target.value}))}
-                    placeholder="Enter project name"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
                     required
-                  />
+                  >
+                    <option value="">Selecione o Projeto</option>
+                    {projects.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="risk-category">Category *</Label>
@@ -784,13 +798,22 @@ const RiskRadar = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <Label htmlFor="edit-risk-project">Project Name *</Label>
-                  <Input
+                  <select
                     id="edit-risk-project"
                     value={editRisk.project}
                     onChange={(e) => setEditRisk(prev => ({...prev, project: e.target.value}))}
-                    placeholder="Enter project name"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid var(--sony-gray-300)',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
                     required
-                  />
+                  >
+                    <option value="">Selecione o Projeto</option>
+                    {projects.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+                  </select>
                 </div>
                 <div>
                   <Label htmlFor="edit-risk-category">Category *</Label>

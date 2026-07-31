@@ -12,6 +12,7 @@ const API = `${BACKEND_URL}/api`;
 
 const StatusReport = () => {
   const [projects, setProjects] = useState([]);
+  const [risks, setRisks] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState("all");
   const [loading, setLoading] = useState(true);
   const reportRef = useRef(null);
@@ -23,10 +24,14 @@ const StatusReport = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API}/projects`);
-      setProjects(res.data);
-      if (res.data.length > 0) {
-        setSelectedProjectId(res.data[0].id);
+      const [projRes, risksRes] = await Promise.all([
+        axios.get(`${API}/projects`),
+        axios.get(`${API}/risk-radar`)
+      ]);
+      setProjects(projRes.data);
+      setRisks(risksRes.data);
+      if (projRes.data.length > 0) {
+        setSelectedProjectId(projRes.data[0].id);
       }
     } catch (e) {
       console.error(e);
@@ -185,10 +190,20 @@ const StatusReport = () => {
                   <p style={{ fontSize: '13px', color: 'var(--sony-gray-600)', fontStyle: 'italic' }}>
                     Riscos puxados automaticamente do Risk Radar para este projeto.
                   </p>
-                  <ul style={{ paddingLeft: '20px', marginTop: '8px', fontSize: '13px', color: 'var(--sony-gray-800)', lineHeight: '1.6' }}>
-                    <li><strong>Risco de Escopo:</strong> Alteração de requisitos no meio da Sprint. (Ação: Travar escopo na planning).</li>
-                    <li><strong>Risco Financeiro:</strong> Variação cambial no fornecedor gringo. (Ação: Negociação em moeda local).</li>
-                  </ul>
+                  {(() => {
+                    const projectRisks = risks.filter(r => r.project === project.name);
+                    if (projectRisks.length === 0) return <div style={{ fontSize: '13px', color: 'var(--sony-gray-500)', marginTop: '8px' }}>Nenhum risco ativo associado a este projeto.</div>;
+                    
+                    return (
+                      <ul style={{ paddingLeft: '20px', marginTop: '8px', fontSize: '13px', color: 'var(--sony-gray-800)', lineHeight: '1.6' }}>
+                        {projectRisks.map(r => (
+                          <li key={r.id} style={{ marginBottom: '6px' }}>
+                            <strong style={{ color: 'var(--sony-gray-900)' }}>{r.risk} ({r.status}):</strong> {r.mitigation} <span style={{ color: 'var(--sony-gray-500)', fontSize: '11px' }}>- Resp: {r.owner}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
