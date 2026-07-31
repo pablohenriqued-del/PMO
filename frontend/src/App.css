@@ -118,6 +118,8 @@ html, body {
 .nav-menu {
   flex: 1;
   padding: 24px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .nav-item {
@@ -673,3 +675,17 @@ body {
 
 .nav-accordion-header:hover { background: rgba(255,255,255,0.05) !important; color: white !important; }
 .nav-sub-item:hover { color: white !important; }
+
+.nav-menu::-webkit-scrollbar {
+  width: 4px;
+}
+.nav-menu::-webkit-scrollbar-track {
+  background: transparent; 
+}
+.nav-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2); 
+  border-radius: 4px;
+}
+.nav-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4); 
+}

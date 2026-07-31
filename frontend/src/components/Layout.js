@@ -30,6 +30,7 @@ import {
 const Layout = ({ children }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [language, setLanguage] = useState(localStorage.getItem('pmo_lang') || 'PT');
 
   const [notifications, setNotifications] = useState([]);
   const [showNotif, setShowNotif] = useState(false);
@@ -50,53 +51,65 @@ const Layout = ({ children }) => {
   };
 
 
-    const navigation = [
+  
+  const handleLanguageChange = (e) => {
+    setLanguage(e.target.value);
+    localStorage.setItem('pmo_lang', e.target.value);
+  };
+
+  const t = (pt, en, es) => {
+    if (language === 'EN') return en;
+    if (language === 'ES') return es;
+    return pt;
+  };
+
+  const navigation = [
     {
-      name: "📊 Dashboard",
+      name: t("📊 Dashboard", "📊 Dashboard", "📊 Tablero"),
       href: "/",
       isAccordion: false
     },
     {
-      name: "🚀 Delivery",
+      name: t("🚀 Delivery", "🚀 Delivery", "🚀 Entrega"),
       isAccordion: true,
       children: [
-        { name: "Projetos", href: "/projects" },
-        { name: "Timeline", href: "/timeline" },
-        { name: "Budget", href: "/budget" },
-        { name: "Capacity Planning", href: "/capacity-planning" }
+        { name: t("Projetos", "Projects", "Proyectos"), href: "/projects" },
+        { name: t("Timeline", "Timeline", "Cronograma"), href: "/timeline" },
+        { name: t("Budget", "Budget", "Presupuesto"), href: "/budget" },
+        { name: t("Capacity Planning", "Capacity Planning", "Capacidad"), href: "/capacity-planning" }
       ]
     },
     {
-      name: "🧠 Analytics & IA",
+      name: t("🧠 Analytics & IA", "🧠 Analytics & AI", "🧠 Analítica e IA"),
       isAccordion: true,
       children: [
         { name: "AI Copilot", href: "/ai-copilot" },
-        { name: "Status Report", href: "/status-report" },
-        { name: "Regional Analytics", href: "/regional" },
-        { name: "Innovation Radar", href: "/innovation-radar" }
+        { name: t("Status Report", "Status Report", "Reporte de Estado"), href: "/status-report" },
+        { name: t("Regional Analytics", "Regional Analytics", "Analítica Regional"), href: "/regional" },
+        { name: t("Innovation Radar", "Innovation Radar", "Radar de Innovación"), href: "/innovation-radar" }
       ]
     },
     {
-      name: "🛡️ Governança PMO",
+      name: t("🛡️ Governança PMO", "🛡️ PMO Governance", "🛡️ Gobernanza PMO"),
       isAccordion: true,
       children: [
-        { name: "Risk Radar", href: "/risk-radar" },
-        { name: "Root Cause Analysis", href: "/root-cause-analysis" },
-        { name: "Lessons Learned", href: "/lessons-learned" },
-        { name: "PMO Playbook", href: "/pmo-playbook" }
+        { name: t("Risk Radar", "Risk Radar", "Radar de Riesgos"), href: "/risk-radar" },
+        { name: t("Root Cause Analysis", "Root Cause Analysis", "Análisis Causa Raíz"), href: "/root-cause-analysis" },
+        { name: t("Lessons Learned", "Lessons Learned", "Lecciones Aprendidas"), href: "/lessons-learned" },
+        { name: t("PMO Playbook", "PMO Playbook", "Manual PMO"), href: "/pmo-playbook" }
       ]
     },
     {
-      name: "📋 CRM & Demandas",
+      name: t("📋 CRM & Demandas", "📋 CRM & Demands", "📋 CRM & Demandas"),
       href: "/crm",
       isAccordion: false
     },
     {
-      name: "⚙️ Administração",
+      name: t("⚙️ Administração", "⚙️ Administration", "⚙️ Administración"),
       isAccordion: true,
       children: [
-        { name: "Usuários", href: "/admin/users" },
-        { name: "Guia & Features", href: "/features-guide" }
+        { name: t("Usuários", "Users", "Usuarios"), href: "/admin/users" },
+        { name: t("Guia & Features", "Guide & Features", "Guía y Funciones"), href: "/features-guide" }
       ]
     }
   ];
@@ -282,63 +295,87 @@ const Layout = ({ children }) => {
 
       {/* Main Content */}
       <main className="main-content">
-        {/* Global Controls */}
-        <div style={{ position: 'fixed', top: '24px', right: '32px', zIndex: 1000, display: 'flex', alignItems: 'center' }}>
+                {/* Global Controls */}
+        <div style={{ position: 'fixed', top: '24px', right: '32px', zIndex: 1000, display: 'flex', alignItems: 'flex-start' }}>
           <PresentationMode />
-          <div style={{ position: 'relative', marginLeft: '16px' }}>
-          <button 
-            onClick={() => setShowNotif(!showNotif)}
-            style={{ 
-              background: 'rgba(20, 20, 20, 0.8)', 
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              borderRadius: '50%',
-              width: '40px', height: '40px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'var(--pure-white)', cursor: 'pointer', position: 'relative'
-            }}
-          >
-            <Bell size={20} />
-            {notifications.length > 0 && (
-              <span style={{ 
-                position: 'absolute', top: '-4px', right: '-4px', 
-                background: 'var(--sony-red)', color: 'white', 
-                fontSize: '10px', fontWeight: 'bold', 
-                width: '18px', height: '18px', borderRadius: '50%', 
-                display: 'flex', alignItems: 'center', justifyContent: 'center' 
-              }}>
-                {notifications.length}
-              </span>
-            )}
-          </button>
-
-          {showNotif && (
-            <div style={{ 
-              position: 'absolute', top: '50px', right: '0', width: '320px', 
-              background: 'var(--sony-white)', borderRadius: '12px', 
-              boxShadow: '0 8px 32px rgba(0,0,0,0.15)', border: '1px solid var(--sony-gray-200)',
-              maxHeight: '400px', overflowY: 'auto'
-            }}>
-              <div style={{ padding: '16px', borderBottom: '1px solid var(--sony-gray-200)', fontWeight: 'bold' }}>
-                Notificações & Alertas
-              </div>
-              <div style={{ display: 'grid' }}>
-                {notifications.length === 0 ? (
-                  <div style={{ padding: '24px', textAlign: 'center', color: 'var(--sony-gray-600)' }}>Nenhum alerta.</div>
-                ) : (
-                  notifications.map(n => (
-                    <div key={n.id} style={{ 
-                      padding: '16px', borderBottom: '1px solid var(--sony-gray-200)',
-                      borderLeft: `4px solid ${n.priority === 'critical' ? 'var(--sony-red)' : n.priority === 'high' ? '#F59E0B' : '#3B82F6'}`
-                    }}>
-                      <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>{n.title}</div>
-                      <div style={{ fontSize: '13px', color: 'var(--sony-gray-700)' }}>{n.message}</div>
-                    </div>
-                  ))
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginLeft: '16px', alignItems: 'flex-end' }}>
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => setShowNotif(!showNotif)}
+                style={{ 
+                  background: 'rgba(20, 20, 20, 0.8)', 
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '50%',
+                  width: '40px', height: '40px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'var(--pure-white)', cursor: 'pointer', position: 'relative'
+                }}
+              >
+                <Bell size={20} />
+                {notifications.length > 0 && (
+                  <span style={{ 
+                    position: 'absolute', top: '-4px', right: '-4px', 
+                    background: 'var(--sony-red)', color: 'white', 
+                    fontSize: '10px', fontWeight: 'bold', 
+                    width: '18px', height: '18px', borderRadius: '50%', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                  }}>
+                    {notifications.length}
+                  </span>
                 )}
-              </div>
+              </button>
+
+              {showNotif && (
+                <div style={{ 
+                  position: 'absolute', top: '50px', right: '0', width: '320px', 
+                  background: 'var(--sony-white)', borderRadius: '12px', 
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)', border: '1px solid var(--sony-gray-200)',
+                  maxHeight: '400px', overflowY: 'auto'
+                }}>
+                  <div style={{ padding: '16px', borderBottom: '1px solid var(--sony-gray-200)', fontWeight: 'bold' }}>
+                    {t("Notificações & Alertas", "Notifications & Alerts", "Notificaciones y Alertas")}
+                  </div>
+                  <div style={{ display: 'grid' }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--sony-gray-600)' }}>{t("Nenhum alerta.", "No alerts.", "No hay alertas.")}</div>
+                    ) : (
+                      notifications.map(n => (
+                        <div key={n.id} style={{ 
+                          padding: '16px', borderBottom: '1px solid var(--sony-gray-200)',
+                          borderLeft: `4px solid ${n.priority === 'critical' ? 'var(--sony-red)' : n.priority === 'high' ? '#F59E0B' : '#3B82F6'}`
+                        }}>
+                          <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>{n.title}</div>
+                          <div style={{ fontSize: '13px', color: 'var(--sony-gray-700)' }}>{n.message}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Language Selector */}
+            <select 
+              value={language}
+              onChange={handleLanguageChange}
+              style={{
+                background: 'rgba(20, 20, 20, 0.8)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                color: 'var(--pure-white)',
+                padding: '4px 8px',
+                borderRadius: '8px',
+                fontSize: '12px',
+                cursor: 'pointer',
+                outline: 'none',
+                fontWeight: '600'
+              }}
+            >
+              <option value="PT">PT</option>
+              <option value="EN">EN</option>
+              <option value="ES">ES</option>
+            </select>
+          </div>
         </div>
 
         {/* Mobile Header */}
