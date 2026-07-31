@@ -1060,6 +1060,14 @@ def parse_upload_to_dicts(file_bytes, filename):
     df = df.fillna('')
     return df.to_dict('records')
 
+
+def get_val(row, possible_keys):
+    for k in row.keys():
+        for pk in possible_keys:
+            if str(k).strip().lower() == pk.lower():
+                return row[k]
+    return ''
+
 @api_router.post("/projects/import-csv")
 async def import_projects_csv(file: UploadFile = File(...)):
     try:
@@ -1070,15 +1078,13 @@ async def import_projects_csv(file: UploadFile = File(...)):
         projects_dict = {}
         
         for row in records:
-            # Map standard columns
-            proj_name = row.get('Project Name') or row.get('Board') or row.get('Plan Name') or row.get('Project') or filename_base
-            
+            proj_name = get_val(row, ['Project Name', 'Board', 'Plan Name', 'Project', 'Plan']) or filename_base
             if proj_name not in projects_dict:
                 projects_dict[proj_name] = []
                 
-            task_name = row.get('Name') or row.get('Task Name') or row.get('Item') or row.get('Title') or 'Tarefa'
-            date_str = str(row.get('Due Date') or row.get('End Date') or row.get('Date') or row.get('Deadline') or '')
-            status = str(row.get('Status') or row.get('State') or row.get('Progress') or '')
+            task_name = get_val(row, ['Name', 'Task Name', 'Item', 'Title', 'Tarefa']) or ''
+            date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo']))
+            status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso']))
             
             # Simple date cleanup
             if '/' in date_str: 
@@ -1087,14 +1093,14 @@ async def import_projects_csv(file: UploadFile = File(...)):
                     # MM/DD/YYYY to YYYY-MM-DD
                     date_str = f"{parts[2]}-{parts[0].zfill(2)}-{parts[1].zfill(2)}"
             
-            # Ensure proper ISO string if pandas gives Timestamp
             import pandas as pd
-            if isinstance(row.get('Due Date'), pd.Timestamp):
-                date_str = row['Due Date'].strftime('%Y-%m-%d')
+            orig_due_date = get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo'])
+            if isinstance(orig_due_date, pd.Timestamp):
+                date_str = orig_due_date.strftime('%Y-%m-%d')
                 
-            completed = status.lower() in ['done', 'completed', 'concluído', 'fechado', '100%', '100']
+            completed = status.lower() in ['done', 'completed', 'concluído', 'fechado', '100%', '100', 'concluido']
             
-            if task_name.strip() and task_name.strip() != 'Tarefa':
+            if str(task_name).strip():
                 projects_dict[proj_name].append({
                     "name": str(task_name).strip(),
                     "date": date_str.split(' ')[0] if date_str else datetime.now(timezone.utc).strftime("%Y-%m-%d"),
@@ -1105,9 +1111,11 @@ async def import_projects_csv(file: UploadFile = File(...)):
             
         inserted_count = 0
         for p_name, milestones in projects_dict.items():
+            if not milestones:
+                continue
             new_project = Project(
                 name=str(p_name).strip()[:100],
-                description="Projeto importado automaticamente (Planner/Monday/Excel).",
+                description="Projeto importado automaticamente.",
                 status=ProjectStatus.PLANNING,
                 priority=ProjectPriority.MEDIUM,
                 type=ProjectType.DIGITAL,
@@ -1129,7 +1137,7 @@ async def import_projects_csv(file: UploadFile = File(...)):
                 activities=[{
                     "id": str(uuid.uuid4()),
                     "type": "system",
-                    "text": "Projeto importado em lote via arquivo.",
+                    "text": f"Projeto importado com {len(milestones)} tarefas.",
                     "user": "System",
                     "date": datetime.now(timezone.utc).isoformat()
                 }]
@@ -1141,6 +1149,8 @@ async def import_projects_csv(file: UploadFile = File(...)):
     except Exception as e:
         logger.error(f"Error importing projects bulk: {e}")
         raise HTTPException(status_code=400, detail=f"Failed to parse file: {str(e)}")
+
+
 
 
 
@@ -1156,9 +1166,9 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
         
         imported_milestones = []
         for row in records:
-            task_name = row.get('Name') or row.get('Task Name') or row.get('Item') or row.get('Title') or 'Tarefa Importada'
-            date_str = str(row.get('Due Date') or row.get('End Date') or row.get('Date') or row.get('Deadline') or '')
-            status = str(row.get('Status') or row.get('State') or row.get('Progress') or '')
+            task_name = get_val(row, ['Name', 'Task Name', 'Item', 'Title', 'Tarefa']) or ''
+            date_str = str(get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo']))
+            status = str(get_val(row, ['Status', 'State', 'Progress', 'Progresso']))
             
             if '/' in date_str: 
                 parts = date_str.split(' ')[0].split('/')
@@ -1166,10 +1176,11 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
                     date_str = f"{parts[2]}-{parts[0].zfill(2)}-{parts[1].zfill(2)}"
             
             import pandas as pd
-            if isinstance(row.get('Due Date'), pd.Timestamp):
-                date_str = row['Due Date'].strftime('%Y-%m-%d')
+            orig_due_date = get_val(row, ['Due Date', 'End Date', 'Date', 'Deadline', 'Prazo'])
+            if isinstance(orig_due_date, pd.Timestamp):
+                date_str = orig_due_date.strftime('%Y-%m-%d')
                     
-            completed = status.lower() in ['done', 'completed', 'concluído', 'fechado', '100%', '100']
+            completed = status.lower() in ['done', 'completed', 'concluído', 'fechado', '100%', '100', 'concluido']
             
             if str(task_name).strip():
                 imported_milestones.append({
@@ -1179,6 +1190,9 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
                     "assigned_to": None,
                     "is_key_milestone": False 
                 })
+            
+        if not imported_milestones:
+            raise ValueError("No valid tasks found in the file.")
             
         existing_milestones = existing_project.get("milestones", [])
         for ms in existing_milestones:
@@ -1200,6 +1214,7 @@ async def import_project_schedule(project_id: str, file: UploadFile = File(...))
     except Exception as e:
         logger.error(f"Error importing schedule: {e}")
         raise HTTPException(status_code=400, detail=f"Failed to parse file: {str(e)}")
+
 
 
 
