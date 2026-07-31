@@ -69,6 +69,8 @@ const Dashboard = () => {
   // --- MOCK DATA FOR CHARTS BASED ON STATS ---
   const atRiskProjects = Math.max(0, stats.active_projects - stats.on_track_projects - stats.delayed_projects);
   
+  const HEALTH_COLORS = ['#10B981', '#F59E0B', '#E50914'];
+  
   const healthData = [
     { name: 'On Track', value: stats.on_track_projects || 0, color: '#10B981' },
     { name: 'Delayed', value: stats.delayed_projects || 0, color: '#F59E0B' },
@@ -77,6 +79,7 @@ const Dashboard = () => {
   if (healthData.every(d => d.value === 0)) {
     healthData[0].value = 1; // Fallback to show something
   }
+  const activeHealthData = healthData.filter(d => d.value > 0);
 
   // Simulating 6 months of financial history
   const financialData = [
@@ -225,7 +228,7 @@ const Dashboard = () => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={healthData.filter(d => d.value > 0)}
+                  data={healthData}
                   cx="50%"
                   cy="50%"
                   innerRadius={70}
@@ -233,9 +236,10 @@ const Dashboard = () => {
                   paddingAngle={5}
                   dataKey="value"
                   stroke="none"
+                  isAnimationActive={false}
                 >
-                  {healthData.filter(d => d.value > 0).map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  {healthData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={HEALTH_COLORS[index]} />
                   ))}
                 </Pie>
                 <Tooltip 
