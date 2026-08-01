@@ -163,6 +163,32 @@ async def login(req: LoginReq, response: Response, request: Request):
     user.pop("_id", None)
     return user
 
+
+@api_router.post("/auth/usm-login")
+async def usm_login(response: Response, request: Request):
+    """
+    Autenticação USM (Sony Music):
+    No ambiente real da Sony, o gateway (SSO/Proxy) injeta a identidade do usuário logado na máquina
+    dentro dos Headers da requisição (ex: X-USM-User-Email).
+    Para o ambiente Emergent (Developer Bypass), simulamos a captura dessa sessão logando o Admin direto.
+    """
+    # Simulação da captura do Header do USM
+    usm_email = request.headers.get("X-USM-User-Email", "pablo.duarte@sonymusic.com")
+    
+    user = await db.users.find_one({"email": usm_email})
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuário USM não cadastrado no sistema.")
+        
+    access_token = create_access_token(user["id"], user["email"])
+    refresh_token = create_refresh_token(user["id"])
+    
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="none", max_age=900, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="none", max_age=604800, path="/")
+    
+    user.pop("password_hash", None)
+    user.pop("_id", None)
+    return user
+
 @api_router.post("/auth/logout")
 async def logout(response: Response):
     response.delete_cookie(key="access_token", path="/", secure=True, samesite="none")
