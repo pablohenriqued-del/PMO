@@ -1,0 +1,78 @@
+{
+  "timestamp": "20260801_014856",
+  "total_tests": 9,
+  "passed_tests": 6,
+  "success_rate": 66.66666666666666,
+  "test_results": [
+    {
+      "test_name": "Login - User Data Returned",
+      "success": true,
+      "details": "",
+      "response_data": {
+        "id": "u-admin",
+        "email": "pablo.duarte@sonymusic.com",
+        "name": "Pablo Duarte",
+        "department": "PMO",
+        "role": "Director",
+        "is_admin": true,
+        "created_at": "2026-08-01T01:48:44.115082+00:00"
+      }
+    },
+    {
+      "test_name": "Login - Access Token Cookie Set",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test_name": "Login - Refresh Token Cookie Set",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test_name": "/auth/me - User Data Returned",
+      "success": true,
+      "details": "",
+      "response_data": {
+        "id": "u-admin",
+        "email": "pablo.duarte@sonymusic.com",
+        "name": "Pablo Duarte",
+        "department": "PMO",
+        "role": "Director",
+        "is_admin": true,
+        "created_at": "2026-08-01T01:48:44.115082+00:00"
+      }
+    },
+    {
+      "test_name": "/auth/me - Correct User",
+      "success": true,
+      "details": "",
+      "response_data": null
+    },
+    {
+      "test_name": "CORS - Allow Credentials",
+      "success": false,
+      "details": "Expected 'true', got None",
+      "response_data": null
+    },
+    {
+      "test_name": "CORS - Explicit Origin",
+      "success": false,
+      "details": "Origin should be explicit, got: *",
+      "response_data": null
+    },
+    {
+      "test_name": "Brute Force Protection - Lockout After 5 Fails",
+      "success": false,
+      "details": "Expected 429, got 401",
+      "response_data": null
+    },
+    {
+      "test_name": "MongoDB - Bcrypt Hash Format",
+      "success": true,
+      "details": "Manual verification required: Check that password_hash starts with $2b$ in MongoDB",
+      "response_data": null
+    }
+  ]
+}

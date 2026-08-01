@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query, UploadFile, File
+from fastapi import FastAPI, APIRouter, HTTPException, Query, UploadFile, File, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -24,10 +24,176 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
+
+from fastapi import Request, Response
+import bcrypt
+import jwt
+from datetime import timedelta
+import secrets
+from bson import ObjectId
+
+# --- JWT AUTHENTICATION ---
+JWT_ALGORITHM = "HS256"
+
+def get_jwt_secret() -> str:
+    return os.environ.get("JWT_SECRET", "super-secret-key-fallback")
+
+def hash_password(password: str) -> str:
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
+
+def create_access_token(user_id: str, email: str) -> str:
+    payload = {"sub": str(user_id), "email": email, "exp": datetime.now(timezone.utc) + timedelta(minutes=15), "type": "access"}
+    return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
+
+def create_refresh_token(user_id: str) -> str:
+    payload = {"sub": str(user_id), "exp": datetime.now(timezone.utc) + timedelta(days=7), "type": "refresh"}
+    return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
+
+async def get_current_user(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+    
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+        
+    try:
+        payload = jwt.decode(token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "access":
+            raise HTTPException(status_code=401, detail="Invalid token type")
+            
+        user = await db.users.find_one({"id": payload["sub"]})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+            
+        user.pop("password_hash", None)
+        user.pop("_id", None)
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
 app = FastAPI(title="Sony Music PMO Dashboard API")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
+
+class LoginReq(BaseModel):
+    email: str
+    password: str
+
+class AuthUserCreate(BaseModel):
+    name: str
+    email: str
+    department: str
+    role: str
+    password: str
+
+# Auth Routes
+@api_router.post("/auth/register")
+async def register(req: AuthUserCreate, response: Response):
+    email_clean = req.email.lower().strip()
+    
+    existing = await db.users.find_one({"email": email_clean})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+        
+    user_id = str(uuid.uuid4())
+    user_doc = {
+        "id": user_id,
+        "name": req.name,
+        "email": email_clean,
+        "department": req.department,
+        "role": req.role,
+        "is_admin": False,
+        "password_hash": hash_password(req.password),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user_doc)
+    
+    access_token = create_access_token(user_id, email_clean)
+    refresh_token = create_refresh_token(user_id)
+    
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="none", max_age=900, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="none", max_age=604800, path="/")
+    
+    user_doc.pop("password_hash")
+    user_doc.pop("_id", None)
+    return user_doc
+
+@api_router.post("/auth/login")
+async def login(req: LoginReq, response: Response, request: Request):
+    email_clean = req.email.lower().strip()
+    ip_addr = request.client.host if request.client else "unknown"
+    identifier = f"{ip_addr}:{email_clean}"
+    
+    # Brute force protection
+    attempt = await db.login_attempts.find_one({"identifier": identifier})
+    if attempt and attempt.get("count", 0) >= 5:
+        last_attempt = attempt.get("last_attempt")
+        if last_attempt and (datetime.now(timezone.utc) - last_attempt.replace(tzinfo=timezone.utc)).total_seconds() < 900:
+            raise HTTPException(status_code=429, detail="Too many failed attempts. Try again later.")
+            
+    user = await db.users.find_one({"email": email_clean})
+    
+    if not user or not user.get("password_hash") or not verify_password(req.password, user["password_hash"]):
+        await db.login_attempts.update_one(
+            {"identifier": identifier}, 
+            {"$inc": {"count": 1}, "$set": {"last_attempt": datetime.now(timezone.utc)}},
+            upsert=True
+        )
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+    await db.login_attempts.delete_one({"identifier": identifier})
+    
+    access_token = create_access_token(user["id"], user["email"])
+    refresh_token = create_refresh_token(user["id"])
+    
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="none", max_age=900, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, samesite="none", max_age=604800, path="/")
+    
+    user.pop("password_hash", None)
+    user.pop("_id", None)
+    return user
+
+@api_router.post("/auth/logout")
+async def logout(response: Response):
+    response.delete_cookie(key="access_token", path="/", secure=True, samesite="none")
+    response.delete_cookie(key="refresh_token", path="/", secure=True, samesite="none")
+    return {"message": "Logged out"}
+
+@api_router.get("/auth/me")
+async def auth_me(user: dict = Depends(get_current_user)):
+    return user
+
+@api_router.post("/auth/refresh")
+async def auth_refresh(request: Request, response: Response):
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Missing refresh token")
+        
+    try:
+        payload = jwt.decode(refresh_token, get_jwt_secret(), algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "refresh":
+            raise HTTPException(status_code=401, detail="Invalid token type")
+            
+        user = await db.users.find_one({"id": payload["sub"]})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+            
+        access_token = create_access_token(user["id"], user["email"])
+        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite="none", max_age=900, path="/")
+        return {"message": "Token refreshed"}
+        
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid refresh token")
 
 # Enums
 class ProjectStatus(str, Enum):
@@ -223,6 +389,45 @@ def parse_from_mongo(item):
     return item
 
 # Initialize mock data
+
+async def seed_admin():
+    admin_email = os.environ.get("ADMIN_EMAIL", "pablo.duarte@sonymusic.com")
+    admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
+    existing = await db.users.find_one({"email": admin_email})
+    if existing is None:
+        hashed = hash_password(admin_password)
+        await db.users.insert_one({
+            "id": "u-admin",
+            "email": admin_email, 
+            "password_hash": hashed, 
+            "name": "Pablo Duarte", 
+            "department": "PMO",
+            "role": "Director",
+            "is_admin": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+    elif "password_hash" not in existing or not verify_password(admin_password, existing["password_hash"]):
+        await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_password), "is_admin": True}})
+        
+    # Also update mock data to have a password hash just in case
+    test_user_email = "test@example.com"
+    test_existing = await db.users.find_one({"email": test_user_email})
+    if not test_existing:
+        await db.users.insert_one({
+            "id": "u-test",
+            "email": test_user_email,
+            "password_hash": hash_password("user123"),
+            "name": "Test User",
+            "department": "Engineering",
+            "role": "QA",
+            "is_admin": False,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+    # Indexes
+    await db.users.create_index("email", unique=True)
+    await db.login_attempts.create_index("identifier")
+
 async def initialize_mock_data():
     """Initialize the database with mock project data"""
     existing_projects = await db.projects.count_documents({})
@@ -1774,7 +1979,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=[os.environ.get('FRONTEND_URL', 'http://localhost:3000'), 'http://localhost:3000', 'https://sony-music-projects.preview.emergentagent.com'],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -1790,6 +1995,7 @@ logger = logging.getLogger(__name__)
 async def startup_event():
     """Initialize mock data on startup"""
     await initialize_mock_data()
+    await seed_admin()
     logger.info("Sony Music PMO Dashboard API started successfully")
 
 @app.on_event("shutdown")
