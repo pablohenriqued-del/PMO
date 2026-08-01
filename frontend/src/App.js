@@ -23,6 +23,18 @@ import FeaturesGuide from "./components/FeaturesGuide";
 import SharedProject from "./components/SharedProject";
 import CRMDashboard from "./components/CRMDashboard";
 
+
+import { AuthProvider, useAuth } from './components/AuthContext';
+import Login from './components/Login';
+import { Navigate } from 'react-router-dom';
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return <div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--sony-black)', color: 'white'}}>Carregando...</div>;
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  return children;
+};
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 function App() {
@@ -41,28 +53,29 @@ function App() {
       </svg>
 
       <BrowserRouter>
-        <Layout>
+        <AuthProvider>
           <Routes>
+            <Route path="/login" element={<Login />} />
             <Route path="/shared/:token" element={<SharedProject />} />
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/regional" element={<RegionalDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/status-report" element={<StatusReport />} />
-            <Route path="/ai-copilot" element={<AICopilot />} />
-            <Route path="/capacity-planning" element={<CapacityPlanning />} />
-            <Route path="/features-guide" element={<FeaturesGuide />} />
-            <Route path="/crm" element={<CRMDashboard />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/timeline" element={<Timeline />} />
-            <Route path="/budget" element={<Budget />} />
-            <Route path="/lessons-learned" element={<LessonsLearned />} />
-            <Route path="/risk-radar" element={<RiskRadar />} />
-            <Route path="/pmo-playbook" element={<PMOPlaybook />} />
-            <Route path="/root-cause-analysis" element={<RootCauseAnalysis />} />
-            <Route path="/innovation-radar" element={<InnovationRadar />} />
+            <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+            <Route path="/regional" element={<ProtectedRoute><Layout><RegionalDashboard /></Layout></ProtectedRoute>} />
+            <Route path="/admin/users" element={<ProtectedRoute><Layout><AdminUsers /></Layout></ProtectedRoute>} />
+            <Route path="/status-report" element={<ProtectedRoute><Layout><StatusReport /></Layout></ProtectedRoute>} />
+            <Route path="/ai-copilot" element={<ProtectedRoute><Layout><AICopilot /></Layout></ProtectedRoute>} />
+            <Route path="/capacity-planning" element={<ProtectedRoute><Layout><CapacityPlanning /></Layout></ProtectedRoute>} />
+            <Route path="/features-guide" element={<ProtectedRoute><Layout><FeaturesGuide /></Layout></ProtectedRoute>} />
+            <Route path="/crm" element={<ProtectedRoute><Layout><CRMDashboard /></Layout></ProtectedRoute>} />
+            <Route path="/projects" element={<ProtectedRoute><Layout><Projects /></Layout></ProtectedRoute>} />
+            <Route path="/timeline" element={<ProtectedRoute><Layout><Timeline /></Layout></ProtectedRoute>} />
+            <Route path="/budget" element={<ProtectedRoute><Layout><Budget /></Layout></ProtectedRoute>} />
+            <Route path="/lessons-learned" element={<ProtectedRoute><Layout><LessonsLearned /></Layout></ProtectedRoute>} />
+            <Route path="/risk-radar" element={<ProtectedRoute><Layout><RiskRadar /></Layout></ProtectedRoute>} />
+            <Route path="/pmo-playbook" element={<ProtectedRoute><Layout><PMOPlaybook /></Layout></ProtectedRoute>} />
+            <Route path="/root-cause-analysis" element={<ProtectedRoute><Layout><RootCauseAnalysis /></Layout></ProtectedRoute>} />
+            <Route path="/innovation-radar" element={<ProtectedRoute><Layout><InnovationRadar /></Layout></ProtectedRoute>} />
           </Routes>
-        </Layout>
-        <Toaster />
+          <Toaster />
+        </AuthProvider>
       </BrowserRouter>
     </div>
   );

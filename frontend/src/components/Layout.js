@@ -3,6 +3,7 @@ import VoiceCommand from "./VoiceCommand";
 import PresentationMode from "./PresentationMode";
 import axios from "axios";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 import { 
   LayoutDashboard,
   LayoutGrid,
@@ -30,6 +31,7 @@ import {
 const Layout = ({ children }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
   const [language, setLanguage] = useState(localStorage.getItem('pmo_lang') || 'PT');
 
   const [notifications, setNotifications] = useState([]);
@@ -258,37 +260,40 @@ const Layout = ({ children }) => {
           <div style={{ 
             display: 'flex', 
             alignItems: 'center', 
+            justifyContent: 'space-between',
             gap: '12px' 
           }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              background: 'var(--sony-red)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--sony-white)',
-              fontSize: '14px',
-              fontWeight: '600'
-            }}>
-              PM
-            </div>
-            <div>
-              <div style={{ 
-                fontSize: '14px', 
-                fontWeight: '600', 
-                color: 'var(--sony-white)' 
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                background: 'var(--sony-red)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--sony-white)',
+                fontSize: '14px',
+                fontWeight: '600'
               }}>
-                PMO Manager
+                {user ? user.name.substring(0,2).toUpperCase() : 'PM'}
               </div>
-              <div style={{ 
-                fontSize: '12px', 
-                color: 'var(--sony-gray-400)' 
-              }}>
-                Sony Music LA
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--sony-white)' }}>
+                  {user ? user.name : 'PMO Manager'}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--sony-gray-400)' }}>
+                  {user ? user.role : 'Sony Music LA'}
+                </div>
               </div>
             </div>
+            <button 
+              onClick={logout}
+              style={{ background: 'none', border: 'none', color: 'var(--sony-gray-400)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '4px' }}
+              title="Sair"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </button>
           </div>
         </div>
       </div>
