@@ -1298,28 +1298,6 @@ async def get_notifications():
     return notifications
 
 
-def parse_upload_to_dicts(file_bytes, filename):
-    import pandas as pd
-    import io
-    
-    if filename.lower().endswith('.xlsx') or filename.lower().endswith('.xls'):
-        df = pd.read_excel(io.BytesIO(file_bytes))
-    else:
-        try:
-            df = pd.read_csv(io.BytesIO(file_bytes), sep=None, engine='python')
-        except Exception:
-            try:
-                df = pd.read_csv(io.BytesIO(file_bytes), sep=None, engine='python', encoding='latin-1')
-            except Exception:
-                # Fallback to strict semicolon if auto-detect fails
-                df = pd.read_csv(io.BytesIO(file_bytes), sep=';', encoding='utf-8', on_bad_lines='skip')
-            
-    # Convert all column names to string and fill NaNs
-    df.columns = [str(c).strip() for c in df.columns]
-    df = df.fillna('')
-    return df.to_dict('records')
-
-
 def get_val(row, possible_keys, fallback_to_first=False):
     keys_lower = [str(k).strip().lower() for k in row.keys()]
     vals = list(row.values())
@@ -1380,9 +1358,6 @@ def get_task_name(row):
     return str(vals[0]).strip() if vals else 'Tarefa'
 
 def parse_upload_to_dicts(file_bytes, filename):
-    import pandas as pd
-    import io
-    
     if filename.lower().endswith('.xlsx') or filename.lower().endswith('.xls'):
         df = pd.read_excel(io.BytesIO(file_bytes), header=None)
     else:
