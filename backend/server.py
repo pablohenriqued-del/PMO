@@ -1975,6 +1975,19 @@ async def bulk_delete_projects(req: BulkDeleteReq):
     result = await db.projects.delete_many({"id": {"$in": req.ids}})
     return {"deleted_count": result.deleted_count}
 
+
+@api_router.get("/download/presentation")
+async def download_presentation():
+    from fastapi.responses import FileResponse
+    path = "/app/presentation_assets/PRISMA_PMO_Apresentacao.pptx"
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado")
+    return FileResponse(
+        path,
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        filename="PRISMA_PMO_Apresentacao.pptx",
+    )
+
 app.include_router(api_router)
 
 app.add_middleware(
